@@ -2,6 +2,9 @@ package eu.lindenbaum.maven;
 
 import java.io.File;
 
+import com.ericsson.otp.erlang.OtpPeer;
+import com.ericsson.otp.erlang.OtpSelf;
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.Mojo;
@@ -43,6 +46,14 @@ import org.apache.maven.project.MavenProject;
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
 abstract class AbstractErlangMojo extends AbstractMojo {
+  /**
+   * A bean class holding the information for the pluins backend erlang node.
+   * This can be used by any implementing {@link Mojo} to establish a connection
+   * to the erlang node (for rpc communication) using
+   * {@link OtpSelf#connect(peer)}.
+   */
+  static final OtpPeer peer = new OtpPeer("maven-erlang-plugin-backend");
+
   /**
    * {@link MavenProject} to process.
    * 

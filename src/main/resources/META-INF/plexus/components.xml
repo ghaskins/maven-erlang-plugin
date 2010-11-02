@@ -24,6 +24,7 @@
           <lifecycle>
             <id>default</id>
             <phases>
+              <initialize>eu.lindenbaum:maven-erlang-plugin:start-backend</initialize>
               <generate-sources>eu.lindenbaum:maven-erlang-plugin:unpack-dependencies</generate-sources>
               <process-resources>eu.lindenbaum:maven-erlang-plugin:copy-resources</process-resources>
               <compile>eu.lindenbaum:maven-erlang-plugin:compile</compile>
@@ -62,6 +63,7 @@
           <lifecycle>
             <id>default</id>
             <phases>
+              <initialize>eu.lindenbaum:maven-erlang-plugin:start-backend</initialize>
               <generate-sources>eu.lindenbaum:maven-erlang-plugin:unpack-dependencies</generate-sources>
               <process-resources>eu.lindenbaum:maven-erlang-plugin:copy-resources</process-resources>
               <compile>eu.lindenbaum:maven-erlang-plugin:dialyzer-release</compile>
