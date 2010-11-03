@@ -124,7 +124,7 @@ public final class MavenSelf {
         if ("ok".equals(indicator.toString())) {
           OtpErlangList forms = (OtpErlangList) result.elementAt(1);
           if (forms.arity() > 0) {
-            connection.sendRPC("erl_eval", "expr", new OtpErlangObject[]{ forms.getHead(), bindings });
+            connection.sendRPC("erl_eval", "exprs", new OtpErlangObject[]{ forms, bindings });
             result = (OtpErlangTuple) connection.receiveRPC();
             indicator = result.elementAt(0);
             if ("value".equals(indicator.toString())) {

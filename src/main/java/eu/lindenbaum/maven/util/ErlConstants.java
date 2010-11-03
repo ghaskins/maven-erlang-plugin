@@ -79,6 +79,11 @@ public interface ErlConstants {
   public static final String TEST_SUFFIX = "_test" + BEAM_SUFFIX;
 
   /**
+   * Suffix for eunit tests.
+   */
+  public static final String TESTS_SUFFIX = "_tests" + BEAM_SUFFIX;
+
+  /**
    * Suffix for source directories containing non-erlang sources.
    */
   public static final String SRC_SUFFIX = "_src";
