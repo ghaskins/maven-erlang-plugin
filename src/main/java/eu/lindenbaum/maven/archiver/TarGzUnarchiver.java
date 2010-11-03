@@ -1,10 +1,12 @@
-package eu.lindenbaum.maven.util;
+package eu.lindenbaum.maven.archiver;
 
 import java.io.File;
 import java.io.IOException;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpPeer;
+
+import eu.lindenbaum.maven.util.MavenSelf;
 
 import org.apache.maven.plugin.MojoExecutionException;
 

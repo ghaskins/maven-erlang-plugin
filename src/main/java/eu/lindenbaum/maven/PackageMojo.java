@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import eu.lindenbaum.maven.util.TarGzArchiver;
+import eu.lindenbaum.maven.archiver.TarGzArchiver;
 
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -229,7 +229,7 @@ public final class PackageMojo extends AbstractErlangMojo {
     // create .tar.gz package
     File toFile = new File(this.target, tmpDir.getName() + TARGZ_SUFFIX);
     try {
-      TarGzArchiver archiver = new TarGzArchiver(log, toFile);
+      TarGzArchiver archiver = new TarGzArchiver(peer, toFile);
       archiver.addFile(tmpDir);
       archiver.createArchive();
       this.project.getArtifact().setFile(toFile);

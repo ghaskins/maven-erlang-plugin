@@ -1,4 +1,4 @@
-package eu.lindenbaum.maven.util;
+package eu.lindenbaum.maven.archiver;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -7,24 +7,20 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import org.junit.AfterClass;
+import eu.lindenbaum.maven.Util;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TarGzUnarchiverTest {
   @BeforeClass
   public static void setupBeforeClass() {
-    ErlTestUtils.startBackendNode();
-  }
-
-  @AfterClass
-  public static void tearDownAfterClass() {
-    ErlTestUtils.stopBackendNode();
+    Util.startBackendNode();
   }
 
   @Test
   public void testArchiveDoesNotExist() {
-    TarGzUnarchiver unarchiver = new TarGzUnarchiver(ErlTestUtils.TEST_PEER);
+    TarGzUnarchiver unarchiver = new TarGzUnarchiver(Util.PEER);
     try {
       unarchiver.extract(new File("not-existing.tar.gz"));
       fail("IOException expected");
@@ -38,7 +34,7 @@ public class TarGzUnarchiverTest {
   public void testSuccess() throws Exception {
     URL resource = getClass().getClassLoader().getResource("tar-gz-unarchiver");
     File destination = new File(resource.getFile());
-    TarGzUnarchiver unarchiver = new TarGzUnarchiver(ErlTestUtils.TEST_PEER, destination);
+    TarGzUnarchiver unarchiver = new TarGzUnarchiver(Util.PEER, destination);
 
     File archive = new File(destination, "test-archive.tar.gz");
     assertTrue(archive.isFile());

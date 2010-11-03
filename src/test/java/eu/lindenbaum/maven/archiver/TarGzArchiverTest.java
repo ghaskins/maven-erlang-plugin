@@ -1,4 +1,4 @@
-package eu.lindenbaum.maven.util;
+package eu.lindenbaum.maven.archiver;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -8,19 +8,25 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import org.apache.maven.plugin.logging.SystemStreamLog;
+import eu.lindenbaum.maven.Util;
+
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TarGzArchiverTest {
+  @BeforeClass
+  public static void setupBeforeClass() {
+    Util.startBackendNode();
+  }
+
   @Test
   public void testNoFiles() {
-    SystemStreamLog log = new SystemStreamLog();
     URL resource = getClass().getClassLoader().getResource("tar-gz-unarchiver");
     File testRoot = new File(resource.getFile());
     File archive = new File(testRoot, "archive.tar.gz");
     archive.delete();
 
-    TarGzArchiver archiver = new TarGzArchiver(log, archive);
+    TarGzArchiver archiver = new TarGzArchiver(Util.PEER, archive);
     try {
       archiver.createArchive();
       fail("IOException expected");
@@ -34,14 +40,13 @@ public class TarGzArchiverTest {
 
   @Test
   public void testSuccess() throws Exception {
-    SystemStreamLog log = new SystemStreamLog();
     URL resource = getClass().getClassLoader().getResource("tar-gz-unarchiver");
     File testRoot = new File(resource.getFile());
     File archive = new File(testRoot, "archive.tar.gz");
     assertFalse(archive.exists());
     archive.deleteOnExit();
 
-    TarGzArchiver archiver = new TarGzArchiver(log, archive);
+    TarGzArchiver archiver = new TarGzArchiver(Util.PEER, archive);
     File toBeArchived = new File(resource.getFile());
     archiver.addFile(toBeArchived, "tar-gz-archived");
     archiver.createArchive();

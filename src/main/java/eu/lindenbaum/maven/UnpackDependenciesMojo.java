@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
+import eu.lindenbaum.maven.archiver.TarGzUnarchiver;
 import eu.lindenbaum.maven.util.ErlConstants;
-import eu.lindenbaum.maven.util.TarGzUnarchiver;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;

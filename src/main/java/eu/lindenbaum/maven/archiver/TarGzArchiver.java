@@ -1,6 +1,4 @@
-package eu.lindenbaum.maven.util;
-
-import static eu.lindenbaum.maven.util.ErlUtils.eval;
+package eu.lindenbaum.maven.archiver;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,9 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.ericsson.otp.erlang.OtpErlangObject;
+import com.ericsson.otp.erlang.OtpPeer;
+
+import eu.lindenbaum.maven.util.MavenSelf;
+
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
 
 /**
  * An archiver that can create gzipped tar archives using the erlang
@@ -19,12 +20,14 @@ import org.apache.maven.plugin.logging.Log;
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
 public final class TarGzArchiver {
-  private final Log log;
+  private static final String script = "erl_tar:create(\"%s\", %s, [compressed]).";
+
+  private final OtpPeer peer;
   private final File archive;
   private final Map<File, String> files = new HashMap<File, String>();
 
-  public TarGzArchiver(Log log, File archive) {
-    this.log = log;
+  public TarGzArchiver(OtpPeer peer, File archive) {
+    this.peer = peer;
     this.archive = archive;
   }
 
@@ -74,29 +77,38 @@ public final class TarGzArchiver {
       throw new IOException("no files to package");
     }
     else {
-      StringBuilder command = new StringBuilder();
-      command.append("erl_tar:create(\"");
-      command.append(this.archive.getAbsolutePath());
-      command.append("\", [");
-      for (Entry<File, String> file : this.files.entrySet()) {
-        command.append("{\"");
-        command.append(file.getValue());
-        command.append("\",\"");
-        command.append(file.getKey().getAbsolutePath());
-        command.append("\"},");
-      }
-      command.deleteCharAt(command.length() - 1);
-      command.append("], [compressed]).");
-
+      String archivePath = this.archive.getAbsolutePath();
+      String expression = String.format(script, archivePath, getFiles(this.files));
       try {
-        eval(this.log, command.toString());
+        OtpErlangObject result = MavenSelf.get().eval(this.peer, expression);
+        if (!"ok".equals(result.toString())) {
+          throw new IOException("failed to create archive: " + result);
+        }
       }
       catch (MojoExecutionException e) {
         throw new IOException(e.getMessage(), e);
       }
-      catch (MojoFailureException e) {
-        throw new IOException(e.getMessage(), e);
-      }
     }
+  }
+
+  /**
+   * Returns a list of the files to archive. It is assumed that there's more
+   * than zero files to archive.
+   * 
+   * @param files mapping of files to package
+   * @return a string containing an erlang list of file mappings
+   */
+  private static String getFiles(Map<File, String> files) {
+    StringBuilder fileList = new StringBuilder("[");
+    for (Entry<File, String> file : files.entrySet()) {
+      fileList.append("{\"");
+      fileList.append(file.getValue());
+      fileList.append("\",\"");
+      fileList.append(file.getKey().getAbsolutePath());
+      fileList.append("\"},");
+    }
+    fileList.deleteCharAt(fileList.length() - 1);
+    fileList.append("]");
+    return fileList.toString();
   }
 }
