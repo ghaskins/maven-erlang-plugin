@@ -328,7 +328,7 @@ public final class PrepareReleaseMojo extends AbstractErlangMojo {
         File artifactFile = getArtifactFile(artifact, this.repository);
         File destDir = new File(this.targetReleases, artifact.getVersion());
         try {
-          new TarGzUnarchiver(log, destDir).extract(artifactFile);
+          new TarGzUnarchiver(peer, destDir).extract(artifactFile);
           File relFile = new File(new File(destDir, "releases"), getReleaseName(artifact) + REL_SUFFIX);
           if (relFile.exists()) {
             result.add(relFile);

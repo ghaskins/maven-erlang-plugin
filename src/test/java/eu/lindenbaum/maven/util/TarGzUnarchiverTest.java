@@ -7,14 +7,24 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import org.apache.maven.plugin.logging.SystemStreamLog;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TarGzUnarchiverTest {
+  @BeforeClass
+  public static void setupBeforeClass() {
+    ErlTestUtils.startBackendNode();
+  }
+
+  @AfterClass
+  public static void tearDownAfterClass() {
+    ErlTestUtils.stopBackendNode();
+  }
+
   @Test
   public void testArchiveDoesNotExist() {
-    SystemStreamLog log = new SystemStreamLog();
-    TarGzUnarchiver unarchiver = new TarGzUnarchiver(log);
+    TarGzUnarchiver unarchiver = new TarGzUnarchiver(ErlTestUtils.TEST_PEER);
     try {
       unarchiver.extract(new File("not-existing.tar.gz"));
       fail("IOException expected");
@@ -26,11 +36,9 @@ public class TarGzUnarchiverTest {
 
   @Test
   public void testSuccess() throws Exception {
-    SystemStreamLog log = new SystemStreamLog();
-
     URL resource = getClass().getClassLoader().getResource("tar-gz-unarchiver");
     File destination = new File(resource.getFile());
-    TarGzUnarchiver unarchiver = new TarGzUnarchiver(log, destination);
+    TarGzUnarchiver unarchiver = new TarGzUnarchiver(ErlTestUtils.TEST_PEER, destination);
 
     File archive = new File(destination, "test-archive.tar.gz");
     assertTrue(archive.isFile());

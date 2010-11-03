@@ -1,13 +1,12 @@
 package eu.lindenbaum.maven.util;
 
-import static eu.lindenbaum.maven.util.ErlUtils.eval;
-
 import java.io.File;
 import java.io.IOException;
 
+import com.ericsson.otp.erlang.OtpErlangObject;
+import com.ericsson.otp.erlang.OtpPeer;
+
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
 
 /**
  * An unarchiver that can extract gzipped tar archives using the erlang
@@ -16,15 +15,17 @@ import org.apache.maven.plugin.logging.Log;
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
 public final class TarGzUnarchiver {
-  private final Log log;
+  private static final String script = "erl_tar:extract(\"%s\", [compressed, {cwd, \"%s\"}]).";
+
+  private final OtpPeer peer;
   private final File destination;
 
-  public TarGzUnarchiver(Log log) {
-    this(log, new File("."));
+  public TarGzUnarchiver(OtpPeer peer) {
+    this(peer, new File("."));
   }
 
-  public TarGzUnarchiver(Log log, File destination) {
-    this.log = log;
+  public TarGzUnarchiver(OtpPeer peer, File destination) {
+    this.peer = peer;
     this.destination = destination;
   }
 
@@ -47,34 +48,34 @@ public final class TarGzUnarchiver {
    *           {@code erl_tar} ends with errors.
    */
   public void extract(File archive) throws IOException {
+    String archivePath = archive.getAbsolutePath();
+    String destinationPath = this.destination.getPath();
     if (archive.isFile()) {
       this.destination.mkdirs();
       if (this.destination.exists()) {
         if (this.destination.isDirectory()) {
-          StringBuilder command = new StringBuilder();
-          command.append("erl_tar:extract(\"");
-          command.append(archive.getAbsolutePath());
-          command.append("\", [compressed]).");
+          String expression = String.format(script, archivePath, destinationPath);
           try {
-            eval(this.log, command.toString(), null, this.destination);
+            MavenSelf self = MavenSelf.get();
+            OtpErlangObject result = self.eval(this.peer, expression);
+            if (!"ok".equals(result.toString())) {
+              throw new IOException("failed to extract archive: " + result);
+            }
           }
           catch (MojoExecutionException e) {
             throw new IOException(e.getMessage(), e);
           }
-          catch (MojoFailureException e) {
-            throw new IOException(e.getMessage(), e);
-          }
         }
         else {
-          throw new IOException(this.destination.getAbsolutePath() + " is not a directory");
+          throw new IOException(destinationPath + " is not a directory");
         }
       }
       else {
-        throw new IOException("could not create " + this.destination.getAbsolutePath());
+        throw new IOException("could not create " + destinationPath);
       }
     }
     else {
-      throw new IOException(archive.getAbsolutePath() + " does not exist");
+      throw new IOException(archivePath + " does not exist");
     }
   }
 }

@@ -28,11 +28,10 @@ public final class UnpackDependenciesMojo extends AbstractErlangMojo {
   @SuppressWarnings("unchecked")
   public void execute() throws MojoExecutionException {
     Log log = getLog();
-    log.info("Creating dependency directory " + this.targetLib);
     this.targetLib.mkdirs();
-    TarGzUnarchiver unarchiver = new TarGzUnarchiver(log, this.targetLib);
+    TarGzUnarchiver unarchiver = new TarGzUnarchiver(peer, this.targetLib);
     Set<Artifact> artifacts = this.project.getArtifacts();
-    log.info("Found artifacts " + artifacts);
+    log.debug("found artifacts " + artifacts);
     for (Artifact artifact : artifacts) {
       if (artifact.getType().equals(ErlConstants.ARTIFACT_TYPE_OTP)) {
         extractArtifact(artifact, unarchiver);
@@ -51,10 +50,9 @@ public final class UnpackDependenciesMojo extends AbstractErlangMojo {
     Log log = getLog();
     File artifactFile = artifact.getFile();
     String artifactdirectory = getArtifactDirectory(artifact);
-    log.info("artifact name " + artifactdirectory);
     File cachedDependency = new File(unarchiver.getDestination(), artifactdirectory);
     if (!cachedDependency.isDirectory() || artifactFile.lastModified() > cachedDependency.lastModified()) {
-      log.info("Extracting artifact " + artifact.getGroupId() + ":" + artifact.getId());
+      log.debug("extracting artifact " + artifact.getGroupId() + ":" + artifact.getId());
       try {
         unarchiver.extract(artifact.getFile());
       }
@@ -63,7 +61,7 @@ public final class UnpackDependenciesMojo extends AbstractErlangMojo {
       }
     }
     else {
-      log.debug("Skipping artifact " + artifact.getGroupId() + ":" + artifact.getId());
+      log.debug("skipping artifact " + artifact.getGroupId() + ":" + artifact.getId());
     }
   }
 
