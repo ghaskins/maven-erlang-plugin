@@ -29,13 +29,13 @@ import org.apache.maven.plugin.MojoExecutionException;
 public final class MavenSelf {
   private static final Object lock = new Object();
 
-  private static MavenSelf self = null;
+  private static MavenSelf instance = null;
 
-  private final OtpSelf otpSelf;
+  private final OtpSelf self;
   private final Map<OtpPeer, OtpConnection> connections;
 
-  private MavenSelf(OtpSelf otpSelf) {
-    this.otpSelf = otpSelf;
+  private MavenSelf(OtpSelf self) {
+    this.self = self;
     this.connections = new HashMap<OtpPeer, OtpConnection>();
   }
 
@@ -47,16 +47,16 @@ public final class MavenSelf {
    */
   public static MavenSelf get() throws MojoExecutionException {
     synchronized (lock) {
-      if (self == null) {
+      if (instance == null) {
         try {
           OtpSelf otpSelf = new OtpSelf("maven-erlang-plugin-frontend");
-          self = new MavenSelf(otpSelf);
+          instance = new MavenSelf(otpSelf);
         }
         catch (IOException e) {
           throw new MojoExecutionException("failed to create self node", e);
         }
       }
-      return self;
+      return instance;
     }
   }
 
@@ -74,11 +74,25 @@ public final class MavenSelf {
       OtpConnection connection = this.connections.get(peer);
       if (connection == null) {
         try {
-          connection = this.otpSelf.connect(peer);
-          this.connections.put(peer, connection);
+          for (int i = 0; i < 6; ++i) {
+            try {
+              connection = this.self.connect(peer);
+              this.connections.put(peer, connection);
+              break;
+            }
+            catch (IOException e) {
+              Thread.sleep(500L);
+            }
+          }
         }
-        catch (Exception e) {
-          throw new MojoExecutionException("failed to connect to " + peer, e);
+        catch (OtpAuthException e) {
+          throw new MojoExecutionException("failed to connect to " + peer);
+        }
+        catch (InterruptedException e) {
+          throw new MojoExecutionException("failed to connect to " + peer);
+        }
+        if (connection == null) {
+          throw new MojoExecutionException("failed to connect to " + peer);
         }
       }
       return connection;
@@ -86,7 +100,8 @@ public final class MavenSelf {
   }
 
   /**
-   * Executes an erlang script on a specific remote erlang node using RPC.
+   * Executes an erlang script on a specific remote erlang node using RPC. A
+   * connection to the remote node will be established if necessary.
    * 
    * @param peer to evaluate the expression on
    * @param expression to evaluate
