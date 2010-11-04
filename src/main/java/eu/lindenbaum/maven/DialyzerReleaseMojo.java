@@ -1,13 +1,12 @@
 package eu.lindenbaum.maven;
 
-import static eu.lindenbaum.maven.util.ErlConstants.DIALYZER;
 import static eu.lindenbaum.maven.util.ErlConstants.DIALYZER_OK;
 import static eu.lindenbaum.maven.util.FileUtils.getDependencyIncludes;
 import static eu.lindenbaum.maven.util.FileUtils.newerFilesThan;
+import static eu.lindenbaum.maven.util.MavenUtils.SEPARATOR;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,17 +36,12 @@ public final class DialyzerReleaseMojo extends AbstractDialyzerMojo {
    */
   private boolean skipDialyzer;
 
-  /**
-   * Additional {@code dialyzer} options.
-   * 
-   * @parameter
-   * @see http://www.erlang.org/doc/man/dialyzer.html
-   */
-  private String[] dialyzerOptions;
-
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     Log log = getLog();
+    log.info(SEPARATOR);
+    log.info(" D I A L Y Z E");
+    log.info(SEPARATOR);
     if (this.skipDialyzer) {
       log.warn("Dialyzer is configured to be skipped.");
     }
@@ -57,24 +51,17 @@ public final class DialyzerReleaseMojo extends AbstractDialyzerMojo {
         lastBuildIndicator.delete();
         log.info("Running dialyzer on " + this.targetLib);
 
-        List<String> command = new ArrayList<String>();
-        command.add(DIALYZER);
-        command.add("--src");
-        command.add("-r");
-        command.add(this.targetLib.getPath());
-        for (File include : getDependencyIncludes(this.targetLib)) {
-          command.add("-I");
-          command.add(include.getPath());
-        }
-        if (this.dialyzerOptions != null) {
-          command.addAll(Arrays.asList(this.dialyzerOptions));
-        }
-        dialyze(command);
+        List<File> sources = Arrays.asList(new File[]{ this.targetLib });
+        List<File> includes = getDependencyIncludes(this.targetLib);
+
+        executeDialyzer(sources, includes);
+        log.info("Dialyzer run successful.");
+
         try {
           lastBuildIndicator.createNewFile();
         }
         catch (IOException e) {
-          throw new MojoExecutionException("Failed to create " + lastBuildIndicator.getAbsolutePath());
+          throw new MojoExecutionException("failed to create " + lastBuildIndicator);
         }
       }
       else {

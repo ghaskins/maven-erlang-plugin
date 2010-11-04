@@ -157,7 +157,8 @@ public final class PackageMojo extends AbstractErlangMojo {
   public void execute() throws MojoExecutionException, MojoFailureException {
     Log log = getLog();
     log.info(SEPARATOR);
-    log.info("PACKAGING PROJECT");
+    log.info(" P A C K A G E");
+    log.info(SEPARATOR);
 
     File tmpDir = new File(this.target, this.project.getArtifactId() + "-" + this.project.getVersion());
     tmpDir.mkdirs();
