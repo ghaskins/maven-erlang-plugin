@@ -1,5 +1,6 @@
 package eu.lindenbaum.maven;
 
+import static eu.lindenbaum.maven.util.MavenSelf.DEFAULT_PEER;
 import static eu.lindenbaum.maven.util.MavenUtils.SEPARATOR;
 
 import java.io.IOException;
@@ -37,12 +38,12 @@ public class StartBackendMojo extends AbstractErlangMojo {
     @Override
     public void run() {
       try {
-        OtpConnection connection = MavenSelf.get().connect(peer);
+        OtpConnection connection = MavenSelf.get().connect(DEFAULT_PEER);
         connection.sendRPC("erlang", "halt", new OtpErlangList());
-        System.out.println("[INFO] Successfully shut down " + peer);
+        System.out.println("[INFO] Successfully shut down " + DEFAULT_PEER);
       }
       catch (Exception e) {
-        System.out.println("[ERROR] Failed to shutdown " + peer);
+        System.out.println("[ERROR] Failed to shutdown " + DEFAULT_PEER);
         e.printStackTrace();
       }
       System.out.println("[INFO] " + SEPARATOR);
@@ -55,21 +56,21 @@ public class StartBackendMojo extends AbstractErlangMojo {
     try {
       try {
         long serial = System.currentTimeMillis();
-        new OtpSelf("maven-erlang-plugin-startup-" + serial).connect(peer);
-        log.debug("node " + peer + " is already running.");
+        new OtpSelf("maven-erlang-plugin-startup-" + serial).connect(DEFAULT_PEER);
+        log.debug("node " + DEFAULT_PEER + " is already running.");
       }
       catch (IOException e) {
-        log.debug("starting " + peer + ".");
+        log.debug("starting " + DEFAULT_PEER + ".");
         ArrayList<String> command = new ArrayList<String>();
         command.add(ErlConstants.ERL);
         command.add("-sname");
-        command.add(peer.alive());
+        command.add(DEFAULT_PEER.alive());
         command.add("-detached");
         Process process = new ProcessBuilder(command).start();
         if (process.waitFor() != 0) {
-          throw new MojoExecutionException("failed to start " + peer);
+          throw new MojoExecutionException("failed to start " + DEFAULT_PEER);
         }
-        log.debug("node " + peer + " sucessfully started.");
+        log.debug("node " + DEFAULT_PEER + " sucessfully started.");
       }
       try {
         Runtime.getRuntime().addShutdownHook(shutdownHook);
@@ -79,13 +80,13 @@ public class StartBackendMojo extends AbstractErlangMojo {
       }
     }
     catch (IOException e) {
-      throw new MojoExecutionException("failed to start " + peer, e);
+      throw new MojoExecutionException("failed to start " + DEFAULT_PEER, e);
     }
     catch (OtpAuthException e) {
-      throw new MojoExecutionException("failed to connect to " + peer, e);
+      throw new MojoExecutionException("failed to connect to " + DEFAULT_PEER, e);
     }
     catch (InterruptedException e) {
-      throw new MojoExecutionException("failed to start " + peer, e);
+      throw new MojoExecutionException("failed to start " + DEFAULT_PEER, e);
     }
   }
 }

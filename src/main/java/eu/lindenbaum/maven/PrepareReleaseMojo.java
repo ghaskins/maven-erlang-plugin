@@ -7,6 +7,7 @@ import static eu.lindenbaum.maven.util.FileUtils.REL_FILTER;
 import static eu.lindenbaum.maven.util.FileUtils.copyDirectory;
 import static eu.lindenbaum.maven.util.FileUtils.getDependencies;
 import static eu.lindenbaum.maven.util.FileUtils.removeDirectory;
+import static eu.lindenbaum.maven.util.MavenSelf.DEFAULT_PEER;
 import static eu.lindenbaum.maven.util.MavenUtils.getArtifact;
 import static eu.lindenbaum.maven.util.MavenUtils.getArtifactFile;
 import static eu.lindenbaum.maven.util.MavenUtils.getReleaseName;
@@ -328,7 +329,7 @@ public final class PrepareReleaseMojo extends AbstractErlangMojo {
         File artifactFile = getArtifactFile(artifact, this.repository);
         File destDir = new File(this.targetReleases, artifact.getVersion());
         try {
-          new TarGzUnarchiver(peer, destDir).extract(artifactFile);
+          new TarGzUnarchiver(DEFAULT_PEER, destDir).extract(artifactFile);
           File relFile = new File(new File(destDir, "releases"), getReleaseName(artifact) + REL_SUFFIX);
           if (relFile.exists()) {
             result.add(relFile);

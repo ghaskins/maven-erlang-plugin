@@ -1,11 +1,13 @@
 package eu.lindenbaum.maven;
 
+import static eu.lindenbaum.maven.util.ErlConstants.ARTIFACT_TYPE_OTP;
+import static eu.lindenbaum.maven.util.MavenSelf.DEFAULT_PEER;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
 import eu.lindenbaum.maven.archiver.TarGzUnarchiver;
-import eu.lindenbaum.maven.util.ErlConstants;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -29,11 +31,11 @@ public final class UnpackDependenciesMojo extends AbstractErlangMojo {
   public void execute() throws MojoExecutionException {
     Log log = getLog();
     this.targetLib.mkdirs();
-    TarGzUnarchiver unarchiver = new TarGzUnarchiver(peer, this.targetLib);
+    TarGzUnarchiver unarchiver = new TarGzUnarchiver(DEFAULT_PEER, this.targetLib);
     Set<Artifact> artifacts = this.project.getArtifacts();
     log.debug("found artifacts " + artifacts);
     for (Artifact artifact : artifacts) {
-      if (artifact.getType().equals(ErlConstants.ARTIFACT_TYPE_OTP)) {
+      if (artifact.getType().equals(ARTIFACT_TYPE_OTP)) {
         extractArtifact(artifact, unarchiver);
       }
     }

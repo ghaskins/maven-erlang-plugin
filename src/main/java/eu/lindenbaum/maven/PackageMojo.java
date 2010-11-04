@@ -18,6 +18,7 @@ import static eu.lindenbaum.maven.util.FileUtils.copyDirectory;
 import static eu.lindenbaum.maven.util.FileUtils.getFilesAndDirectoriesRecursive;
 import static eu.lindenbaum.maven.util.FileUtils.getFilesRecursive;
 import static eu.lindenbaum.maven.util.FileUtils.removeDirectory;
+import static eu.lindenbaum.maven.util.MavenSelf.DEFAULT_PEER;
 import static eu.lindenbaum.maven.util.MavenUtils.SEPARATOR;
 import static org.codehaus.plexus.util.FileUtils.fileWrite;
 
@@ -229,7 +230,7 @@ public final class PackageMojo extends AbstractErlangMojo {
     // create .tar.gz package
     File toFile = new File(this.target, tmpDir.getName() + TARGZ_SUFFIX);
     try {
-      TarGzArchiver archiver = new TarGzArchiver(peer, toFile);
+      TarGzArchiver archiver = new TarGzArchiver(DEFAULT_PEER, toFile);
       archiver.addFile(tmpDir);
       archiver.createArchive();
       this.project.getArtifact().setFile(toFile);

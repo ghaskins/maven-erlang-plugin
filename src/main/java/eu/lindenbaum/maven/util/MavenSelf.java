@@ -14,6 +14,7 @@ import com.ericsson.otp.erlang.OtpErlangTuple;
 import com.ericsson.otp.erlang.OtpPeer;
 import com.ericsson.otp.erlang.OtpSelf;
 
+import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
@@ -27,7 +28,13 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
 public final class MavenSelf {
-  private static final Object lock = new Object();
+  /**
+   * A bean class holding the information for the pluins backend erlang node.
+   * This can be used by any implementing {@link Mojo} to establish a connection
+   * to the erlang node (for rpc communication) using
+   * {@link OtpSelf#connect(peer)}.
+   */
+  public static final OtpPeer DEFAULT_PEER = new OtpPeer("maven-erlang-plugin-backend");
 
   private static MavenSelf instance = null;
 
@@ -46,18 +53,16 @@ public final class MavenSelf {
    * @throws MojoExecutionException in case the instance cannot be created
    */
   public static MavenSelf get() throws MojoExecutionException {
-    synchronized (lock) {
-      if (instance == null) {
-        try {
-          OtpSelf otpSelf = new OtpSelf("maven-erlang-plugin-frontend");
-          instance = new MavenSelf(otpSelf);
-        }
-        catch (IOException e) {
-          throw new MojoExecutionException("failed to create self node", e);
-        }
+    if (instance == null) {
+      try {
+        OtpSelf otpSelf = new OtpSelf("maven-erlang-plugin-frontend");
+        instance = new MavenSelf(otpSelf);
       }
-      return instance;
+      catch (IOException e) {
+        throw new MojoExecutionException("failed to create self node", e);
+      }
     }
+    return instance;
   }
 
   /**
@@ -70,33 +75,31 @@ public final class MavenSelf {
    * @throws MojoExecutionException in case the connection cannot be established
    */
   public OtpConnection connect(OtpPeer peer) throws MojoExecutionException {
-    synchronized (lock) {
-      OtpConnection connection = this.connections.get(peer);
-      if (connection == null) {
-        try {
-          for (int i = 0; i < 6; ++i) {
-            try {
-              connection = this.self.connect(peer);
-              this.connections.put(peer, connection);
-              break;
-            }
-            catch (IOException e) {
-              Thread.sleep(500L);
-            }
+    OtpConnection connection = this.connections.get(peer);
+    if (connection == null) {
+      try {
+        for (int i = 0; i < 6; ++i) {
+          try {
+            connection = this.self.connect(peer);
+            this.connections.put(peer, connection);
+            break;
+          }
+          catch (IOException e) {
+            Thread.sleep(500L);
           }
         }
-        catch (OtpAuthException e) {
-          throw new MojoExecutionException("failed to connect to " + peer);
-        }
-        catch (InterruptedException e) {
-          throw new MojoExecutionException("failed to connect to " + peer);
-        }
-        if (connection == null) {
-          throw new MojoExecutionException("failed to connect to " + peer);
-        }
       }
-      return connection;
+      catch (OtpAuthException e) {
+        throw new MojoExecutionException("failed to connect to " + peer);
+      }
+      catch (InterruptedException e) {
+        throw new MojoExecutionException("failed to connect to " + peer);
+      }
+      if (connection == null) {
+        throw new MojoExecutionException("failed to connect to " + peer);
+      }
     }
+    return connection;
   }
 
   /**
