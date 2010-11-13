@@ -63,6 +63,8 @@ public class StartBackendMojo extends AbstractErlangMojo {
         log.debug("starting " + DEFAULT_PEER + ".");
         ArrayList<String> command = new ArrayList<String>();
         command.add(ErlConstants.ERL);
+        command.add("-boot");
+        command.add("start_sasl");
         command.add("-sname");
         command.add(DEFAULT_PEER.alive());
         command.add("-detached");

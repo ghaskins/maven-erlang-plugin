@@ -91,7 +91,7 @@ public final class BeamCompilerScript implements Script<CompilerResult> {
   @Override
   public CompilerResult handle(OtpErlangObject result) {
     OtpErlangTuple r = (OtpErlangTuple) result;
-    final OtpErlangString failed = (OtpErlangString) r.elementAt(0);
+    final OtpErlangObject failed = r.elementAt(0);
     final OtpErlangList messages = (OtpErlangList) r.elementAt(1);
     return new CompilerResult() {
       @Override
@@ -111,13 +111,12 @@ public final class BeamCompilerScript implements Script<CompilerResult> {
 
       @Override
       public String getFailed() {
-        String filename = failed.stringValue().trim();
-        if (filename.isEmpty()) {
-          return null;
+        if (failed instanceof OtpErlangString) {
+          OtpErlangString filename = (OtpErlangString) failed;
+          String converted = filename.stringValue().trim();
+          return converted.isEmpty() ? null : converted;
         }
-        else {
-          return filename;
-        }
+        return null;
       }
     };
   }

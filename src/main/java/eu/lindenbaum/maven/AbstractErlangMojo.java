@@ -195,8 +195,7 @@ abstract class AbstractErlangMojo extends AbstractMojo {
    * Base directory for the project packaging. Default is:
    * {@code target/$ARTIFACT_ID-$VERSION}.
    * 
-   * @parameter expression=
-   *            "${project.build.directory}/${project.artifactid}-${project.version}"
+   * @parameter expression= "${project.build.directory}/${project.artifactId}-${project.version}"
    * @required
    * @readonly
    */
@@ -206,8 +205,7 @@ abstract class AbstractErlangMojo extends AbstractMojo {
    * Directory where the compiled sources will be placed into. Default is:
    * {@code target/$ARTIFACT_ID-$VERSION/ebin}.
    * 
-   * @parameter expression=
-   *            "${project.build.directory}/${project.artifactid}-${project.version}/ebin/"
+   * @parameter expression= "${project.build.directory}/${project.artifactId}-${project.version}/ebin/"
    * @required
    * @readonly
    */
@@ -217,8 +215,7 @@ abstract class AbstractErlangMojo extends AbstractMojo {
    * Directory where includes to package will be put into. Default is:
    * {@code target/$ARTIFACT_ID-$VERSION/include}.
    * 
-   * @parameter expression=
-   *            "${project.build.directory}/${project.artifactid}-${project.version}/include"
+   * @parameter expression= "${project.build.directory}/${project.artifactId}-${project.version}/include"
    * @required
    * @readonly
    */
@@ -228,8 +225,7 @@ abstract class AbstractErlangMojo extends AbstractMojo {
    * Directory where SNMP related resources will be put into. Default is:
    * {@code target/$ARTIFACT_ID-$VERSION/mibs}.
    * 
-   * @parameter expression=
-   *            "${project.build.directory}/${project.artifactid}-${project.version}/mibs"
+   * @parameter expression= "${project.build.directory}/${project.artifactId}-${project.version}/mibs"
    * @required
    * @readonly
    */
@@ -239,8 +235,7 @@ abstract class AbstractErlangMojo extends AbstractMojo {
    * Directory where private resources will be put into. Default is:
    * {@code target/$ARTIFACT_ID-$VERSION/priv}.
    * 
-   * @parameter expression=
-   *            "${project.build.directory}/${project.artifactid}-${project.version}/priv"
+   * @parameter expression= "${project.build.directory}/${project.artifactId}-${project.version}/priv"
    * @required
    * @readonly
    */
@@ -250,8 +245,7 @@ abstract class AbstractErlangMojo extends AbstractMojo {
    * Directory where sources to package will be put into. Default is:
    * {@code target/$ARTIFACT_ID-$VERSION/src}.
    * 
-   * @parameter expression=
-   *            "${project.build.directory}/${project.artifactid}-${project.version}/src"
+   * @parameter expression= "${project.build.directory}/${project.artifactId}-${project.version}/src"
    * @required
    * @readonly
    */

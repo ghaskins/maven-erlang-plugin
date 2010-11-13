@@ -78,10 +78,10 @@ public final class CompileMojo extends AbstractCompilerMojo {
       if (failedCompilationUnit != null) {
         throw new MojoFailureException("failed to compile " + failedCompilationUnit);
       }
-      log.info("Compilation successfull.");
+      log.info("Successfully compiled " + files.size() + " source file(s).");
     }
     else {
-      log.info("No sources to compile.");
+      log.info("No source files to compile.");
     }
   }
 }

@@ -54,7 +54,7 @@ public final class UnpackDependenciesMojo extends AbstractErlangMojo {
     String artifactdirectory = getArtifactDirectory(artifact);
     File cachedDependency = new File(unarchiver.getDestination(), artifactdirectory);
     if (!cachedDependency.isDirectory() || artifactFile.lastModified() > cachedDependency.lastModified()) {
-      log.debug("extracting artifact " + artifact.getGroupId() + ":" + artifact.getId());
+      log.info("Extracting artifact " + artifact.getGroupId() + ":" + artifact.getId());
       try {
         unarchiver.extract(artifact.getFile());
       }
@@ -63,7 +63,7 @@ public final class UnpackDependenciesMojo extends AbstractErlangMojo {
       }
     }
     else {
-      log.debug("skipping artifact " + artifact.getGroupId() + ":" + artifact.getId());
+      log.debug("Skipping artifact " + artifact.getGroupId() + ":" + artifact.getId());
     }
   }
 
