@@ -1,6 +1,6 @@
 package eu.lindenbaum.maven;
 
-import static eu.lindenbaum.maven.util.MavenSelf.DEFAULT_PEER;
+import static eu.lindenbaum.maven.erlang.MavenSelf.DEFAULT_PEER;
 import static eu.lindenbaum.maven.util.MavenUtils.SEPARATOR;
 
 import java.io.IOException;
@@ -11,8 +11,8 @@ import com.ericsson.otp.erlang.OtpConnection;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpSelf;
 
+import eu.lindenbaum.maven.erlang.MavenSelf;
 import eu.lindenbaum.maven.util.ErlConstants;
-import eu.lindenbaum.maven.util.MavenSelf;
 
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;

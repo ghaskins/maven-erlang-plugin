@@ -1,16 +1,22 @@
 package eu.lindenbaum.maven;
 
+import static eu.lindenbaum.maven.erlang.MavenSelf.DEFAULT_PEER;
 import static eu.lindenbaum.maven.util.ErlConstants.BEAM_SUFFIX;
-import static eu.lindenbaum.maven.util.ErlConstants.BIN_SUFFIX;
 import static eu.lindenbaum.maven.util.ErlConstants.ERL_SUFFIX;
-import static eu.lindenbaum.maven.util.ErlConstants.HRL_SUFFIX;
-import static eu.lindenbaum.maven.util.ErlConstants.MIB_SUFFIX;
+import static eu.lindenbaum.maven.util.FileUtils.getDependencyIncludes;
+import static eu.lindenbaum.maven.util.FileUtils.getFilesRecursive;
 import static eu.lindenbaum.maven.util.FileUtils.removeFilesRecursive;
+import static eu.lindenbaum.maven.util.MavenUtils.SEPARATOR;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import eu.lindenbaum.maven.erlang.BeamCompilerScript;
+import eu.lindenbaum.maven.erlang.CompilerResult;
+import eu.lindenbaum.maven.erlang.MavenSelf;
+import eu.lindenbaum.maven.erlang.Script;
 
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -18,7 +24,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 
 /**
- * This {@link Mojo} compiles the projects erlang sources and SNMP files.
+ * This {@link Mojo} compiles the projects erlang sources.
  * 
  * @goal compile
  * @phase compile
@@ -30,55 +36,52 @@ public final class CompileMojo extends AbstractCompilerMojo {
    * Setting this to {@code true} will compile all modules with debug
    * information.
    * 
-   * @parameter default-value=false
+   * @parameter expression=${debugInfo} default-value=false
    */
   private boolean debugInfo;
 
   /**
    * Additional compiler options.
    * 
-   * @parameter
+   * @parameter expression=${compilerOptions}
    */
-  private String[] erlcOptions;
+  private String[] compilerOptions;
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     Log log = getLog();
+    log.info(SEPARATOR);
+    log.info(" C O M P I L E");
+    log.info(SEPARATOR);
 
-    List<String> options = new ArrayList<String>();
-    if (this.erlcOptions != null) {
-      options.addAll(Arrays.asList(this.erlcOptions));
-    }
-    if (this.debugInfo) {
-      options.add("+debug_info");
-    }
+    this.targetEbin.mkdirs();
+    int removed = removeFilesRecursive(this.targetEbin, BEAM_SUFFIX);
+    log.debug("Removed " + removed + " stale " + BEAM_SUFFIX + "-files from " + this.targetEbin);
 
-    int compiled = 0;
-    File inc = this.srcMainErlang; // "private" includes may be used
-    if (this.srcMainErlang.exists()) {
-      this.targetMibs.mkdirs();
-      int removed = removeFilesRecursive(this.targetMibs, BIN_SUFFIX);
-      log.info("Removed " + removed + " stale " + BIN_SUFFIX + "-files from " + this.targetMibs);
-      compiled += compile(this.srcMainErlang, this.targetMibs, inc, MIB_SUFFIX, BIN_SUFFIX, options);
-    }
-    if (this.targetMibs.exists()) {
-      this.targetInclude.mkdirs();
-      int removed = removeFilesRecursive(this.targetInclude, HRL_SUFFIX);
-      log.info("Removed " + removed + " stale " + HRL_SUFFIX + "-files from " + this.targetInclude);
-      compiled += compile(this.targetMibs, this.targetInclude, inc, BIN_SUFFIX, HRL_SUFFIX, options);
-    }
-    if (this.srcMainErlang.exists()) {
-      this.targetEbin.mkdirs();
-      int removed = removeFilesRecursive(this.targetEbin, BEAM_SUFFIX);
-      log.info("Removed " + removed + " stale " + BEAM_SUFFIX + "-files from " + this.targetEbin);
-      options.addAll(Arrays.asList(new String[]{ "+report_errors", "+report_warnings" }));
-      compiled += compile(this.srcMainErlang, this.targetEbin, inc, ERL_SUFFIX, BEAM_SUFFIX, options);
-    }
-    if (compiled == 0) {
-      log.info("No sources to compile");
+    List<File> files = getFilesRecursive(this.srcMainErlang, ERL_SUFFIX);
+    if (!files.isEmpty()) {
+      List<File> includes = new ArrayList<File>();
+      includes.addAll(Arrays.asList(new File[]{ this.srcMainInclude, this.targetInclude, this.srcMainErlang }));
+      includes.addAll(getDependencyIncludes(this.targetLib));
+      List<String> options = new ArrayList<String>();
+      if (this.compilerOptions != null) {
+        options.addAll(Arrays.asList(this.compilerOptions));
+      }
+      if (this.debugInfo) {
+        options.add("+debug_info");
+      }
+
+      Script<CompilerResult> script = new BeamCompilerScript(files, this.targetEbin, includes, options);
+      CompilerResult result = MavenSelf.get().eval(DEFAULT_PEER, script);
+      result.logOutput(log);
+      String failedCompilationUnit = result.getFailed();
+      if (failedCompilationUnit != null) {
+        throw new MojoFailureException("failed to compile " + failedCompilationUnit);
+      }
+      log.info("Compilation successfull.");
     }
     else {
-      log.info("Compiled " + compiled + " files");
+      log.info("No sources to compile.");
     }
   }
 }

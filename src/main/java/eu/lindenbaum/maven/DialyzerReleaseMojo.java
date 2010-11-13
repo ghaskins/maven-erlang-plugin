@@ -1,5 +1,6 @@
 package eu.lindenbaum.maven;
 
+import static eu.lindenbaum.maven.erlang.MavenSelf.DEFAULT_PEER;
 import static eu.lindenbaum.maven.util.ErlConstants.DIALYZER_OK;
 import static eu.lindenbaum.maven.util.FileUtils.getDependencyIncludes;
 import static eu.lindenbaum.maven.util.FileUtils.newerFilesThan;
@@ -10,6 +11,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import eu.lindenbaum.maven.erlang.DialyzerScript;
+import eu.lindenbaum.maven.erlang.MavenSelf;
+
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -19,7 +23,7 @@ import org.apache.maven.plugin.logging.Log;
  * <p>
  * This {@link Mojo} runs the erlang {@code dialyzer} tool on a complete release
  * found in {@link AbstractErlangMojo#targetLib}. The {@code dialyzer} can be
- * skipped using the {@code useDialyzer} paramter in the projects pom. Since
+ * skipped using the {@code skipDialyzer} paramter in the projects pom. Since
  * this {@link Mojo} is called in order to check a complete release it is run
  * over all release dependencies.
  * </p>
@@ -28,13 +32,31 @@ import org.apache.maven.plugin.logging.Log;
  * @phase compile
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
-public final class DialyzerReleaseMojo extends AbstractDialyzerMojo {
+public final class DialyzerReleaseMojo extends AbstractErlangMojo {
   /**
    * Setting this to {@code true} will skip the {@code dialyzer} analysis.
    * 
-   * @parameter default-value=false
+   * @parameter expression=${skipDialyzer} default-value=false
    */
   private boolean skipDialyzer;
+
+  /**
+   * Setting this to {@code true} will break the build when a {@code dialyzer}
+   * run returns warnings.
+   * 
+   * @parameter expression=${dialyzerWarningsAreErrors} default-value=false
+   */
+  private boolean dialyzerWarningsAreErrors;
+
+  /**
+   * Additional {@code dialyzer} warning options. These must be valid warning
+   * atoms that will be included when calling
+   * <code>dialyzer:run([{warnings,[...]}, ...])</code>.
+   * 
+   * @parameter expression=${dialyzerOptions}
+   * @see http://www.erlang.org/doc/man/dialyzer.html
+   */
+  private String[] dialyzerOptions;
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
@@ -54,7 +76,14 @@ public final class DialyzerReleaseMojo extends AbstractDialyzerMojo {
         List<File> sources = Arrays.asList(new File[]{ this.targetLib });
         List<File> includes = getDependencyIncludes(this.targetLib);
 
-        executeDialyzer(sources, includes);
+        DialyzerScript script = new DialyzerScript(sources, includes, this.dialyzerOptions);
+        String[] warnings = MavenSelf.get().eval(DEFAULT_PEER, script);
+        for (String warning : warnings) {
+          log.warn(warning);
+        }
+        if (warnings.length > 0 && this.dialyzerWarningsAreErrors) {
+          throw new MojoFailureException("dialyzer emitted warnings");
+        }
         log.info("Dialyzer run successful.");
 
         try {

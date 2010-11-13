@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.ericsson.otp.erlang.OtpErlangTuple;
 import com.ericsson.otp.erlang.OtpPeer;
 
-import eu.lindenbaum.maven.util.MavenSelf;
+import eu.lindenbaum.maven.erlang.MavenSelf;
+import eu.lindenbaum.maven.erlang.Script;
 
 import org.apache.maven.plugin.MojoExecutionException;
 
@@ -17,8 +19,6 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
 public final class TarGzUnarchiver {
-  private static final String script = "erl_tar:extract(\"%s\", [compressed, {cwd, \"%s\"}]).";
-
   private final OtpPeer peer;
   private final File destination;
 
@@ -50,18 +50,15 @@ public final class TarGzUnarchiver {
    *           {@code erl_tar} ends with errors.
    */
   public void extract(File archive) throws IOException {
-    String archivePath = archive.getAbsolutePath();
-    String destinationPath = this.destination.getPath();
     if (archive.isFile()) {
       this.destination.mkdirs();
       if (this.destination.exists()) {
         if (this.destination.isDirectory()) {
-          String expression = String.format(script, archivePath, destinationPath);
+          Script<String> script = new TarGzUnarchiverScript(archive, this.destination);
           try {
-            MavenSelf self = MavenSelf.get();
-            OtpErlangObject result = self.eval(this.peer, expression);
-            if (!"ok".equals(result.toString())) {
-              throw new IOException("failed to extract archive: " + result);
+            String error = MavenSelf.get().eval(this.peer, script);
+            if (error != null) {
+              throw new IOException("failed to extract archive: " + error);
             }
           }
           catch (MojoExecutionException e) {
@@ -69,15 +66,51 @@ public final class TarGzUnarchiver {
           }
         }
         else {
-          throw new IOException(destinationPath + " is not a directory");
+          throw new IOException(this.destination.toString() + " is not a directory");
         }
       }
       else {
-        throw new IOException("could not create " + destinationPath);
+        throw new IOException("could not create " + this.destination.toString());
       }
     }
     else {
-      throw new IOException(archivePath + " does not exist");
+      throw new IOException(archive.toString() + " does not exist");
+    }
+  }
+
+  private static final class TarGzUnarchiverScript implements Script<String> {
+    private static final String script = "erl_tar:extract(\"%s\", [compressed, {cwd, \"%s\"}]).";
+
+    private final File archive;
+    private final File destination;
+
+    TarGzUnarchiverScript(File archive, File destination) {
+      this.archive = archive;
+      this.destination = destination;
+    }
+
+    @Override
+    public String get() {
+      String archivePath = this.archive.getAbsolutePath();
+      String destinationPath = this.destination.getAbsolutePath();
+      return String.format(script, archivePath, destinationPath);
+    }
+
+    /**
+     * Converts the {@link Script} result into an error message, if any.
+     * 
+     * @param result The term returned by the script execution.
+     * @return An error reason as returned by the {@link Script} execution,
+     *         {@code null} on success.
+     */
+    @Override
+    public String handle(OtpErlangObject result) {
+      if (!"ok".equals(result.toString())) {
+        OtpErlangTuple errorInfo = (OtpErlangTuple) result;
+        OtpErlangTuple nameReason = (OtpErlangTuple) errorInfo.elementAt(1);
+        return nameReason.elementAt(1).toString();
+      }
+      return null;
     }
   }
 }

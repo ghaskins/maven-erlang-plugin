@@ -152,44 +152,14 @@ abstract class AbstractErlangMojo extends AbstractMojo {
   File target;
 
   /**
-   * Directories where dependencies are unpacked. Default is: {@code target/lib}
-   * .
+   * Directories where dependencies get unpacked into. Default is:
+   * {@code target/lib}.
    * 
    * @parameter expression="${project.build.directory}/lib/"
    * @required
    * @readonly
    */
   File targetLib;
-
-  /**
-   * Directory where the compiled sources will be placed into. Default is:
-   * {@code target/ebin}.
-   * 
-   * @parameter expression="${project.build.directory}/ebin/"
-   * @required
-   * @readonly
-   */
-  File targetEbin;
-
-  /**
-   * Directory where generated includes will be put into. Default is:
-   * {@code target/include}.
-   * 
-   * @parameter expression="${project.build.directory}/include"
-   * @required
-   * @readonly
-   */
-  File targetInclude;
-
-  /**
-   * Directory where private resources will be put into. Default is:
-   * {@code target/priv}.
-   * 
-   * @parameter expression="${project.build.directory}/priv"
-   * @required
-   * @readonly
-   */
-  File targetPriv;
 
   /**
    * Directory where the compiled test sources and recompiled sources will be
@@ -200,16 +170,6 @@ abstract class AbstractErlangMojo extends AbstractMojo {
    * @readonly
    */
   File targetTest;
-
-  /**
-   * Directory where SNMP related resources will be put into. Default is:
-   * {@code target/mibs}.
-   * 
-   * @parameter expression="${project.build.directory}/mibs"
-   * @required
-   * @readonly
-   */
-  File targetMibs;
 
   /**
    * Directories where all releases will be put into. Default is:
@@ -230,4 +190,70 @@ abstract class AbstractErlangMojo extends AbstractMojo {
    * @readonly
    */
   File targetSurefireReports;
+
+  /**
+   * Base directory for the project packaging. Default is:
+   * {@code target/$ARTIFACT_ID-$VERSION}.
+   * 
+   * @parameter expression=
+   *            "${project.build.directory}/${project.artifactid}-${project.version}"
+   * @required
+   * @readonly
+   */
+  File targetProject;
+
+  /**
+   * Directory where the compiled sources will be placed into. Default is:
+   * {@code target/$ARTIFACT_ID-$VERSION/ebin}.
+   * 
+   * @parameter expression=
+   *            "${project.build.directory}/${project.artifactid}-${project.version}/ebin/"
+   * @required
+   * @readonly
+   */
+  File targetEbin;
+
+  /**
+   * Directory where includes to package will be put into. Default is:
+   * {@code target/$ARTIFACT_ID-$VERSION/include}.
+   * 
+   * @parameter expression=
+   *            "${project.build.directory}/${project.artifactid}-${project.version}/include"
+   * @required
+   * @readonly
+   */
+  File targetInclude;
+
+  /**
+   * Directory where SNMP related resources will be put into. Default is:
+   * {@code target/$ARTIFACT_ID-$VERSION/mibs}.
+   * 
+   * @parameter expression=
+   *            "${project.build.directory}/${project.artifactid}-${project.version}/mibs"
+   * @required
+   * @readonly
+   */
+  File targetMibs;
+
+  /**
+   * Directory where private resources will be put into. Default is:
+   * {@code target/$ARTIFACT_ID-$VERSION/priv}.
+   * 
+   * @parameter expression=
+   *            "${project.build.directory}/${project.artifactid}-${project.version}/priv"
+   * @required
+   * @readonly
+   */
+  File targetPriv;
+
+  /**
+   * Directory where sources to package will be put into. Default is:
+   * {@code target/$ARTIFACT_ID-$VERSION/src}.
+   * 
+   * @parameter expression=
+   *            "${project.build.directory}/${project.artifactid}-${project.version}/src"
+   * @required
+   * @readonly
+   */
+  File targetSrc;
 }

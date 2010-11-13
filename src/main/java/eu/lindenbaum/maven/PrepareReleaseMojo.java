@@ -1,5 +1,6 @@
 package eu.lindenbaum.maven;
 
+import static eu.lindenbaum.maven.erlang.MavenSelf.DEFAULT_PEER;
 import static eu.lindenbaum.maven.util.ErlConstants.EBIN_DIRECTORY;
 import static eu.lindenbaum.maven.util.ErlConstants.REL_SUFFIX;
 import static eu.lindenbaum.maven.util.ErlUtils.eval;
@@ -7,7 +8,6 @@ import static eu.lindenbaum.maven.util.FileUtils.REL_FILTER;
 import static eu.lindenbaum.maven.util.FileUtils.copyDirectory;
 import static eu.lindenbaum.maven.util.FileUtils.getDependencies;
 import static eu.lindenbaum.maven.util.FileUtils.removeDirectory;
-import static eu.lindenbaum.maven.util.MavenSelf.DEFAULT_PEER;
 import static eu.lindenbaum.maven.util.MavenUtils.getArtifact;
 import static eu.lindenbaum.maven.util.MavenUtils.getArtifactFile;
 import static eu.lindenbaum.maven.util.MavenUtils.getReleaseName;

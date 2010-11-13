@@ -7,9 +7,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.ericsson.otp.erlang.OtpErlangTuple;
 import com.ericsson.otp.erlang.OtpPeer;
 
-import eu.lindenbaum.maven.util.MavenSelf;
+import eu.lindenbaum.maven.erlang.MavenSelf;
+import eu.lindenbaum.maven.erlang.Script;
 
 import org.apache.maven.plugin.MojoExecutionException;
 
@@ -20,8 +22,6 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
 public final class TarGzArchiver {
-  private static final String script = "erl_tar:create(\"%s\", %s, [compressed]).";
-
   private final OtpPeer peer;
   private final File archive;
   private final Map<File, String> files = new HashMap<File, String>();
@@ -77,12 +77,11 @@ public final class TarGzArchiver {
       throw new IOException("no files to package");
     }
     else {
-      String archivePath = this.archive.getAbsolutePath();
-      String expression = String.format(script, archivePath, getFiles(this.files));
+      Script<String> script = new TarGzArchiverScript(this.archive, this.files);
       try {
-        OtpErlangObject result = MavenSelf.get().eval(this.peer, expression);
-        if (!"ok".equals(result.toString())) {
-          throw new IOException("failed to create archive: " + result);
+        String error = MavenSelf.get().eval(this.peer, script);
+        if (error != null) {
+          throw new IOException("failed to create archive: " + error);
         }
       }
       catch (MojoExecutionException e) {
@@ -91,24 +90,59 @@ public final class TarGzArchiver {
     }
   }
 
-  /**
-   * Returns a list of the files to archive. It is assumed that there's more
-   * than zero files to archive.
-   * 
-   * @param files mapping of files to package
-   * @return a string containing an erlang list of file mappings
-   */
-  private static String getFiles(Map<File, String> files) {
-    StringBuilder fileList = new StringBuilder("[");
-    for (Entry<File, String> file : files.entrySet()) {
-      fileList.append("{\"");
-      fileList.append(file.getValue());
-      fileList.append("\",\"");
-      fileList.append(file.getKey().getAbsolutePath());
-      fileList.append("\"},");
+  private static final class TarGzArchiverScript implements Script<String> {
+    private static final String script = "erl_tar:create(\"%s\", %s, [compressed]).";
+
+    private final File archive;
+    private final Map<File, String> files;
+
+    TarGzArchiverScript(File archive, Map<File, String> files) {
+      this.archive = archive;
+      this.files = files;
     }
-    fileList.deleteCharAt(fileList.length() - 1);
-    fileList.append("]");
-    return fileList.toString();
+
+    @Override
+    public String get() {
+      String archivePath = this.archive.getAbsolutePath();
+      return String.format(script, archivePath, getFiles(this.files));
+    }
+
+    /**
+     * Converts the {@link Script} result into an error message, if any.
+     * 
+     * @param result The term returned by the script execution.
+     * @return An error reason as returned by the {@link Script} execution,
+     *         {@code null} on success.
+     */
+    @Override
+    public String handle(OtpErlangObject result) {
+      if (!"ok".equals(result.toString())) {
+        OtpErlangTuple errorInfo = (OtpErlangTuple) result;
+        OtpErlangTuple nameReason = (OtpErlangTuple) errorInfo.elementAt(1);
+        return nameReason.elementAt(1).toString();
+      }
+      return null;
+    }
+
+    /**
+     * Returns a list of the files to archive. It is assumed that there's more
+     * than zero files to archive.
+     * 
+     * @param files mapping of files to package
+     * @return a string containing an erlang list of file mappings
+     */
+    private static String getFiles(Map<File, String> files) {
+      StringBuilder fileList = new StringBuilder("[");
+      for (Entry<File, String> file : files.entrySet()) {
+        fileList.append("{\"");
+        fileList.append(file.getValue());
+        fileList.append("\",\"");
+        fileList.append(file.getKey().getAbsolutePath());
+        fileList.append("\"},");
+      }
+      fileList.deleteCharAt(fileList.length() - 1);
+      fileList.append("]");
+      return fileList.toString();
+    }
   }
 }

@@ -1,7 +1,7 @@
 package eu.lindenbaum.maven;
 
+import static eu.lindenbaum.maven.erlang.MavenSelf.DEFAULT_PEER;
 import static eu.lindenbaum.maven.util.ErlConstants.ARTIFACT_TYPE_OTP;
-import static eu.lindenbaum.maven.util.MavenSelf.DEFAULT_PEER;
 
 import java.io.File;
 import java.io.IOException;

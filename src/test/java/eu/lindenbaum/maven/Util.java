@@ -2,7 +2,7 @@ package eu.lindenbaum.maven;
 
 import com.ericsson.otp.erlang.OtpPeer;
 
-import eu.lindenbaum.maven.util.MavenSelf;
+import eu.lindenbaum.maven.erlang.MavenSelf;
 
 /**
  * Utility for unit tests needing a running erlang backend node.

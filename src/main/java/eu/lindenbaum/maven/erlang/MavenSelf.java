@@ -1,4 +1,4 @@
-package eu.lindenbaum.maven.util;
+package eu.lindenbaum.maven.erlang;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -100,6 +100,19 @@ public final class MavenSelf {
       }
     }
     return connection;
+  }
+
+  /**
+   * Executes a {@link Script} on a specific remote erlang node using RPC. A
+   * connection to the remote node will be established if necessary.
+   * 
+   * @param peer to evaluate the {@link Script} on
+   * @param script to evaluate
+   * @return the processed result of the {@link Script}
+   * @throws MojoExecutionException
+   */
+  public <T> T eval(OtpPeer peer, Script<T> script) throws MojoExecutionException {
+    return script.handle(eval(peer, script.get()));
   }
 
   /**

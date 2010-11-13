@@ -1,5 +1,6 @@
 package eu.lindenbaum.maven;
 
+import static eu.lindenbaum.maven.erlang.MavenSelf.DEFAULT_PEER;
 import static eu.lindenbaum.maven.util.ErlConstants.APPUP_SUFFIX;
 import static eu.lindenbaum.maven.util.ErlConstants.APP_SUFFIX;
 import static eu.lindenbaum.maven.util.ErlConstants.BEAM_SUFFIX;
@@ -18,7 +19,6 @@ import static eu.lindenbaum.maven.util.FileUtils.copyDirectory;
 import static eu.lindenbaum.maven.util.FileUtils.getFilesAndDirectoriesRecursive;
 import static eu.lindenbaum.maven.util.FileUtils.getFilesRecursive;
 import static eu.lindenbaum.maven.util.FileUtils.removeDirectory;
-import static eu.lindenbaum.maven.util.MavenSelf.DEFAULT_PEER;
 import static eu.lindenbaum.maven.util.MavenUtils.SEPARATOR;
 import static org.codehaus.plexus.util.FileUtils.fileWrite;
 

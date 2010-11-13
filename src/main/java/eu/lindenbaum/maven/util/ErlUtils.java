@@ -7,16 +7,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.ericsson.otp.erlang.OtpAuthException;
-import com.ericsson.otp.erlang.OtpConnection;
-import com.ericsson.otp.erlang.OtpErlangExit;
-import com.ericsson.otp.erlang.OtpErlangList;
-import com.ericsson.otp.erlang.OtpErlangObject;
-import com.ericsson.otp.erlang.OtpErlangString;
-import com.ericsson.otp.erlang.OtpErlangTuple;
-import com.ericsson.otp.erlang.OtpPeer;
-import com.ericsson.otp.erlang.OtpSelf;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -28,85 +18,7 @@ import org.apache.maven.plugin.logging.Log;
  */
 public final class ErlUtils {
   /**
-   * Executes the given erlang script on a remote erlang node using RPC.
-   * 
-   * @param expression to evaluate
-   * @param connection to use for RPC communication
-   * @return the term representing the script result
-   * @throws MojoExecutionException
-   */
-  public static OtpErlangObject eval(String expression, OtpConnection connection) throws MojoExecutionException {
-    try {
-      connection.sendRPC("erl_eval", "new_bindings", new OtpErlangList());
-      OtpErlangObject bindings = connection.receiveRPC();
-
-      connection.sendRPC("erl_scan", "string", new OtpErlangList(new OtpErlangString(expression)));
-      OtpErlangTuple result = (OtpErlangTuple) connection.receiveRPC();
-      OtpErlangObject indicator = result.elementAt(0);
-      if ("ok".equals(indicator.toString())) {
-        connection.sendRPC("erl_parse", "parse_exprs", new OtpErlangList(result.elementAt(1)));
-        result = (OtpErlangTuple) connection.receiveRPC();
-        indicator = result.elementAt(0);
-        if ("ok".equals(indicator.toString())) {
-          OtpErlangList forms = (OtpErlangList) result.elementAt(1);
-          if (forms.arity() > 0) {
-            connection.sendRPC("erl_eval", "expr", new OtpErlangObject[]{ forms.getHead(), bindings });
-            result = (OtpErlangTuple) connection.receiveRPC();
-            indicator = result.elementAt(0);
-            if ("value".equals(indicator.toString())) {
-              return result.elementAt(1);
-            }
-            else {
-              OtpErlangObject errorInfo = result.elementAt(1);
-              throw new MojoExecutionException("failed to evaluate form: " + errorInfo.toString());
-            }
-          }
-          else {
-            throw new MojoExecutionException("couldn't find forms to evaluate in expression");
-          }
-        }
-        else {
-          OtpErlangObject errorInfo = result.elementAt(1);
-          throw new MojoExecutionException("failed to parse tokens: " + errorInfo.toString());
-        }
-      }
-      else {
-        OtpErlangObject errorInfo = result.elementAt(1);
-        throw new MojoExecutionException("failed to scan expression: " + errorInfo.toString());
-      }
-    }
-    catch (IOException e) {
-      throw new MojoExecutionException(e.getMessage(), e);
-    }
-    catch (OtpErlangExit e) {
-      throw new MojoExecutionException(e.getMessage(), e);
-    }
-    catch (OtpAuthException e) {
-      throw new MojoExecutionException(e.getMessage(), e);
-    }
-  }
-
-  /**
-   * A wrapper function around {@link OtpSelf#connect(OtpPeer)} converting all
-   * occuring exceptions into {@link MojoExecutionException}s.
-   * 
-   * @param self name of the node that will be created to connect from
-   * @param peer node to connect to
-   * @return a connection between the nodes that may be used for RPC
-   *         communication
-   * @throws MojoExecutionException
-   */
-  public static OtpConnection connect(String self, OtpPeer peer) throws MojoExecutionException {
-    try {
-      return new OtpSelf(self).connect(peer);
-    }
-    catch (Exception e) {
-      throw new MojoExecutionException(e.getMessage(), e);
-    }
-  }
-
-  /**
-   * Converts the am array into a string containing a valid erlang list. The
+   * Converts an array into a string containing a valid erlang list. The
    * elements will not be converted in any way.
    * 
    * @param array to convert, maybe {@code null}
@@ -122,8 +34,8 @@ public final class ErlUtils {
   }
 
   /**
-   * Converts the a {@link Collection} into a string containing a valid erlang
-   * list. The elements will not be converted in any way.
+   * Converts a {@link Collection} into a string containing a valid erlang list.
+   * The elements will not be converted in any way.
    * 
    * @param list to convert
    * @param p optional predicat whether to include a specific list element,
@@ -147,8 +59,8 @@ public final class ErlUtils {
   }
 
   /**
-   * Converts the a {@link Collection} into a string containing a valid erlang
-   * list. The elements will be converted into erlang strings.
+   * Converts a {@link Collection} into a string containing a valid erlang list.
+   * The elements will be converted into erlang strings.
    * 
    * @param array to convert, maybe {@code null}
    * @param p optional predicat whether to include a specific list element,
@@ -163,8 +75,8 @@ public final class ErlUtils {
   }
 
   /**
-   * Converts the a {@link Collection} into a string containing a valid erlang
-   * list. The elements will be converted into erlang strings.
+   * Converts a {@link Collection} into a string containing a valid erlang list.
+   * The elements will be converted into erlang strings.
    * 
    * @param list to convert
    * @param p optional predicat whether to include a specific list element,
@@ -182,6 +94,38 @@ public final class ErlUtils {
         result.append("\"");
         result.append(elem.toString());
         result.append("\"");
+        i++;
+      }
+    }
+    result.append("]");
+    return result.toString();
+  }
+
+  /**
+   * Converts a {@link Collection} of files into a string containing a valid
+   * erlang list. The files will be converted into erlang strings using
+   * {@link File#getAbsolutePath()}. The files will be checked for {@code null}
+   * and existence. The prefix and postfix {@link String}s will be
+   * prepended/appended to every element of the list.
+   * 
+   * @param list to convert
+   * @param prefix to prepend to an entry
+   * @param postfix to append to an entry
+   * @return a string representing a valid erlang list
+   */
+  public static String toFileList(Collection<File> list, String prefix, String postfix) {
+    StringBuilder result = new StringBuilder("[");
+    int i = 0;
+    for (File file : list) {
+      if (file != null && file.exists()) {
+        if (i != 0) {
+          result.append(", ");
+        }
+        result.append(prefix);
+        result.append("\"");
+        result.append(file.getAbsolutePath());
+        result.append("\"");
+        result.append(postfix);
         i++;
       }
     }
