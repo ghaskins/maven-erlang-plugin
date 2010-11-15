@@ -31,7 +31,7 @@ import org.apache.maven.plugin.logging.Log;
  * @author Olivier Sambourg
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
-public final class CompileMojo extends AbstractCompilerMojo {
+public final class CompileMojo extends AbstractErlangMojo {
   /**
    * Setting this to {@code true} will compile all modules with debug
    * information.
@@ -61,8 +61,11 @@ public final class CompileMojo extends AbstractCompilerMojo {
     List<File> files = getFilesRecursive(this.srcMainErlang, ERL_SUFFIX);
     if (!files.isEmpty()) {
       List<File> includes = new ArrayList<File>();
-      includes.addAll(Arrays.asList(new File[]{ this.srcMainInclude, this.targetInclude, this.srcMainErlang }));
       includes.addAll(getDependencyIncludes(this.targetLib));
+      includes.add(this.srcMainInclude);
+      includes.add(this.targetInclude);
+      includes.add(this.srcMainErlang);
+
       List<String> options = new ArrayList<String>();
       if (this.compilerOptions != null) {
         options.addAll(Arrays.asList(this.compilerOptions));

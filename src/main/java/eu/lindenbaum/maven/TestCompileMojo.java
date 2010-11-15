@@ -1,64 +1,93 @@
 package eu.lindenbaum.maven;
 
+import static eu.lindenbaum.maven.erlang.MavenSelf.DEFAULT_PEER;
 import static eu.lindenbaum.maven.util.ErlConstants.BEAM_SUFFIX;
 import static eu.lindenbaum.maven.util.ErlConstants.ERL_SUFFIX;
+import static eu.lindenbaum.maven.util.FileUtils.extractFilesFromJar;
+import static eu.lindenbaum.maven.util.FileUtils.getDependencyIncludes;
+import static eu.lindenbaum.maven.util.FileUtils.getFilesRecursive;
 import static eu.lindenbaum.maven.util.FileUtils.removeFilesRecursive;
+import static eu.lindenbaum.maven.util.MavenUtils.getPluginFile;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import eu.lindenbaum.maven.erlang.BeamCompilerScript;
+import eu.lindenbaum.maven.erlang.CompilerResult;
+import eu.lindenbaum.maven.erlang.MavenSelf;
+import eu.lindenbaum.maven.erlang.Script;
+
+import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 
 /**
- * Compile erlang test sources and recompile erlang sources with debug
- * information using the {@code export_all} option.
+ * Compile erlang test sources and recompile erlang sources with the options
+ * {@code debug_info}, {@code export_all} and <code>{d, 'TEST'}</code>. This
+ * will also compile the erlang sources provided along with the plugin.
  * 
  * @goal test-compile
  * @phase test-compile
  * @author Olivier Sambourg
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
-public final class TestCompileMojo extends AbstractCompilerMojo {
+public final class TestCompileMojo extends AbstractErlangMojo {
   /**
-   * Additional compiler options for test compilation.
+   * Additional compiler options for test compilation. Note: The user may not
+   * specifiy one of the {@code report} options since the {@link Mojo} itself
+   * uses the {@code return} option internally. Warnings and Errors will always
+   * be printed.
    * 
-   * @parameter
+   * @parameter expression="${testCompilerOptions}"
    */
-  private String[] erlcTestOptions;
+  private String[] testCompilerOptions;
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     Log log = getLog();
-
-    List<String> options = new ArrayList<String>();
-    if (this.erlcTestOptions != null) {
-      options.addAll(Arrays.asList(this.erlcTestOptions));
-    }
-    options.add("+debug_info");
-    options.add("+export_all");
-    options.add("+report_errors");
-    options.add("+report_warnings");
-    options.add("-DTEST");
-
     this.targetTest.mkdirs();
     int removed = removeFilesRecursive(this.targetTest, BEAM_SUFFIX);
-    log.info("Removed " + removed + " stale " + BEAM_SUFFIX + "-files from " + this.targetTest);
+    log.debug("Removed " + removed + " stale " + BEAM_SUFFIX + "-files from " + this.targetTest);
 
-    int i = 0;
-    if (this.srcMainErlang.exists()) {
-      i += compile(this.srcMainErlang, this.targetTest, this.srcMainErlang, ERL_SUFFIX, BEAM_SUFFIX, options);
-    }
-    if (this.srcTestErlang.exists()) {
-      i += compile(this.srcTestErlang, this.targetTest, this.srcTestInclude, ERL_SUFFIX, BEAM_SUFFIX, options);
-    }
-    if (i == 0) {
-      log.info("No sources to compile");
+    List<File> files = getFilesRecursive(this.srcTestErlang, ERL_SUFFIX);
+    if (!files.isEmpty()) {
+      File plugin = getPluginFile("maven-erlang-plugin", this.project, this.repository);
+      extractFilesFromJar(plugin, ERL_SUFFIX, this.targetTest);
+
+      files.addAll(getFilesRecursive(this.srcMainErlang, ERL_SUFFIX));
+      files.add(new File(this.targetTest, "mock.erl"));
+      files.add(new File(this.targetTest, "surefire.erl"));
+      files.add(new File(this.targetTest, "cover2.erl"));
+
+      List<File> includes = new ArrayList<File>();
+      includes.addAll(getDependencyIncludes(this.targetLib));
+      includes.add(this.srcMainInclude);
+      includes.add(this.srcTestInclude);
+      includes.add(this.targetInclude);
+      includes.add(this.srcMainErlang);
+
+      List<String> options = new ArrayList<String>();
+      if (this.testCompilerOptions != null) {
+        options.addAll(Arrays.asList(this.testCompilerOptions));
+      }
+      options.add("debug_info");
+      options.add("export_all");
+      options.add("{d, 'TEST'}");
+
+      Script<CompilerResult> script = new BeamCompilerScript(files, this.targetTest, includes, options);
+      CompilerResult result = MavenSelf.get().eval(DEFAULT_PEER, script);
+      result.logOutput(log);
+      String failedCompilationUnit = result.getFailed();
+      if (failedCompilationUnit != null) {
+        throw new MojoFailureException("failed to compile " + failedCompilationUnit);
+      }
+      log.info("Successfully compiled " + files.size() + " test source file(s).");
     }
     else {
-      log.info("Compiled " + i + " files");
+      log.info("No test source files to compile.");
     }
   }
 }
