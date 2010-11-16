@@ -55,7 +55,7 @@ public class StartBackendMojo extends AbstractErlangMojo {
     final Log log = getLog();
     try {
       try {
-        long serial = System.currentTimeMillis();
+        long serial = System.nanoTime();
         new OtpSelf("maven-erlang-plugin-startup-" + serial).connect(DEFAULT_PEER);
         log.debug("node " + DEFAULT_PEER + " is already running.");
       }
