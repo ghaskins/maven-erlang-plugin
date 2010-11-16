@@ -63,7 +63,7 @@ public final class CompileMojo extends AbstractErlangMojo {
       includes.add(this.srcMainErlang);
 
       List<String> options = new ArrayList<String>();
-      if (this.compilerOptions != null) {
+      if (this.compilerOptions != null && !this.compilerOptions.isEmpty()) {
         log.info("Using additional compiler options: " + this.compilerOptions);
         options.add(this.compilerOptions);
       }

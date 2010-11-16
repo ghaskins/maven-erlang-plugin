@@ -74,7 +74,7 @@ public final class TestCompileMojo extends AbstractErlangMojo {
       options.add("debug_info");
       options.add("export_all");
       options.add("{d, 'TEST'}");
-      if (this.testCompilerOptions != null) {
+      if (this.testCompilerOptions != null && !this.testCompilerOptions.isEmpty()) {
         log.info("Using additinal test compiler options: " + this.testCompilerOptions);
         options.add(this.testCompilerOptions);
       }
