@@ -38,12 +38,13 @@ import org.apache.maven.plugin.logging.Log;
  * @goal dialyzer
  * @phase process-test-classes
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
+ * @author Olle Törnström <olle.toernstroem@lindenbaum.eu>
  */
 public final class DialyzerMojo extends AbstractErlangMojo {
   /**
    * Setting this to {@code true} will skip the {@code dialyzer} analysis.
    * 
-   * @parameter expression=${skipDialyzer} default-value=false
+   * @parameter expression="${skipDialyzer}" default-value=false
    */
   private boolean skipDialyzer;
 
@@ -51,7 +52,7 @@ public final class DialyzerMojo extends AbstractErlangMojo {
    * Setting this to {@code true} will include the projects dependencies into
    * the {@code dialyzer} run. Note: This may take very long.
    * 
-   * @parameter expression=${dialyzerWithDependencies} default-value=false
+   * @parameter expression="${dialyzerWithDependencies}" default-value=false
    */
   private boolean dialyzerWithDependencies;
 
@@ -59,7 +60,7 @@ public final class DialyzerMojo extends AbstractErlangMojo {
    * Setting this to {@code true} will break the build when a {@code dialyzer}
    * run returns warnings.
    * 
-   * @parameter expression=${dialyzerWarningsAreErrors} default-value=false
+   * @parameter expression="${dialyzerWarningsAreErrors}" default-value=false
    */
   private boolean dialyzerWarningsAreErrors;
 
@@ -68,7 +69,7 @@ public final class DialyzerMojo extends AbstractErlangMojo {
    * atoms that will be included when calling
    * <code>dialyzer:run([{warnings,[...]}, ...])</code>.
    * 
-   * @parameter expression=${dialyzerOptions}
+   * @parameter expression="${dialyzerOptions}"
    * @see http://www.erlang.org/doc/man/dialyzer.html
    */
   private String[] dialyzerOptions;
