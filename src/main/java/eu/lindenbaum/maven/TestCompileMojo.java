@@ -11,7 +11,6 @@ import static eu.lindenbaum.maven.util.MavenUtils.getPluginFile;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import eu.lindenbaum.maven.erlang.BeamCompilerScript;
@@ -36,14 +35,16 @@ import org.apache.maven.plugin.logging.Log;
  */
 public final class TestCompileMojo extends AbstractErlangMojo {
   /**
-   * Additional compiler options for test compilation. Note: The user may not
-   * specifiy one of the {@code report} options since the {@link Mojo} itself
-   * uses the {@code return} option internally. Warnings and Errors will always
-   * be printed.
+   * Additional compiler options (comma separated) for test compilation that are
+   * directly passed to <code>compile:file/2</code>, e.g. <code>"{d, Macro},
+   * nowarn_unused_function"</code>. Note: The user may not specifiy one of the
+   * {@code report} options since the {@link Mojo} itself uses the
+   * {@code return} option internally. Warnings and Errors will be printed
+   * without specifying extra options.
    * 
    * @parameter expression="${testCompilerOptions}"
    */
-  private String[] testCompilerOptions;
+  private String testCompilerOptions;
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
@@ -70,12 +71,13 @@ public final class TestCompileMojo extends AbstractErlangMojo {
       includes.add(this.srcMainErlang);
 
       List<String> options = new ArrayList<String>();
-      if (this.testCompilerOptions != null) {
-        options.addAll(Arrays.asList(this.testCompilerOptions));
-      }
       options.add("debug_info");
       options.add("export_all");
       options.add("{d, 'TEST'}");
+      if (this.testCompilerOptions != null) {
+        log.info("Using additinal test compiler options: " + this.testCompilerOptions);
+        options.add(this.testCompilerOptions);
+      }
 
       Script<CompilerResult> script = new BeamCompilerScript(files, this.targetTest, includes, options);
       CompilerResult result = MavenSelf.get().eval(DEFAULT_PEER, script);

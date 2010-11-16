@@ -10,7 +10,6 @@ import static eu.lindenbaum.maven.util.MavenUtils.SEPARATOR;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import eu.lindenbaum.maven.erlang.BeamCompilerScript;
@@ -33,19 +32,16 @@ import org.apache.maven.plugin.logging.Log;
  */
 public final class CompileMojo extends AbstractErlangMojo {
   /**
-   * Setting this to {@code true} will compile all modules with debug
-   * information.
-   * 
-   * @parameter expression=${debugInfo} default-value=false
-   */
-  private boolean debugInfo;
-
-  /**
-   * Additional compiler options.
+   * Additional compiler options (comma separated) for compilation that are
+   * directly passed to <code>compile:file/2</code>, e.g. <code>"debug_info,
+   * nowarn_unused_function"</code>. Note: The user may not specifiy one of the
+   * {@code report} options since the {@link Mojo} itself uses the
+   * {@code return} option internally. Warnings and Errors will be printed
+   * without specifying extra options.
    * 
    * @parameter expression=${compilerOptions}
    */
-  private String[] compilerOptions;
+  private String compilerOptions;
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
@@ -68,10 +64,8 @@ public final class CompileMojo extends AbstractErlangMojo {
 
       List<String> options = new ArrayList<String>();
       if (this.compilerOptions != null) {
-        options.addAll(Arrays.asList(this.compilerOptions));
-      }
-      if (this.debugInfo) {
-        options.add("+debug_info");
+        log.info("Using additional compiler options: " + this.compilerOptions);
+        options.add(this.compilerOptions);
       }
 
       Script<CompilerResult> script = new BeamCompilerScript(files, this.targetEbin, includes, options);
