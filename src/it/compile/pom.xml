@@ -8,7 +8,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <build>
-    <defaultGoal>verify</defaultGoal>
     <plugins>
       <plugin>
         <groupId>eu.lindenbaum</groupId>
