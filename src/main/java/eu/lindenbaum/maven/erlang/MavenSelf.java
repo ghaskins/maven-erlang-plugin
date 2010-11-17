@@ -78,7 +78,7 @@ public final class MavenSelf {
     OtpConnection connection = this.connections.get(peer);
     if (connection == null) {
       try {
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < 10; ++i) {
           try {
             connection = this.self.connect(peer);
             this.connections.put(peer, connection);
