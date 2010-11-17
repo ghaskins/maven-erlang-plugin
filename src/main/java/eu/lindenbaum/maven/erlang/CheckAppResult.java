@@ -1,7 +1,7 @@
 package eu.lindenbaum.maven.erlang;
 
 /**
- * Interface representing the result returned by the {@link CheckAppFileScript}.
+ * Interface representing the result returned by the {@link CheckAppScript}.
  * 
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */

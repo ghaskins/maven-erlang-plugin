@@ -32,6 +32,11 @@ import org.apache.maven.plugin.logging.Log;
  */
 public class StartBackendMojo extends AbstractErlangMojo {
   /**
+   * @parameter expression="${shutdownNode}" default-value=true
+   */
+  private boolean shutdownNode;
+
+  /**
    * Static thread shutting down the running plugin backend.
    */
   private static final Thread shutdownHook = new Thread(new Runnable() {
@@ -74,11 +79,13 @@ public class StartBackendMojo extends AbstractErlangMojo {
         }
         log.debug("node " + DEFAULT_PEER + " sucessfully started.");
       }
-      try {
-        Runtime.getRuntime().addShutdownHook(shutdownHook);
-      }
-      catch (IllegalArgumentException e1) {
-        log.debug("shutdown hook already registered.");
+      if (this.shutdownNode) {
+        try {
+          Runtime.getRuntime().addShutdownHook(shutdownHook);
+        }
+        catch (IllegalArgumentException e1) {
+          log.debug("shutdown hook already registered.");
+        }
       }
     }
     catch (IOException e) {
