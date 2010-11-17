@@ -32,6 +32,9 @@ import org.apache.maven.plugin.logging.Log;
  */
 public class StartBackendMojo extends AbstractErlangMojo {
   /**
+   * Setting this to {@code false} will leave the plugins backend node up and
+   * running even if the executing jvm exits.
+   * 
    * @parameter expression="${shutdownNode}" default-value=true
    */
   private boolean shutdownNode;
@@ -86,6 +89,10 @@ public class StartBackendMojo extends AbstractErlangMojo {
         catch (IllegalArgumentException e1) {
           log.debug("shutdown hook already registered.");
         }
+      }
+      else {
+        log.info("Node " + DEFAULT_PEER + " will not be shutdown automatically.");
+        log.info("To shutdown the node run 'mvn erlang:start-backend -DshutdownNode=true'");
       }
     }
     catch (IOException e) {
