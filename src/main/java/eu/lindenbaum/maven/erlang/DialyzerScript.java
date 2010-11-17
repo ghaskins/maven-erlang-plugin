@@ -28,7 +28,7 @@ public final class DialyzerScript implements Script<String[]> {
 
   private final List<File> files;
   private final List<File> includes;
-  private final String[] options;
+  private final String options;
 
   /**
    * Creates a dialyzer script for a {@link List} of erlang source files,
@@ -39,7 +39,7 @@ public final class DialyzerScript implements Script<String[]> {
    * @param options a list of dialyzer options according to the erlang docs
    * @see http://www.erlang.org/doc/man/dialyzer.html
    */
-  public DialyzerScript(List<File> files, List<File> includes, String[] options) {
+  public DialyzerScript(List<File> files, List<File> includes, String options) {
     this.files = files;
     this.includes = includes;
     this.options = options;
@@ -52,7 +52,7 @@ public final class DialyzerScript implements Script<String[]> {
   public String get() {
     String files = ErlUtils.toFileList(this.files, "", "");
     String incs = ErlUtils.toFileList(this.includes, "", "");
-    String opts = ErlUtils.toPlainList(this.options, null);
+    String opts = "[" + (this.options != null ? this.options : "") + "]";
     return String.format(script, files, incs, opts);
   }
 

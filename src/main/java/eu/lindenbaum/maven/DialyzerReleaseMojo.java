@@ -50,14 +50,14 @@ public final class DialyzerReleaseMojo extends AbstractErlangMojo {
   private boolean dialyzerWarningsAreErrors;
 
   /**
-   * Additional {@code dialyzer} warning options. These must be valid warning
-   * atoms that will be included when calling
+   * Additional {@code dialyzer} warning options. This must be a comma separated
+   * list with valid warning atoms that will be included when calling
    * <code>dialyzer:run([{warnings,[...]}, ...])</code>.
    * 
    * @parameter expression="${dialyzerOptions}"
    * @see http://www.erlang.org/doc/man/dialyzer.html
    */
-  private String[] dialyzerOptions;
+  private String dialyzerOptions;
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {

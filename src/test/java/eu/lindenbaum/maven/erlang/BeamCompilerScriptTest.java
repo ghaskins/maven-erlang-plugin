@@ -32,10 +32,10 @@ public class BeamCompilerScriptTest {
 
   @Test
   public void testGet() {
-    List<File> files = Arrays.asList(new File[]{ new File("file") });
+    List<File> files = Arrays.asList(new File("file"));
     File outdir = new File("outdir");
-    List<File> includes = Arrays.asList(new File[]{ new File("include") });
-    List<String> options = Arrays.asList(new String[]{ "option" });
+    List<File> includes = Arrays.asList(new File("include"));
+    List<String> options = Arrays.asList("option");
 
     BeamCompilerScript script = new BeamCompilerScript(files, outdir, includes, options);
     String expression = script.get();
@@ -51,10 +51,10 @@ public class BeamCompilerScriptTest {
 
     this.control.replay();
 
-    List<File> files = Arrays.asList(new File[]{ new File("file") });
+    List<File> files = Arrays.asList(new File("file"));
     File outdir = new File("outdir");
-    List<File> includes = Arrays.asList(new File[]{ new File("include") });
-    List<String> options = Arrays.asList(new String[]{ "option" });
+    List<File> includes = Arrays.asList(new File("include"));
+    List<String> options = Arrays.asList("option");
 
     OtpErlangAtom warn = new OtpErlangAtom("warn");
     OtpErlangString string1 = new OtpErlangString("message1");

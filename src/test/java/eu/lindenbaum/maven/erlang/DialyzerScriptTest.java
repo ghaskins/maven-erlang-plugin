@@ -18,9 +18,9 @@ import org.junit.Test;
 public class DialyzerScriptTest {
   @Test
   public void testGet() {
-    List<File> files = Arrays.asList(new File[]{ new File("file") });
-    List<File> includes = Arrays.asList(new File[]{ new File("include") });
-    String[] options = new String[]{ "option" };
+    List<File> files = Arrays.asList(new File("file"));
+    List<File> includes = Arrays.asList(new File("include"));
+    String options = "option";
 
     DialyzerScript script = new DialyzerScript(files, includes, options);
     String expression = script.get();
@@ -31,9 +31,9 @@ public class DialyzerScriptTest {
 
   @Test
   public void testHandle() {
-    List<File> files = Arrays.asList(new File[]{ new File("file") });
-    List<File> includes = Arrays.asList(new File[]{ new File("include") });
-    String[] options = new String[]{ "option" };
+    List<File> files = Arrays.asList(new File("file"));
+    List<File> includes = Arrays.asList(new File("include"));
+    String options = "option1, option2";
 
     OtpErlangString warning1 = new OtpErlangString("warning1");
     OtpErlangString warning2 = new OtpErlangString("warning2");
