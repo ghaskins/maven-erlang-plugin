@@ -3,7 +3,7 @@ package eu.lindenbaum.maven.erlang;
 import org.apache.maven.plugin.logging.Log;
 
 /**
- * Interface representing the result returned by compiler {@link Script}s.
+ * Interface representing the result returned by the {@link BeamCompilerScript}.
  * 
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
