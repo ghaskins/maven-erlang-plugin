@@ -134,6 +134,39 @@ public final class ErlUtils {
   }
 
   /**
+   * Converts a {@link Collection} of erlang source or beam files into a string
+   * containing a valid erlang list of module names. The files will be checked
+   * for {@code null} and existence. The prefix and postfix {@link String}s will
+   * be prepended/appended to every element of the list.
+   * 
+   * @param list to convert
+   * @param prefix to prepend to an entry
+   * @param postfix to append to an entry
+   * @return a string representing a valid erlang list
+   */
+  public static String toModuleList(Collection<File> list, String prefix, String postfix) {
+    StringBuilder result = new StringBuilder("[");
+    int i = 0;
+    for (File file : list) {
+      if (file != null && file.exists()) {
+        if (i != 0) {
+          result.append(", ");
+        }
+        result.append(prefix);
+        result.append("'");
+        result.append(file.getName()
+                          .replace(ErlConstants.BEAM_SUFFIX, "")
+                          .replace(ErlConstants.ERL_SUFFIX, ""));
+        result.append("'");
+        result.append(postfix);
+        i++;
+      }
+    }
+    result.append("]");
+    return result.toString();
+  }
+
+  /**
    * Evaluate an erlang expression and return the result.
    * 
    * @param log logger.

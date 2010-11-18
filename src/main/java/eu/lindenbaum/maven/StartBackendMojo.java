@@ -37,7 +37,7 @@ public class StartBackendMojo extends AbstractErlangMojo {
    * 
    * @parameter expression="${shutdownNode}" default-value=true
    */
-  private boolean shutdownNode;
+  private boolean shutdownNode = true;
 
   /**
    * Static thread shutting down the running plugin backend.
