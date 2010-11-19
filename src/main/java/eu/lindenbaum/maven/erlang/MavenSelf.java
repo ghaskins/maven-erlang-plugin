@@ -29,21 +29,20 @@ import org.apache.maven.plugin.MojoExecutionException;
  */
 public final class MavenSelf {
   /**
-   * A bean class holding the information for the pluins backend erlang node.
-   * This can be used by any implementing {@link Mojo} to establish a connection
-   * to the erlang node (for rpc communication) using
-   * {@link OtpSelf#connect(peer)}.
+   * The name of the pluins backend erlang node. This can be used by any
+   * implementing {@link Mojo} to establish a connection to the erlang node (for
+   * rpc communication) using {@link OtpSelf#connect(DEFAULT_PEER)}.
    */
-  public static final OtpPeer DEFAULT_PEER = new OtpPeer("maven-erlang-plugin-backend");
+  public static final String DEFAULT_PEER = "maven-erlang-plugin-backend";
 
   private static MavenSelf instance = null;
 
   private final OtpSelf self;
-  private final Map<OtpPeer, OtpConnection> connections;
+  private final Map<String, OtpConnection> connections;
 
   private MavenSelf(OtpSelf self) {
     this.self = self;
-    this.connections = new HashMap<OtpPeer, OtpConnection>();
+    this.connections = new HashMap<String, OtpConnection>();
   }
 
   /**
@@ -74,13 +73,13 @@ public final class MavenSelf {
    * @return an {@link OtpConnection} that may be used for rpc communication
    * @throws MojoExecutionException in case the connection cannot be established
    */
-  public OtpConnection connect(OtpPeer peer) throws MojoExecutionException {
+  public OtpConnection connect(String peer) throws MojoExecutionException {
     OtpConnection connection = this.connections.get(peer);
     if (connection == null) {
       try {
         for (int i = 0; i < 10; ++i) {
           try {
-            connection = this.self.connect(peer);
+            connection = this.self.connect(new OtpPeer(peer));
             this.connections.put(peer, connection);
             break;
           }
@@ -111,7 +110,7 @@ public final class MavenSelf {
    * @return the processed result of the {@link Script}
    * @throws MojoExecutionException
    */
-  public <T> T eval(OtpPeer peer, Script<T> script) throws MojoExecutionException {
+  public <T> T eval(String peer, Script<T> script) throws MojoExecutionException {
     return script.handle(eval(peer, script.get()));
   }
 
@@ -124,7 +123,7 @@ public final class MavenSelf {
    * @return the result term of the expression
    * @throws MojoExecutionException
    */
-  public OtpErlangObject eval(OtpPeer peer, String expression) throws MojoExecutionException {
+  public OtpErlangObject eval(String peer, String expression) throws MojoExecutionException {
     OtpConnection connection = connect(peer);
     try {
       connection.sendRPC("erl_eval", "new_bindings", new OtpErlangList());

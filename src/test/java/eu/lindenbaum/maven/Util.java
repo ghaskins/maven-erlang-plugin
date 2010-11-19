@@ -1,7 +1,5 @@
 package eu.lindenbaum.maven;
 
-import com.ericsson.otp.erlang.OtpPeer;
-
 import eu.lindenbaum.maven.erlang.MavenSelf;
 
 /**
@@ -10,7 +8,7 @@ import eu.lindenbaum.maven.erlang.MavenSelf;
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
 public final class Util {
-  public static OtpPeer PEER = MavenSelf.DEFAULT_PEER;
+  public static String PEER = MavenSelf.DEFAULT_PEER;
 
   /**
    * Starts a detached node. A connection to that node can be established using

@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
-import com.ericsson.otp.erlang.OtpPeer;
 
 import eu.lindenbaum.maven.erlang.MavenSelf;
 import eu.lindenbaum.maven.erlang.Script;
@@ -22,11 +21,11 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
 public final class TarGzArchiver {
-  private final OtpPeer peer;
+  private final String peer;
   private final File archive;
   private final Map<File, String> files = new HashMap<File, String>();
 
-  public TarGzArchiver(OtpPeer peer, File archive) {
+  public TarGzArchiver(String peer, File archive) {
     this.peer = peer;
     this.archive = archive;
   }

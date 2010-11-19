@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import com.ericsson.otp.erlang.OtpAuthException;
 import com.ericsson.otp.erlang.OtpConnection;
 import com.ericsson.otp.erlang.OtpErlangList;
+import com.ericsson.otp.erlang.OtpPeer;
 import com.ericsson.otp.erlang.OtpSelf;
 
 import eu.lindenbaum.maven.erlang.MavenSelf;
@@ -48,10 +49,10 @@ public class StartBackendMojo extends AbstractErlangMojo {
       try {
         OtpConnection connection = MavenSelf.get().connect(DEFAULT_PEER);
         connection.sendRPC("erlang", "halt", new OtpErlangList());
-        System.out.println("[INFO] Successfully shut down " + DEFAULT_PEER);
+        System.out.println("[INFO] Successfully shut down '" + DEFAULT_PEER + "'");
       }
       catch (Exception e) {
-        System.out.println("[ERROR] Failed to shutdown " + DEFAULT_PEER);
+        System.out.println("[ERROR] Failed to shutdown '" + DEFAULT_PEER + "'");
         e.printStackTrace();
       }
       System.out.println("[INFO] " + SEPARATOR);
@@ -61,26 +62,27 @@ public class StartBackendMojo extends AbstractErlangMojo {
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     final Log log = getLog();
+    OtpPeer peer = new OtpPeer(DEFAULT_PEER);
     try {
       try {
         long serial = System.nanoTime();
-        new OtpSelf("maven-erlang-plugin-startup-" + serial).connect(DEFAULT_PEER);
-        log.debug("node " + DEFAULT_PEER + " is already running.");
+        new OtpSelf("maven-erlang-plugin-startup-" + serial).connect(peer);
+        log.debug("node " + peer + " is already running.");
       }
       catch (IOException e) {
-        log.debug("starting " + DEFAULT_PEER + ".");
+        log.debug("starting " + peer + ".");
         ArrayList<String> command = new ArrayList<String>();
         command.add(ErlConstants.ERL);
         command.add("-boot");
         command.add("start_sasl");
         command.add("-sname");
-        command.add(DEFAULT_PEER.alive());
+        command.add(peer.alive());
         command.add("-detached");
         Process process = new ProcessBuilder(command).start();
         if (process.waitFor() != 0) {
-          throw new MojoExecutionException("failed to start " + DEFAULT_PEER);
+          throw new MojoExecutionException("failed to start " + peer);
         }
-        log.debug("node " + DEFAULT_PEER + " sucessfully started.");
+        log.debug("node " + peer + " sucessfully started.");
       }
       if (this.shutdownNode) {
         try {
@@ -91,18 +93,18 @@ public class StartBackendMojo extends AbstractErlangMojo {
         }
       }
       else {
-        log.info("Node " + DEFAULT_PEER + " will not be shutdown automatically.");
+        log.info("Node " + peer + " will not be shutdown automatically.");
         log.info("To shutdown the node run 'mvn erlang:start-backend -DshutdownNode=true'");
       }
     }
     catch (IOException e) {
-      throw new MojoExecutionException("failed to start " + DEFAULT_PEER, e);
+      throw new MojoExecutionException("failed to start " + peer, e);
     }
     catch (OtpAuthException e) {
-      throw new MojoExecutionException("failed to connect to " + DEFAULT_PEER, e);
+      throw new MojoExecutionException("failed to connect to " + peer, e);
     }
     catch (InterruptedException e) {
-      throw new MojoExecutionException("failed to start " + DEFAULT_PEER, e);
+      throw new MojoExecutionException("failed to start " + peer, e);
     }
   }
 }

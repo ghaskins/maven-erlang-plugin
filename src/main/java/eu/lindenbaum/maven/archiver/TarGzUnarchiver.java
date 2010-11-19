@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
-import com.ericsson.otp.erlang.OtpPeer;
 
 import eu.lindenbaum.maven.erlang.MavenSelf;
 import eu.lindenbaum.maven.erlang.Script;
@@ -19,14 +18,14 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
 public final class TarGzUnarchiver {
-  private final OtpPeer peer;
+  private final String peer;
   private final File destination;
 
-  public TarGzUnarchiver(OtpPeer peer) {
+  public TarGzUnarchiver(String peer) {
     this(peer, new File("."));
   }
 
-  public TarGzUnarchiver(OtpPeer peer, File destination) {
+  public TarGzUnarchiver(String peer, File destination) {
     this.peer = peer;
     this.destination = destination;
   }
