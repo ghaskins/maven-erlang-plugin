@@ -16,7 +16,7 @@ import eu.lindenbaum.maven.util.ErlUtils;
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  * @author Olle Törnström <olle.toernstroem@lindenbaum.eu>
  */
-public class FilterForAttributeScript implements Script<String[]> {
+public class FilterForAttributeScript implements Script<String> {
   private static final String script = //
   "    lists:flatten(" + //
       "  lists:foldl(" + //
@@ -44,25 +44,29 @@ public class FilterForAttributeScript implements Script<String[]> {
 
   @Override
   public String get() {
-    String modules = ErlUtils.toModuleList(this.modules, "", "");
+    String modules = ErlUtils.toModuleList(this.modules, "'", "'");
     return String.format(script, modules, this.attribute);
   }
 
   /**
-   * Converts the result of the {@link Script} execution into a list of modules
-   * specifying a specific attribute.
+   * Converts the result of the {@link Script} execution into a {@link String}
+   * containing an erlang list of modules specifying a specific attribute.
    * 
    * @param result to convert
    * @return A list of modules, never {@code null}.
    */
   @Override
-  public String[] handle(OtpErlangObject result) {
+  public String handle(OtpErlangObject result) {
     OtpErlangList resultList = (OtpErlangList) result;
-    String[] filtered = new String[resultList.arity()];
+    StringBuilder filtered = new StringBuilder("[");
     for (int i = 0; i < resultList.arity(); ++i) {
+      if (i != 0) {
+        filtered.append(", ");
+      }
       OtpErlangAtom module = (OtpErlangAtom) resultList.elementAt(i);
-      filtered[i] = module.atomValue();
+      filtered.append("'" + module.atomValue() + "'");
     }
-    return filtered;
+    filtered.append("]");
+    return filtered.toString();
   }
 }

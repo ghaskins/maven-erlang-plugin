@@ -18,31 +18,33 @@ import org.apache.maven.plugin.logging.Log;
  */
 public final class ErlUtils {
   /**
-   * Converts an array into a string containing a valid erlang list. The
-   * elements will not be converted in any way.
+   * Converts an array into a string containing a valid erlang list.
    * 
    * @param array to convert, maybe {@code null}
    * @param p optional predicat whether to include a specific list element,
    *          maybe {@code null}
+   * @param prefix to prepend to an entry
+   * @param postfix to append to an entry
    * @return a string representing a valid erlang list
    */
-  public static <T> String toPlainList(T[] array, Predicate<T> p) {
+  public static <T> String toList(T[] array, Predicate<T> p, String prefix, String postfix) {
     if (array != null) {
-      return toPlainList(Arrays.asList(array), p);
+      return toList(Arrays.asList(array), p, prefix, postfix);
     }
     return "[]";
   }
 
   /**
    * Converts a {@link Collection} into a string containing a valid erlang list.
-   * The elements will not be converted in any way.
    * 
    * @param list to convert
    * @param p optional predicat whether to include a specific list element,
    *          maybe {@code null}
+   * @param prefix to prepend to an entry
+   * @param postfix to append to an entry
    * @return a string representing a valid erlang list
    */
-  public static <T> String toPlainList(Collection<T> list, Predicate<T> p) {
+  public static <T> String toList(Collection<T> list, Predicate<T> p, String prefix, String postfix) {
     StringBuilder result = new StringBuilder("[");
     int i = 0;
     for (T elem : list) {
@@ -50,50 +52,9 @@ public final class ErlUtils {
         if (i != 0) {
           result.append(", ");
         }
+        result.append(prefix);
         result.append(elem.toString());
-        i++;
-      }
-    }
-    result.append("]");
-    return result.toString();
-  }
-
-  /**
-   * Converts a {@link Collection} into a string containing a valid erlang list.
-   * The elements will be converted into erlang strings.
-   * 
-   * @param array to convert, maybe {@code null}
-   * @param p optional predicat whether to include a specific list element,
-   *          maybe {@code null}
-   * @return a string representing a valid erlang list
-   */
-  public static <T> String toStringList(T[] array, Predicate<T> p) {
-    if (array != null) {
-      return toStringList(Arrays.asList(array), p);
-    }
-    return "[]";
-  }
-
-  /**
-   * Converts a {@link Collection} into a string containing a valid erlang list.
-   * The elements will be converted into erlang strings.
-   * 
-   * @param list to convert
-   * @param p optional predicat whether to include a specific list element,
-   *          maybe {@code null}
-   * @return a string representing a valid erlang list
-   */
-  public static <T> String toStringList(Collection<T> list, Predicate<T> p) {
-    StringBuilder result = new StringBuilder("[");
-    int i = 0;
-    for (T elem : list) {
-      if (p == null || p.pred(elem)) {
-        if (i != 0) {
-          result.append(", ");
-        }
-        result.append("\"");
-        result.append(elem.toString());
-        result.append("\"");
+        result.append(postfix);
         i++;
       }
     }
@@ -103,10 +64,11 @@ public final class ErlUtils {
 
   /**
    * Converts a {@link Collection} of files into a string containing a valid
-   * erlang list. The files will be converted into erlang strings using
+   * erlang list. The files will be converted using
    * {@link File#getAbsolutePath()}. The files will be checked for {@code null}
    * and existence. The prefix and postfix {@link String}s will be
-   * prepended/appended to every element of the list.
+   * prepended/appended to every element of the list. This may be used to quote
+   * the returned paths correctly as erlang strings.
    * 
    * @param list to convert
    * @param prefix to prepend to an entry
@@ -122,9 +84,7 @@ public final class ErlUtils {
           result.append(", ");
         }
         result.append(prefix);
-        result.append("\"");
         result.append(file.getAbsolutePath());
-        result.append("\"");
         result.append(postfix);
         i++;
       }
@@ -137,7 +97,8 @@ public final class ErlUtils {
    * Converts a {@link Collection} of erlang source or beam files into a string
    * containing a valid erlang list of module names. The files will be checked
    * for {@code null} and existence. The prefix and postfix {@link String}s will
-   * be prepended/appended to every element of the list.
+   * be prepended/appended to every element of the list. This may be used to
+   * quote the module list correctly.
    * 
    * @param list to convert
    * @param prefix to prepend to an entry
@@ -153,11 +114,9 @@ public final class ErlUtils {
           result.append(", ");
         }
         result.append(prefix);
-        result.append("'");
         result.append(file.getName()
                           .replace(ErlConstants.BEAM_SUFFIX, "")
                           .replace(ErlConstants.ERL_SUFFIX, ""));
-        result.append("'");
         result.append(postfix);
         i++;
       }

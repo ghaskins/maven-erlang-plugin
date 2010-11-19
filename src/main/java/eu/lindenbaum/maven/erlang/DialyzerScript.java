@@ -50,8 +50,8 @@ public final class DialyzerScript implements Script<String[]> {
    */
   @Override
   public String get() {
-    String files = ErlUtils.toFileList(this.files, "", "");
-    String incs = ErlUtils.toFileList(this.includes, "", "");
+    String files = ErlUtils.toFileList(this.files, "\"", "\"");
+    String incs = ErlUtils.toFileList(this.includes, "\"", "\"");
     String opts = "[" + (this.options != null ? this.options : "") + "]";
     return String.format(script, files, incs, opts);
   }

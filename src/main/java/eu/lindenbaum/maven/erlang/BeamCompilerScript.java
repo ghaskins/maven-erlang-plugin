@@ -74,9 +74,9 @@ public final class BeamCompilerScript implements Script<CompilerResult> {
   @Override
   public String get() {
     String out = this.outdir.getAbsolutePath();
-    String incs = ErlUtils.toFileList(this.includes, "{i, ", "}");
-    String opts = ErlUtils.toPlainList(this.options, null);
-    String files = ErlUtils.toFileList(this.files, "", "");
+    String incs = ErlUtils.toFileList(this.includes, "{i, \"", "\"}");
+    String opts = ErlUtils.toList(this.options, null, "", "");
+    String files = ErlUtils.toFileList(this.files, "\"", "\"");
     return String.format(script, out, incs, opts, files);
   }
 

@@ -1,6 +1,6 @@
 package eu.lindenbaum.maven.erlang;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
@@ -35,8 +35,8 @@ public class FilterForAttributeScriptTest {
     OtpErlangList result = new OtpErlangList();
 
     FilterForAttributeScript script = new FilterForAttributeScript(modules, attribute);
-    String[] filtered = script.handle(result);
-    assertArrayEquals(new String[0], filtered);
+    String filtered = script.handle(result);
+    assertEquals("[]", filtered);
   }
 
   @Test
@@ -49,7 +49,7 @@ public class FilterForAttributeScriptTest {
     OtpErlangList result = new OtpErlangList(new OtpErlangObject[]{ file1, file2 });
 
     FilterForAttributeScript script = new FilterForAttributeScript(modules, attribute);
-    String[] filtered = script.handle(result);
-    assertArrayEquals(new String[]{ "file1", "file2" }, filtered);
+    String filtered = script.handle(result);
+    assertEquals("['file1', 'file2']", filtered);
   }
 }
