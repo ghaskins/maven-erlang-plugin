@@ -105,13 +105,14 @@ handle_cancel(test, Data, St = #state{lines = Lines}) ->
 %%% @end
 %%%-----------------------------------------------------------------------------
 terminate({ok, Data}, #state{lines = Lines, report_to = Dest}) ->
+    io:format("~p", [Data]),
     Pass = proplists:get_value(pass, Data, 0),
     Fail = proplists:get_value(fail, Data, 0),
     Skip = proplists:get_value(skip, Data, 0),
     Cancel = proplists:get_value(cancel, Data, 0),
-    Dest ! Lines ++ format_result(Pass, Fail, Skip, Cancel);
+    Dest ! format_result(Pass, Fail, Skip, Cancel, Lines);
 terminate({error, Reason}, #state{lines = Lines, report_to = Dest}) ->
-    Dest ! Lines ++ [format("Internal error: ~p.\n", [Reason])].
+    Dest ! {error, Lines ++ [format("Internal error: ~p.\n", [Reason])]}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% internal function section
@@ -120,29 +121,35 @@ terminate({error, Reason}, #state{lines = Lines, report_to = Dest}) ->
 %%% @doc
 %%% @end
 %%%-----------------------------------------------------------------------------
-format_result(0, 0, 0, 0) ->
-    ["  There were no tests to run."];
-format_result(1, 0, 0, 0) ->
-    ["  Test passed."];
-format_result(Pass, 0, 0, 0) ->
-    [format("  All ~w tests passed.", [Pass])];
-format_result(Pass, Fail, Skip, 0) ->
-    ["=======================================================",
-     format("  Failed: ~w.  Skipped: ~w.  Passed: ~w.", 
-	    [Fail, Skip, Pass])];
-format_result(Pass, Fail, Skip, Cancel) ->
-    ["=======================================================",
-     format("  Failed: ~w.  Skipped: ~w.  Passed: ~w  Cancelled: ~w.",
-	    [Fail, Skip, Pass, Cancel])].
+format_result(0, 0, 0, 0, Acc) ->
+    {warn, Acc ++ ["  There were no tests to run."]};
+format_result(1, 0, 0, 0, Acc) ->
+    {info, Acc ++ ["  Test passed."]};
+format_result(Pass, 0, 0, 0, Acc) ->
+    {info, Acc ++ [format("  All ~w tests passed.", [Pass])]};
+format_result(Pass, Fail, Skip, 0, Acc) ->
+    {error, Acc ++
+     ["=======================================================",
+      format("  Failed: ~w.  Skipped: ~w.  Passed: ~w.", 
+	     [Fail, Skip, Pass])]};
+format_result(Pass, Fail, Skip, Cancel, Acc) ->
+    {error, Acc ++
+     ["=======================================================",
+      format("  Failed: ~w.  Skipped: ~w.  Passed: ~w  Cancelled: ~w.",
+	     [Fail, Skip, Pass, Cancel])]}.
 
 %%%-----------------------------------------------------------------------------
 %%% @doc
 %%% @end
 %%%-----------------------------------------------------------------------------
 print_test_error({error, Exception}, Data) ->
-    O = format("  output:<<\"~w\">>", [proplists:get_value(output, Data)]),
-    E = format("~s", [eunit_lib:format_exception(Exception)]),
-    ["*failed*", E, O, ""];
+    O = case proplists:get_value(output, Data) of
+	    undefined -> [""];
+	    <<>> -> [""];
+	    Else -> [format("  output:<<\"~w\">>", [Else]), ""]
+	end,
+    E = format("::~s", [eunit_lib:format_exception(Exception)]),
+    ["*failed*", E] ++ O;
 print_test_error({skipped, Reason}, _) ->
     ["*did not run*"] ++ format_skipped(Reason).
 
@@ -151,9 +158,9 @@ print_test_error({skipped, Reason}, _) ->
 %%% @end
 %%%-----------------------------------------------------------------------------
 format_skipped({module_not_found, M}) ->
-    [format("missing module: ~w", [M])];
+    [format("::missing module: ~w", [M]), ""];
 format_skipped({no_such_function, {M, F, A}}) ->
-    [format("no such function: ~w:~w/~w", [M, F, A])].
+    [format("::no such function: ~w:~w/~w", [M, F, A]), ""].
 
 %%%-----------------------------------------------------------------------------
 %%% @doc
@@ -170,7 +177,7 @@ format_cancel({blame, _}) ->
 format_cancel({exit, Reason}) ->
     ["*unexpected termination of test process*", format("::~p", [Reason]), ""];
 format_cancel({abort, Reason}) ->
-    [format("~s", [eunit_lib:format_error(Reason)])].
+    ["*eunit error*", format("::~s", [eunit_lib:format_error(Reason)]), ""].
 
 %%%-----------------------------------------------------------------------------
 %%% @doc
