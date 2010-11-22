@@ -75,7 +75,10 @@ handle_end(test, Data, St = #state{lines = Lines}) ->
     case proplists:get_value(status, Data) of
 	ok -> St;
 	Status ->
-	    St#state{lines = Lines ++ print_test_error(Status, Data)}
+	    Output = proplists:get_value(output, Data),
+	    St#state{lines = Lines
+		     ++ format_description(Data)
+		     ++ format_output(Status, Output)}
     end;
 handle_end(_, _, State) ->
     State.
@@ -97,7 +100,9 @@ handle_cancel(group, Data, St = #state{lines = Lines}) ->
     end;
 handle_cancel(test, Data, St = #state{lines = Lines}) ->
     Reason = proplists:get_value(reason, Data),
-    St#state{lines = Lines ++ format_cancel(Reason)}.
+    St#state{lines = Lines
+	     ++ format_description(Data)
+	     ++ format_cancel(Reason)}.
 
 %%%-----------------------------------------------------------------------------
 %%% @doc
@@ -116,6 +121,20 @@ terminate({error, Reason}, #state{lines = Lines, report_to = Dest}) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% internal function section
+
+format_description(Data) ->
+    Line = proplists:get_value(line, Data, 0),
+    Source = proplists:get_value(source, Data),
+    Desc = proplists:get_value(desc, Data, ""),
+    L = case Line of
+	    0 -> "";
+	    _ -> format("~w", [Line])
+	end,
+    [case Source of
+	 {M, F, A} -> format("~w.erl:~s ~w/~w... ", [M, L, F, A]);
+	 undefined -> format("~s:~s... ", [Desc, L]);
+	 Else -> format("~w:~s... ", [Else, L])
+     end].
 
 %%%-----------------------------------------------------------------------------
 %%% @doc
@@ -142,15 +161,16 @@ format_result(Pass, Fail, Skip, Cancel, Acc) ->
 %%% @doc
 %%% @end
 %%%-----------------------------------------------------------------------------
-print_test_error({error, Exception}, Data) ->
-    O = case proplists:get_value(output, Data) of
-	    undefined -> [""];
-	    <<>> -> [""];
-	    Else -> [format("  output:<<\"~w\">>", [Else]), ""]
-	end,
+format_output({error, Exception}, undefined) ->
     E = format("::~s", [eunit_lib:format_exception(Exception)]),
-    ["*failed*", E] ++ O;
-print_test_error({skipped, Reason}, _) ->
+    ["*failed*", E, ""];
+format_output({error, Exception}, <<>>) ->
+    E = format("::~s", [eunit_lib:format_exception(Exception)]),
+    ["*failed*", E, ""];
+format_output({error, Exception}, Else) ->
+    E = format("::~s", [eunit_lib:format_exception(Exception)]),
+    ["*failed*", E, format("  output: ~p", [Else]), ""];
+format_output({skipped, Reason}, _) ->
     ["*did not run*"] ++ format_skipped(Reason).
 
 %%%-----------------------------------------------------------------------------
