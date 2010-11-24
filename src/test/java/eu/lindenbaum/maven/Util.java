@@ -1,6 +1,7 @@
 package eu.lindenbaum.maven;
 
 import eu.lindenbaum.maven.erlang.MavenSelf;
+import eu.lindenbaum.maven.mojo.StartBackend;
 
 /**
  * Utility for unit tests needing a running erlang backend node.
@@ -16,7 +17,7 @@ public final class Util {
    */
   public static void startBackendNode() {
     try {
-      new StartBackendMojo().execute();
+      new StartBackend().execute();
     }
     catch (Exception e) {
       // ignored

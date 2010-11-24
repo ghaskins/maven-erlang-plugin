@@ -7,6 +7,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -51,7 +52,6 @@ abstract class ErlangMojo extends AbstractMojo {
    * 
    * @parameter expression="${node}" default-value="maven-erlang-plugin-backend"
    * @required
-   * @readonly
    */
   private String node;
 
@@ -60,7 +60,6 @@ abstract class ErlangMojo extends AbstractMojo {
    * 
    * @parameter expression="${cookie}" default-value=""
    * @required
-   * @readonly
    */
   private String cookie;
 
@@ -72,16 +71,17 @@ abstract class ErlangMojo extends AbstractMojo {
   public void execute() throws MojoExecutionException, MojoFailureException {
     PackagingType type = PackagingType.fromString(this.project.getPackaging());
     Properties p = new PropertiesImpl(type, this.project, this.repository, this.base, this.node, this.cookie);
-    execute(p);
+    execute(getLog(), p);
   }
 
   /**
    * Will be invoked when {@link #execute()} gets invoked on the base class.
    * 
+   * @param log logger to be used for output logging
    * @param p to be passed by the base class.
    * @see AbstractMojo#execute()
    */
-  protected abstract void execute(Properties p) throws MojoExecutionException, MojoFailureException;
+  protected abstract void execute(Log log, Properties p) throws MojoExecutionException, MojoFailureException;
 
   /**
    * Implementation of the {@link Properties} bean that provides the directory

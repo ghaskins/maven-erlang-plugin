@@ -78,6 +78,16 @@ enum PackagingType {
   }
 
   /**
+   * Compares a specific id with this types id.
+   * 
+   * @param id to compare to this enums id
+   * @return {@code true} if the ids match, {@code false} otherwise
+   */
+  public boolean isA(String id) {
+    return this.id.equals(id);
+  }
+
+  /**
    * Returns a {@link PackagingType} for a packaging id. If the string does not
    * match a specific enum type an {@link IllegalArgumentException} is thrown.
    * 

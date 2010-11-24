@@ -1,7 +1,4 @@
-package eu.lindenbaum.maven;
-
-import static eu.lindenbaum.maven.erlang.MavenSelf.DEFAULT_PEER;
-import static eu.lindenbaum.maven.util.MavenUtils.SEPARATOR;
+package eu.lindenbaum.maven.mojo;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,6 +11,7 @@ import com.ericsson.otp.erlang.OtpSelf;
 
 import eu.lindenbaum.maven.erlang.MavenSelf;
 import eu.lindenbaum.maven.util.ErlConstants;
+import eu.lindenbaum.maven.util.MavenUtils;
 
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -21,24 +19,30 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 
 /**
- * {@link Mojo} that starts an erlang node {@link AbstractErlangMojo#peer} used
- * as a backend for rpcs made by the plugin. The node will only be started if it
- * is not already running. The node will be shutdown when the executing JVM
- * exits. This is done by a {@link Runtime#addShutdownHook(Thread)} which will
- * only be added <b>once</b> each JVM execution.
+ * {@link Mojo} that starts the an erlang node used as a backend for rpcs made
+ * by the plugin. The node will only be started if it is not already running.
+ * The node will be shutdown when the executing JVM exits. This is done by a
+ * {@link Runtime#addShutdownHook(Thread)} which will only be added <b>once</b>
+ * each JVM execution.
  * 
  * @goal start-backend
  * @phase initialize
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
-public class StartBackendMojo extends AbstractErlangMojo {
+public class StartBackend extends ErlangMojo {
   /**
    * Setting this to {@code false} will leave the plugins backend node up and
    * running even if the executing jvm exits.
    * 
    * @parameter expression="${shutdownNode}" default-value=true
    */
-  private boolean shutdownNode = true;
+  boolean shutdownNode = true;
+
+  /**
+   * Static placeholder to insert the actual (configured) node name into the
+   * shutdown hook.
+   */
+  static volatile String nodeName = "maven-erlang-plugin-backend";
 
   /**
    * Static thread shutting down the running plugin backend.
@@ -47,22 +51,22 @@ public class StartBackendMojo extends AbstractErlangMojo {
     @Override
     public void run() {
       try {
-        OtpConnection connection = MavenSelf.get().connect(DEFAULT_PEER);
+        OtpConnection connection = MavenSelf.get().connect(nodeName);
         connection.sendRPC("erlang", "halt", new OtpErlangList());
-        System.out.println("[INFO] Successfully shut down '" + DEFAULT_PEER + "'");
+        System.out.println("[INFO] Successfully shut down '" + nodeName + "'");
       }
       catch (Exception e) {
-        System.out.println("[ERROR] Failed to shutdown '" + DEFAULT_PEER + "'");
+        System.out.println("[ERROR] Failed to shutdown '" + nodeName + "'");
         e.printStackTrace();
       }
-      System.out.println("[INFO] " + SEPARATOR);
+      System.out.println("[INFO] " + MavenUtils.SEPARATOR);
     }
   });
 
   @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
-    final Log log = getLog();
-    OtpPeer peer = new OtpPeer(DEFAULT_PEER);
+  protected void execute(final Log log, Properties p) throws MojoExecutionException, MojoFailureException {
+    nodeName = p.node();
+    OtpPeer peer = new OtpPeer(nodeName);
     try {
       try {
         long serial = System.nanoTime();
