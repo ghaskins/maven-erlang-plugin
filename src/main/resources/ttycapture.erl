@@ -110,7 +110,6 @@ handle_cancel(test, Data, St = #state{lines = Lines}) ->
 %%% @end
 %%%-----------------------------------------------------------------------------
 terminate({ok, Data}, #state{lines = Lines, report_to = Dest}) ->
-    io:format("~p", [Data]),
     Pass = proplists:get_value(pass, Data, 0),
     Fail = proplists:get_value(fail, Data, 0),
     Skip = proplists:get_value(skip, Data, 0),
