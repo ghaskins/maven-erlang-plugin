@@ -35,15 +35,19 @@ public final class BeamCompilerScript implements Script<CompilerResult> {
       "                             end," + //
       "          R = lists:foldr(" + //
       "                fun({Level, {File, Exceptions}}, Acc) ->" + //
-      "                        lists:map(fun({Line, Module, Info}) ->" + //
-      "                                          Formatted = Module:format_error(Info)," + //
-      "                                          Flattened = lists:flatten(Formatted)," + //
-      "                                          S = io_lib:format(\"~s:~p: ~s\", [File, Line, Flattened])," + //
-      "                                          {Level, lists:flatten(S)};" + //
-      "                                     (Else) ->" + //
-      "                                          S = io_lib:format(\"~s: ~p\", [File, Else])," + //
-      "                                          {Level, lists:flatten(S)}" + //
-      "                                  end, Exceptions) ++ Acc" + //
+      "                        lists:foldr(fun({Line, Module, Info}, A) ->" + //
+      "                                            Formatted = Module:format_error(Info)," + //
+      "                                            Flattened = lists:flatten(Formatted)," + //
+      "                                            F = io_lib:format(\"~s:~p:\", [File, Line])," + //
+      "                                            S = io_lib:format(\"~s\", [Flattened])," + //
+      "                                            [{Level, lists:flatten(F)}," + //
+      "                                             {Level, lists:flatten(S)}] ++ A;" + //
+      "                                       (Else, A) ->" + //
+      "                                            F = io_lib:format(\"~s:\", [File])," + //
+      "                                            S = io_lib:format(\"~p\", [Else])," + //
+      "                                            [{Level, lists:flatten(F)}," + //
+      "                                             {Level, lists:flatten(S)}] ++ A" + //
+      "                                    end, Acc, Exceptions)" + //
       "                end, [], Messages)," + //
       "          {Fail, Reports ++ R};" + //
       "     (_, Result) ->" + //

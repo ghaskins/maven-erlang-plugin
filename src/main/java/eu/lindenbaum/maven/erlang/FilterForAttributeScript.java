@@ -45,7 +45,7 @@ public class FilterForAttributeScript implements Script<String> {
   @Override
   public String get() {
     String modules = ErlUtils.toModuleList(this.modules, "'", "'");
-    return String.format(script, modules, this.attribute);
+    return String.format(script, this.attribute, modules);
   }
 
   /**

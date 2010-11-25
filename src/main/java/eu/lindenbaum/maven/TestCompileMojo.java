@@ -7,6 +7,7 @@ import static eu.lindenbaum.maven.util.FileUtils.extractFilesFromJar;
 import static eu.lindenbaum.maven.util.FileUtils.getDependencyIncludes;
 import static eu.lindenbaum.maven.util.FileUtils.getFilesRecursive;
 import static eu.lindenbaum.maven.util.FileUtils.removeFilesRecursive;
+import static eu.lindenbaum.maven.util.MavenUtils.SEPARATOR;
 import static eu.lindenbaum.maven.util.MavenUtils.getPluginFile;
 
 import java.io.File;
@@ -49,6 +50,10 @@ public final class TestCompileMojo extends AbstractErlangMojo {
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     Log log = getLog();
+    log.info(SEPARATOR);
+    log.info(" T E S T - C O M P I L E");
+    log.info(SEPARATOR);
+
     this.targetTest.mkdirs();
     int removed = removeFilesRecursive(this.targetTest, BEAM_SUFFIX);
     log.debug("Removed " + removed + " stale " + BEAM_SUFFIX + "-files from " + this.targetTest);
