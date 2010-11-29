@@ -1,12 +1,8 @@
-package eu.lindenbaum.maven;
+package eu.lindenbaum.maven.mojo;
 
-import static eu.lindenbaum.maven.erlang.MavenSelf.DEFAULT_PEER;
-import static eu.lindenbaum.maven.util.ErlConstants.BEAM_SUFFIX;
-import static eu.lindenbaum.maven.util.ErlConstants.ERL_SUFFIX;
 import static eu.lindenbaum.maven.util.FileUtils.getDependencyIncludes;
 import static eu.lindenbaum.maven.util.FileUtils.getFilesRecursive;
 import static eu.lindenbaum.maven.util.FileUtils.removeFilesRecursive;
-import static eu.lindenbaum.maven.util.MavenUtils.SEPARATOR;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -16,6 +12,8 @@ import eu.lindenbaum.maven.erlang.BeamCompilerScript;
 import eu.lindenbaum.maven.erlang.CompilerResult;
 import eu.lindenbaum.maven.erlang.MavenSelf;
 import eu.lindenbaum.maven.erlang.Script;
+import eu.lindenbaum.maven.util.ErlConstants;
+import eu.lindenbaum.maven.util.MavenUtils;
 
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -31,7 +29,7 @@ import org.apache.maven.plugin.logging.Log;
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  * @author Olle Törnström <olle.toernstroem@lindenbaum.eu>
  */
-public final class CompileMojo extends AbstractErlangMojo {
+public final class Compiler extends ErlangMojo {
   /**
    * Additional compiler options (comma separated) for compilation that are
    * directly passed to <code>compile:file/2</code>, e.g. <code>"debug_info,
@@ -45,23 +43,22 @@ public final class CompileMojo extends AbstractErlangMojo {
   private String compilerOptions;
 
   @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
-    Log log = getLog();
-    log.info(SEPARATOR);
-    log.info(" C O M P I L E");
-    log.info(SEPARATOR);
+  protected void execute(Log log, Properties p) throws MojoExecutionException, MojoFailureException {
+    log.info(MavenUtils.SEPARATOR);
+    log.info(" C O M P I L E R");
+    log.info(MavenUtils.SEPARATOR);
 
-    this.targetEbin.mkdirs();
-    int removed = removeFilesRecursive(this.targetEbin, BEAM_SUFFIX);
-    log.debug("Removed " + removed + " stale " + BEAM_SUFFIX + "-files from " + this.targetEbin);
+    p.targetEbin().mkdirs();
+    int removed = removeFilesRecursive(p.targetEbin(), ErlConstants.BEAM_SUFFIX);
+    log.debug("Removed " + removed + " stale " + ErlConstants.BEAM_SUFFIX + "-files from " + p.targetEbin());
 
-    List<File> files = getFilesRecursive(this.srcMainErlang, ERL_SUFFIX);
+    List<File> files = getFilesRecursive(p.src(), ErlConstants.ERL_SUFFIX);
     if (!files.isEmpty()) {
       List<File> includes = new ArrayList<File>();
-      includes.addAll(getDependencyIncludes(this.targetLib));
-      includes.add(this.srcMainInclude);
-      includes.add(this.targetInclude);
-      includes.add(this.srcMainErlang);
+      includes.addAll(getDependencyIncludes(p.targetLib()));
+      includes.add(p.include());
+      includes.add(p.targetInclude());
+      includes.add(p.src());
 
       List<String> options = new ArrayList<String>();
       if (this.compilerOptions != null && !this.compilerOptions.isEmpty()) {
@@ -69,8 +66,8 @@ public final class CompileMojo extends AbstractErlangMojo {
         options.add(this.compilerOptions);
       }
 
-      Script<CompilerResult> script = new BeamCompilerScript(files, this.targetEbin, includes, options);
-      CompilerResult result = MavenSelf.get().eval(DEFAULT_PEER, script);
+      Script<CompilerResult> script = new BeamCompilerScript(files, p.targetEbin(), includes, options);
+      CompilerResult result = MavenSelf.get().eval(p.node(), script);
       result.logOutput(log);
       String failedCompilationUnit = result.getFailed();
       if (failedCompilationUnit != null) {

@@ -85,23 +85,23 @@ public final class CheckAppScript implements Script<CheckAppResult> {
       }
 
       @Override
-      public String[] getModules() {
+      public List<String> getModules() {
         List<String> r = new ArrayList<String>();
         OtpErlangList m = (OtpErlangList) modules;
         for (int i = 0; i < m.arity(); ++i) {
           r.add(((OtpErlangAtom) m.elementAt(i)).atomValue());
         }
-        return r.toArray(new String[0]);
+        return r;
       }
 
       @Override
-      public String[] getApplications() {
+      public List<String> getApplications() {
         List<String> r = new ArrayList<String>();
         OtpErlangList a = (OtpErlangList) applications;
         for (int i = 0; i < a.arity(); ++i) {
           r.add(((OtpErlangAtom) a.elementAt(i)).atomValue());
         }
-        return r.toArray(new String[0]);
+        return r;
       }
     };
   }

@@ -94,6 +94,7 @@ abstract class ErlangMojo extends AbstractMojo {
     private final ArtifactRepository repository;
 
     private final String projectName;
+    private final PackagingType packagingType;
     private final String node;
     private final String cookie;
 
@@ -129,6 +130,7 @@ abstract class ErlangMojo extends AbstractMojo {
       this.repository = repository;
 
       this.projectName = project.getArtifactId() + "-" + project.getVersion();
+      this.packagingType = type;
       this.node = node;
       this.cookie = cookie;
 
@@ -197,6 +199,11 @@ abstract class ErlangMojo extends AbstractMojo {
     @Override
     public String projectName() {
       return this.projectName;
+    }
+
+    @Override
+    public PackagingType packagingType() {
+      return this.packagingType;
     }
 
     @Override

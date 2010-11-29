@@ -1,9 +1,9 @@
 package eu.lindenbaum.maven.erlang;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 
@@ -40,8 +40,8 @@ public class CheckAppScriptTest {
     assertEquals("undefined", appResult.getName());
     assertEquals("undefined", appResult.getVersion());
     assertEquals("undefined", appResult.getStartModule());
-    assertArrayEquals(new String[0], appResult.getModules());
-    assertArrayEquals(new String[0], appResult.getApplications());
+    assertTrue(appResult.getModules().isEmpty());
+    assertTrue(appResult.getApplications().isEmpty());
   }
 
   @Test
@@ -62,7 +62,8 @@ public class CheckAppScriptTest {
     assertEquals("name", appResult.getName());
     assertEquals("1.0.0-SNAPSHOT", appResult.getVersion());
     assertEquals("startModule", appResult.getStartModule());
-    assertArrayEquals(new String[]{ "module1", "Module2" }, appResult.getModules());
-    assertArrayEquals(new String[]{ "sasl" }, appResult.getApplications());
+    assertEquals("module1", appResult.getModules().get(0));
+    assertEquals("Module2", appResult.getModules().get(1));
+    assertEquals("sasl", appResult.getApplications().get(0));
   }
 }

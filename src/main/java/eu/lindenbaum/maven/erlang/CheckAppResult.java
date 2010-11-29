@@ -1,5 +1,7 @@
 package eu.lindenbaum.maven.erlang;
 
+import java.util.List;
+
 /**
  * Interface representing the result returned by the {@link CheckAppScript}.
  * 
@@ -33,7 +35,7 @@ public interface CheckAppResult {
    * @return A non-{@code null} list containing the configured applications
    *         modules.
    */
-  public String[] getModules();
+  public List<String> getModules();
 
   /**
    * Returns a list of the applications that must be running before the
@@ -41,5 +43,5 @@ public interface CheckAppResult {
    * 
    * @return A non-{@code null} list containing the application dependencies.
    */
-  public String[] getApplications();
+  public List<String> getApplications();
 }

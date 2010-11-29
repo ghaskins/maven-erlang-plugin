@@ -1,13 +1,9 @@
-package eu.lindenbaum.maven;
+package eu.lindenbaum.maven.mojo;
 
-import static eu.lindenbaum.maven.erlang.MavenSelf.DEFAULT_PEER;
-import static eu.lindenbaum.maven.util.ErlConstants.BEAM_SUFFIX;
-import static eu.lindenbaum.maven.util.ErlConstants.ERL_SUFFIX;
 import static eu.lindenbaum.maven.util.FileUtils.extractFilesFromJar;
 import static eu.lindenbaum.maven.util.FileUtils.getDependencyIncludes;
 import static eu.lindenbaum.maven.util.FileUtils.getFilesRecursive;
 import static eu.lindenbaum.maven.util.FileUtils.removeFilesRecursive;
-import static eu.lindenbaum.maven.util.MavenUtils.SEPARATOR;
 import static eu.lindenbaum.maven.util.MavenUtils.getPluginFile;
 
 import java.io.File;
@@ -18,6 +14,8 @@ import eu.lindenbaum.maven.erlang.BeamCompilerScript;
 import eu.lindenbaum.maven.erlang.CompilerResult;
 import eu.lindenbaum.maven.erlang.MavenSelf;
 import eu.lindenbaum.maven.erlang.Script;
+import eu.lindenbaum.maven.util.ErlConstants;
+import eu.lindenbaum.maven.util.MavenUtils;
 
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -34,7 +32,14 @@ import org.apache.maven.plugin.logging.Log;
  * @author Olivier Sambourg
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
-public final class TestCompileMojo extends AbstractErlangMojo {
+public final class TestCompiler extends ErlangMojo {
+  /**
+   * Setting this to {@code true will} will skip the test compilation.
+   * 
+   * @parameter expression="${skipTests}" default-value=false
+   */
+  private boolean skipTests;
+
   /**
    * Additional compiler options (comma separated) for test compilation that are
    * directly passed to <code>compile:file/2</code>, e.g. <code>"{d, Macro},
@@ -48,32 +53,36 @@ public final class TestCompileMojo extends AbstractErlangMojo {
   private String testCompilerOptions;
 
   @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
-    Log log = getLog();
-    log.info(SEPARATOR);
-    log.info(" T E S T - C O M P I L E");
-    log.info(SEPARATOR);
+  protected void execute(Log log, Properties p) throws MojoExecutionException, MojoFailureException {
+    log.info(MavenUtils.SEPARATOR);
+    log.info(" T E S T - C O M P I L E R");
+    log.info(MavenUtils.SEPARATOR);
 
-    this.targetTest.mkdirs();
-    int removed = removeFilesRecursive(this.targetTest, BEAM_SUFFIX);
-    log.debug("Removed " + removed + " stale " + BEAM_SUFFIX + "-files from " + this.targetTest);
+    if (this.skipTests) {
+      log.info("Test compilation is skipped.");
+      return;
+    }
 
-    List<File> files = getFilesRecursive(this.srcTestErlang, ERL_SUFFIX);
+    p.targetTest().mkdirs();
+    int removed = removeFilesRecursive(p.targetTest(), ErlConstants.BEAM_SUFFIX);
+    log.debug("Removed " + removed + " stale " + ErlConstants.BEAM_SUFFIX + "-files from " + p.targetTest());
+
+    List<File> files = getFilesRecursive(p.test_src(), ErlConstants.ERL_SUFFIX);
     if (!files.isEmpty()) {
-      File plugin = getPluginFile("maven-erlang-plugin", this.project, this.repository);
-      extractFilesFromJar(plugin, ERL_SUFFIX, this.targetTest);
+      File plugin = getPluginFile("maven-erlang-plugin", p.project(), p.repository());
+      extractFilesFromJar(plugin, ErlConstants.ERL_SUFFIX, p.targetTest());
 
-      files.addAll(getFilesRecursive(this.srcMainErlang, ERL_SUFFIX));
-      files.add(new File(this.targetTest, "mock.erl"));
-      files.add(new File(this.targetTest, "surefire.erl"));
-      files.add(new File(this.targetTest, "cover2.erl"));
+      files.addAll(getFilesRecursive(p.src(), ErlConstants.ERL_SUFFIX));
+      files.add(new File(p.targetTest(), "mock.erl"));
+      files.add(new File(p.targetTest(), "surefire.erl"));
+      files.add(new File(p.targetTest(), "cover2.erl"));
 
       List<File> includes = new ArrayList<File>();
-      includes.addAll(getDependencyIncludes(this.targetLib));
-      includes.add(this.srcMainInclude);
-      includes.add(this.srcTestInclude);
-      includes.add(this.targetInclude);
-      includes.add(this.srcMainErlang);
+      includes.addAll(getDependencyIncludes(p.targetLib()));
+      includes.add(p.include());
+      includes.add(p.test_include());
+      includes.add(p.targetInclude());
+      includes.add(p.src());
 
       List<String> options = new ArrayList<String>();
       options.add("debug_info");
@@ -84,8 +93,8 @@ public final class TestCompileMojo extends AbstractErlangMojo {
         options.add(this.testCompilerOptions);
       }
 
-      Script<CompilerResult> script = new BeamCompilerScript(files, this.targetTest, includes, options);
-      CompilerResult result = MavenSelf.get().eval(DEFAULT_PEER, script);
+      Script<CompilerResult> script = new BeamCompilerScript(files, p.targetTest(), includes, options);
+      CompilerResult result = MavenSelf.get().eval(p.node(), script);
       result.logOutput(log);
       String failedCompilationUnit = result.getFailed();
       if (failedCompilationUnit != null) {

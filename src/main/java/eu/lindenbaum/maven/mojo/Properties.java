@@ -23,9 +23,15 @@ interface Properties {
   public ArtifactRepository repository();
 
   /**
-   * Returns the name of the projects build artifact.
+   * Returns the name of the projects build artifact. Usually this is
+   * {@code "artifactId-version"}.
    */
   public String projectName();
+
+  /**
+   * Returns the packaging type of the project artifact.
+   */
+  public PackagingType packagingType();
 
   /**
    * Returns the name of the backend node to use.

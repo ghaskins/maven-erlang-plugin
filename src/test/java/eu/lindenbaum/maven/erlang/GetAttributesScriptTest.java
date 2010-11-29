@@ -14,14 +14,14 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 
 import org.junit.Test;
 
-public class FilterForAttributeScriptTest {
+public class GetAttributesScriptTest {
   @Test
   public void testGet() {
     List<File> modules = Arrays.asList(new File("file1.erl", "file2.beam"));
     String attribute = "attribute";
     File path = new File("path");
 
-    FilterForAttributeScript script = new FilterForAttributeScript(path, modules, attribute);
+    GetAttributesScript script = new GetAttributesScript(path, modules, attribute);
     String expression = script.get();
     assertNotNull(expression);
     assertFalse(expression.isEmpty());
@@ -36,7 +36,7 @@ public class FilterForAttributeScriptTest {
 
     OtpErlangList result = new OtpErlangList();
 
-    FilterForAttributeScript script = new FilterForAttributeScript(path, modules, attribute);
+    GetAttributesScript script = new GetAttributesScript(path, modules, attribute);
     String filtered = script.handle(result);
     assertEquals("[]", filtered);
   }
@@ -47,12 +47,12 @@ public class FilterForAttributeScriptTest {
     String attribute = "attribute";
     File path = new File("path");
 
-    OtpErlangAtom file1 = new OtpErlangAtom("file1");
-    OtpErlangAtom file2 = new OtpErlangAtom("file2");
+    OtpErlangAtom file1 = new OtpErlangAtom("value1");
+    OtpErlangAtom file2 = new OtpErlangAtom("value2");
     OtpErlangList result = new OtpErlangList(new OtpErlangObject[]{ file1, file2 });
 
-    FilterForAttributeScript script = new FilterForAttributeScript(path, modules, attribute);
+    GetAttributesScript script = new GetAttributesScript(path, modules, attribute);
     String filtered = script.handle(result);
-    assertEquals("['file1', 'file2']", filtered);
+    assertEquals("['value1', 'value2']", filtered);
   }
 }

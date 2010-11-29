@@ -10,13 +10,13 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import eu.lindenbaum.maven.util.ErlUtils;
 
 /**
- * A {@link Script} that filters a list of modules for the specification of a
- * certain attribute.
+ * A {@link Script} that returns the found values for an attribute in a list of
+ * modules.
  * 
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  * @author Olle Törnström <olle.toernstroem@lindenbaum.eu>
  */
-public class FilterForAttributeScript implements Script<String> {
+public class GetAttributesScript implements Script<String> {
   private static final String script = //
   "    code:add_patha(\"%s\")," + //
       "R = lists:flatten(" + //
@@ -25,7 +25,7 @@ public class FilterForAttributeScript implements Script<String> {
       "              A = Module:module_info(attributes)," + //
       "              case proplists:get_value(%s, A) of" + //
       "                  undefined -> Acc;" + //
-      "                  _ -> [Module | Acc]" + //
+      "                  Attr -> [Attr | Acc]" + //
       "              end" + //
       "      end, [], %s))," + //
       "code:del_path(\"%s\")," + //
@@ -36,12 +36,12 @@ public class FilterForAttributeScript implements Script<String> {
   private final String attribute;
 
   /**
-   * Filters a list of modules for a specific attribute.
+   * Returns the attribute values for a specific attribute.
    * 
-   * @param modules to filter
+   * @param modules to search for the attribute in
    * @param attribute to look after
    */
-  public FilterForAttributeScript(File path, List<File> modules, String attribute) {
+  public GetAttributesScript(File path, List<File> modules, String attribute) {
     this.path = path;
     this.modules = modules;
     this.attribute = attribute;
@@ -56,7 +56,8 @@ public class FilterForAttributeScript implements Script<String> {
 
   /**
    * Converts the result of the {@link Script} execution into a {@link String}
-   * containing an erlang list of modules specifying a specific attribute.
+   * containing an erlang list of attribute values found. Attribute values are
+   * expected to be atoms (or list of atoms).
    * 
    * @param result to convert
    * @return A list of modules, never {@code null}.
@@ -64,15 +65,15 @@ public class FilterForAttributeScript implements Script<String> {
   @Override
   public String handle(OtpErlangObject result) {
     OtpErlangList resultList = (OtpErlangList) result;
-    StringBuilder filtered = new StringBuilder("[");
+    StringBuilder attributes = new StringBuilder("[");
     for (int i = 0; i < resultList.arity(); ++i) {
       if (i != 0) {
-        filtered.append(", ");
+        attributes.append(", ");
       }
-      OtpErlangAtom module = (OtpErlangAtom) resultList.elementAt(i);
-      filtered.append("'" + module.atomValue() + "'");
+      OtpErlangAtom attribute = (OtpErlangAtom) resultList.elementAt(i);
+      attributes.append("'" + attribute.atomValue() + "'");
     }
-    filtered.append("]");
-    return filtered.toString();
+    attributes.append("]");
+    return attributes.toString();
   }
 }
