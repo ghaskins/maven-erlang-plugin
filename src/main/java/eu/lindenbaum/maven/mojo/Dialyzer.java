@@ -109,7 +109,9 @@ public final class Dialyzer extends ErlangMojo {
       log.info("Dialyzer run successful.");
 
       try {
-        lastBuildIndicator.createNewFile();
+        if (warnings.length == 0) {
+          lastBuildIndicator.createNewFile();
+        }
       }
       catch (IOException e) {
         throw new MojoExecutionException("failed to create " + lastBuildIndicator);
