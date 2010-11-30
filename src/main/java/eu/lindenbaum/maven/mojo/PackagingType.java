@@ -23,10 +23,8 @@ enum PackagingType {
    *    +-- src/main/include (*.hrl)
    *    +-- src/main/priv (*)
    *    +-- src/test/include (*.hrl)
-   *    +-- src/test/resources (*)
    *    +-- src/test/erlang (*.erl)
-   *    +-- src/main
-   *    |         [+-- *] (other non-erlang source folders)
+   *    +-- src/test/priv (*)
    *    +-- target (build artifacts)
    *    +-- pom.xml
    *    +-- *.rel
@@ -47,7 +45,6 @@ enum PackagingType {
    *    +-- test_include (*.hrl)
    *    +-- test_priv (*)
    *    +-- test_src (*.erl)
-   *    [+-- *] (other non-erlang source folders)
    *    +-- target (build artifacts)
    *    +-- pom.xml
    * </pre>

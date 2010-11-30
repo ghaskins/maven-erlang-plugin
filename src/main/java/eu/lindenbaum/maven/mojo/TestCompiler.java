@@ -63,23 +63,25 @@ public final class TestCompiler extends ErlangMojo {
       return;
     }
 
-    p.targetTest().mkdirs();
-    int removed = removeFilesRecursive(p.targetTest(), ErlConstants.BEAM_SUFFIX);
-    log.debug("Removed " + removed + " stale " + ErlConstants.BEAM_SUFFIX + "-files from " + p.targetTest());
+    p.targetTestEbin().mkdirs();
+    int removed = removeFilesRecursive(p.targetTestEbin(), ErlConstants.BEAM_SUFFIX);
+    log.debug("Removed " + removed + " stale " + ErlConstants.BEAM_SUFFIX + "-files from "
+              + p.targetTestEbin());
 
     List<File> files = getFilesRecursive(p.test_src(), ErlConstants.ERL_SUFFIX);
     if (!files.isEmpty()) {
       File plugin = getPluginFile("maven-erlang-plugin", p.project(), p.repository());
-      extractFilesFromJar(plugin, ErlConstants.ERL_SUFFIX, p.targetTest());
+      extractFilesFromJar(plugin, ErlConstants.ERL_SUFFIX, p.targetTestEbin());
 
       files.addAll(getFilesRecursive(p.src(), ErlConstants.ERL_SUFFIX));
-      files.add(new File(p.targetTest(), "mock.erl"));
-      files.add(new File(p.targetTest(), "surefire.erl"));
-      files.add(new File(p.targetTest(), "cover2.erl"));
+      files.add(new File(p.targetTestEbin(), "mock.erl"));
+      files.add(new File(p.targetTestEbin(), "surefire.erl"));
+      files.add(new File(p.targetTestEbin(), "cover2.erl"));
 
       List<File> includes = new ArrayList<File>();
       includes.addAll(getDependencyIncludes(p.targetLib()));
       includes.add(p.include());
+      includes.add(p.test_src());
       includes.add(p.test_include());
       includes.add(p.targetInclude());
       includes.add(p.src());
@@ -93,7 +95,7 @@ public final class TestCompiler extends ErlangMojo {
         options.add(this.testCompilerOptions);
       }
 
-      Script<CompilerResult> script = new BeamCompilerScript(files, p.targetTest(), includes, options);
+      Script<CompilerResult> script = new BeamCompilerScript(files, p.targetTestEbin(), includes, options);
       CompilerResult result = MavenSelf.get().eval(p.node(), script);
       result.logOutput(log);
       String failedCompilationUnit = result.getFailed();

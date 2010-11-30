@@ -34,7 +34,7 @@
               <process-classes></process-classes>
               <generate-test-sources></generate-test-sources>
               <process-test-sources></process-test-sources>
-              <generate-test-resources></generate-test-resources>
+              <generate-test-resources>eu.lindenbaum:maven-erlang-plugin:copy-test-resources</generate-test-resources>
               <process-test-resources></process-test-resources>
               <test-compile>eu.lindenbaum:maven-erlang-plugin:test-compile</test-compile>
               <process-test-classes></process-test-classes>

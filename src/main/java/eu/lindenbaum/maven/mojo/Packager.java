@@ -1,6 +1,5 @@
 package eu.lindenbaum.maven.mojo;
 
-import static eu.lindenbaum.maven.util.ErlConstants.BEAM_SUFFIX;
 import static eu.lindenbaum.maven.util.ErlConstants.TARGZ_SUFFIX;
 import static eu.lindenbaum.maven.util.FileUtils.APP_FILTER;
 import static eu.lindenbaum.maven.util.FileUtils.copyDirectory;
@@ -10,14 +9,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import eu.lindenbaum.maven.archiver.TarGzArchiver;
 import eu.lindenbaum.maven.erlang.CheckAppResult;
 import eu.lindenbaum.maven.erlang.CheckAppScript;
 import eu.lindenbaum.maven.erlang.CheckAppUpScript;
-import eu.lindenbaum.maven.erlang.FilterForAttributeScript;
 import eu.lindenbaum.maven.erlang.GetAttributesScript;
 import eu.lindenbaum.maven.erlang.MavenSelf;
 import eu.lindenbaum.maven.erlang.Script;
@@ -25,6 +25,7 @@ import eu.lindenbaum.maven.util.ErlConstants;
 import eu.lindenbaum.maven.util.ErlUtils;
 import eu.lindenbaum.maven.util.MavenUtils;
 
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -34,16 +35,15 @@ import org.apache.maven.plugin.logging.Log;
  * <p>
  * This {@link Mojo} packages all application artifacts into a single
  * {@code .tar.gz} package. This includes {@code .beam} files, the {@code .hrl}
- * include files, SNMP resources, private data from the {@code priv} and
- * {@code resources} directories and non-erlang sources.
+ * include files and private data from the {@code priv} directory.
  * </p>
  * <p>
  * Besides that this {@link Mojo} also copies the erlang application resource
  * file. In order to manage the project over the project pom there is the
  * possibility to let the {@link Mojo} automatically fill in values from the
- * project pom into the {@code .app} file. This can be done by using one of the
- * supported variables into the application resource files. Below is a list of
- * supported variables and their substitutions:
+ * project pom into the {@code .app} and {@code .appup} files. This can be done
+ * by using one of the supported variables into the application resource files.
+ * Below is a list of supported variables and their substitutions:
  * </p>
  * <ul>
  * <li><code>${ARTIFACT}</code>: the projects artifact id (atom)</li>
@@ -57,30 +57,8 @@ import org.apache.maven.plugin.logging.Log;
  * {@code .beam} files (list)</li>
  * </ul>
  * <p>
- * In case there is no application resouce file specified the {@link Mojo} will
- * generate a default {@code .app} file which looks like this:
- * </p>
- * 
- * <pre>
- * {application, ${ARTIFACT},
- *   [{description, ${DESCRIPTION}},
- *    {id, ${ID}},
- *    {vsn, ${VERSION}},
- *    {modules, ${MODULES}},
- *    {maxT, infinity},
- *    {registered, ${REGISTERED}},
- *    {included_applications, []},
- *    {applications, []},
- *    {env, []},
- *    {mod, undefined},
- *    {start_phases, []}]}.
- * </pre>
- * <p>
  * The resulting application resource file as well as the application upgrade
- * file will be checked for plausability regardless if generated or not. This is
- * done by checking the application version against the project version,
- * checking the application modules against the found compiled modules as well
- * as checking the application's start module.
+ * file will be checked for plausability.
  * </p>
  * 
  * @goal package
@@ -103,6 +81,8 @@ public final class Packager extends ErlangMojo {
     log.info(" P A C K A G E R");
     log.info(MavenUtils.SEPARATOR);
 
+    @SuppressWarnings("unchecked")
+    List<Dependency> dependencies = p.project().getDependencies();
     String projectVersion = p.project().getVersion();
 
     List<File> modules = getFilesRecursive(p.targetEbin(), ErlConstants.BEAM_SUFFIX);
@@ -129,56 +109,14 @@ public final class Packager extends ErlangMojo {
       throw new MojoFailureException("no .app file found");
     }
 
-    // check .app file
+    // parse .app file
     Script<CheckAppResult> appScript = new CheckAppScript(appFile);
     CheckAppResult appResult = MavenSelf.get().eval(p.node(), appScript);
-
-    String name = appResult.getName();
-    if (!p.project().getArtifactId().equals(name)) {
-      log.error("Name mismatch.");
-      log.error("Project name is " + p.project().getArtifactId() + " while .app name is " + name);
-      throw new MojoFailureException("name mismatch " + p.project().getArtifactId() + " != " + name);
-    }
-
-    String version = appResult.getVersion();
-    if (!projectVersion.equals(version)) {
-      log.error("Version mismatch.");
-      log.error("Project version is " + projectVersion + " while .app version is " + version);
-      throw new MojoFailureException("version mismatch " + projectVersion + " != " + version);
-    }
-
-    String startModule = appResult.getStartModule();
-    if ("undefined".equals(startModule)) {
-      log.info("No start module configured.");
-      log.info("This is ok for library applications.");
-    }
-    else {
-      File beamFile = new File(p.targetEbin(), startModule + ErlConstants.BEAM_SUFFIX);
-      if (beamFile.isFile()) {
-        List<File> list = Arrays.asList(beamFile);
-        Script<String> behaviourScript = new FilterForAttributeScript(p.targetEbin(), list, "behaviour");
-        String behaviours = MavenSelf.get().eval(p.node(), behaviourScript);
-        if (behaviours.contains("application")) {
-          if (!appResult.getApplications().contains("sasl")) {
-            log.error("Application dependency to sasl is missing.");
-            throw new MojoFailureException("dependency to sasl is missing");
-          }
-        }
-        else {
-          log.error("Configured start module \'" + startModule
-                    + "\' does not implement the application behaviour");
-          throw new MojoFailureException("Configured start module does not implement the application behaviour");
-        }
-      }
-      else {
-        log.error("Configured start module \'" + startModule + "\' does not exist.");
-        throw new MojoFailureException("configured start module does not exist");
-      }
-    }
-
-    appResult.getApplications();
-
-    appResult.getModules();
+    checkApplicationName(log, p.project().getArtifactId(), appResult.getName());
+    checkApplicationVersion(log, projectVersion, appResult.getVersion());
+    checkStartModule(log, p, appResult);
+    checkModules(log, modules, appResult.getModules());
+    checkApplications(log, dependencies, appResult.getApplications());
 
     File appUpFile = new File(p.targetEbin(), p.project().getArtifactId() + ErlConstants.APPUP_SUFFIX);
     if (!appUpFile.exists()) {
@@ -210,54 +148,110 @@ public final class Packager extends ErlangMojo {
     log.info(MavenUtils.SEPARATOR);
   }
 
-//  /**
-//   * Checks whether the modules to be packaged are declared in the erlang
-//   * application file.
-//   * 
-//   * @param appFile the erlang application resource file
-//   * @throws MojoExecutionException
-//   * @throws MojoFailureException in case of undeclared modules, if
-//   *           {@link #failOnUndeclaredModules}
-//   */
-//  private void checkModules(File appFile) throws MojoExecutionException, MojoFailureException {
-//    Log log = getLog();
-//    String name = this.project.getArtifactId();
-//    String moduleStr = eval(log, String.format(EXTRACT_MODULES, name, appFile.getPath()));
-//    Set<String> appModules = new HashSet<String>(Arrays.asList(moduleStr.split(" ")));
-//    Set<String> modules = new HashSet<String>();
-//    for (File beam : getFilesRecursive(this.targetEbin, BEAM_SUFFIX)) {
-//      modules.add(beam.getName().replace(BEAM_SUFFIX, ""));
-//    }
-//    if (!modules.containsAll(appModules) || !appModules.containsAll(modules)) {
-//      Set<String> undeclared = new HashSet<String>(modules);
-//      undeclared.removeAll(appModules);
-//      log.warn("Undeclared modules: " + undeclared.toString());
-//      Set<String> unbacked = new HashSet<String>(appModules);
-//      unbacked.removeAll(modules);
-//      log.warn("Unbacked modules: " + unbacked.toString());
-//      if (this.failOnUndeclaredModules) {
-//        throw new MojoFailureException("Module mismatch found.");
-//      }
-//    }
-//  }
+  /**
+   * Checks whether the application resource files application name equals the
+   * projects artifact id.
+   */
+  private void checkApplicationName(Log log, String artifactId, String appName) throws MojoFailureException {
+    if (!artifactId.equals(appName)) {
+      log.error("Name mismatch.");
+      log.error("Project name is " + artifactId + " while .app name is " + appName);
+      throw new MojoFailureException("name mismatch " + artifactId + " != " + appName);
+    }
+  }
 
   /**
-   * Returns a {@link String} containing all source modules in the given
-   * directory in valid erlang list representation.
-   * 
-   * @param directory to scan for sources
-   * @return a {@link String} containing all found source modules
+   * Checks whether the application resource files application version equals
+   * the projects version.
    */
-  private static String getModules(File directory) {
-    StringBuilder modules = new StringBuilder("[");
-    List<File> sources = getFilesRecursive(directory, BEAM_SUFFIX);
-    for (int i = 0; i < sources.size(); ++i) {
-      if (i != 0) {
-        modules.append(", ");
-      }
-      modules.append("\'" + sources.get(i).getName().replace(BEAM_SUFFIX, "") + "\'");
+  private void checkApplicationVersion(Log log, String version, String appVersion) throws MojoFailureException {
+    if (!version.equals(appVersion)) {
+      log.error("Version mismatch.");
+      log.error("Project version is " + version + " while .app version is " + appVersion);
+      throw new MojoFailureException("version mismatch " + version + " != " + appVersion);
     }
-    modules.append("]");
-    return modules.toString();
+  }
+
+  /**
+   * Checks the start module configured in the application resource file for
+   * existence, implemented application behaviour and the sasl application
+   * dependency.
+   */
+  private void checkStartModule(Log log, Properties p, CheckAppResult r) throws MojoExecutionException,
+                                                                        MojoFailureException {
+    String startModule = r.getStartModule();
+    if ("undefined".equals(startModule)) {
+      log.info("No start module configured.");
+      log.info("This is ok for library applications.");
+    }
+    else {
+      File beamFile = new File(p.targetEbin(), startModule + ErlConstants.BEAM_SUFFIX);
+      if (beamFile.isFile()) {
+        List<File> list = Arrays.asList(beamFile);
+        Script<String> behaviourScript = new GetAttributesScript(p.targetEbin(), list, "behaviour");
+        String behaviours = MavenSelf.get().eval(p.node(), behaviourScript);
+        if (behaviours.contains("application")) {
+          if (!r.getApplications().contains("sasl")) {
+            log.error("Application dependency to 'sasl' is missing.");
+            throw new MojoFailureException("dependency to sasl is missing");
+          }
+        }
+        else {
+          log.error("Configured start module \'" + startModule
+                    + "\' does not implement the application behaviour");
+          throw new MojoFailureException("Configured start module does not implement the application behaviour");
+        }
+      }
+      else {
+        log.error("Configured start module \'" + startModule + "\' does not exist.");
+        throw new MojoFailureException("configured start module does not exist");
+      }
+    }
+  }
+
+  /**
+   * Checks whether the modules to be packaged are declared in the erlang
+   * application file.
+   */
+  private void checkModules(Log log, List<File> modules, List<String> appModules) throws MojoFailureException {
+    Set<String> m = new HashSet<String>();
+    for (File module : modules) {
+      m.add(module.getName().replace(ErlConstants.BEAM_SUFFIX, "").replace(ErlConstants.ERL_SUFFIX, ""));
+    }
+    if (!m.containsAll(appModules) || !appModules.containsAll(m)) {
+      Set<String> undeclared = new HashSet<String>(m);
+      undeclared.removeAll(appModules);
+      log.warn("Undeclared modules: " + undeclared.toString());
+      Set<String> unbacked = new HashSet<String>(appModules);
+      unbacked.removeAll(m);
+      log.warn("Unbacked modules: " + unbacked.toString());
+      if (this.failOnUndeclaredModules) {
+        throw new MojoFailureException("module mismatch found");
+      }
+    }
+  }
+
+  /**
+   * Checks whether all erlang-otp or erlang-std dependecies defined in the
+   * project pom are correctly configured as application dependencies in the
+   * application resource file.
+   */
+  private void checkApplications(Log log, List<Dependency> dependencies, List<String> applications) throws MojoFailureException {
+    boolean missingDependencies = false;
+    for (Dependency dependency : dependencies) {
+      String type = dependency.getType();
+      if (PackagingType.ERLANG_OTP.isA(type) || PackagingType.ERLANG_STD.isA(type)) {
+        if (!"test".equals(dependency.getScope())) {
+          String artifactId = dependency.getArtifactId();
+          if (!applications.contains(artifactId)) {
+            log.error("Application dependency to '" + artifactId + "' is missing.");
+            missingDependencies = true;
+          }
+        }
+      }
+    }
+    if (missingDependencies) {
+      throw new MojoFailureException("missing application dependencies");
+    }
   }
 }

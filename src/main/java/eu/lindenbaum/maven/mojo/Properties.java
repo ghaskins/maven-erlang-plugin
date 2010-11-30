@@ -54,14 +54,9 @@ interface Properties {
   public File include();
 
   /**
-   * Returns the directory where the private files reside.
+   * Returns the directory where the private resources reside.
    */
   public File priv();
-
-  /**
-   * Returns the directory where resources reside.
-   */
-  public File resources();
 
   /**
    * Returns the directory where the erlang sources reside.
@@ -80,9 +75,9 @@ interface Properties {
   public File test_include();
 
   /**
-   * Returns the directory where test resources reside.
+   * Returns the directory where private test resources reside.
    */
-  public File test_resources();
+  public File test_priv();
 
   /**
    * Returns the directory where the erlang test source files reside.
@@ -140,8 +135,21 @@ interface Properties {
   public File targetSurefireReports();
 
   /**
+   * Returns the base directory for the tests. This will be accessibly during
+   * the test phase by calling <code>code:lib_dir($APPNAME)</code>.
+   */
+  public File targetTest();
+
+  /**
    * Returns the directory where the compiled test sources and recompiled
    * sources will be placed into.
    */
-  public File targetTest();
+  public File targetTestEbin();
+
+  /**
+   * Returns the directory where the main and test resources will be put into
+   * (test resources will override main resources). This will be accessibly
+   * during the test phase by calling <code>code:lib_dir($APPNAME, priv)</code>.
+   */
+  public File targetTestPriv();
 }

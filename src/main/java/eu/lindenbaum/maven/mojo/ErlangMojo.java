@@ -101,11 +101,10 @@ abstract class ErlangMojo extends AbstractMojo {
     private final File ebin;
     private final File include;
     private final File priv;
-    private final File resources;
     private final File src;
     private final File src_base;
     private final File test_include;
-    private final File test_resources;
+    private final File test_priv;
     private final File test_src;
 
     private final File target;
@@ -119,6 +118,8 @@ abstract class ErlangMojo extends AbstractMojo {
     private final File targetSrc;
     private final File targetSurefireReports;
     private final File targetTest;
+    private final File targetTestEbin;
+    private final File targetTestPriv;
 
     PropertiesImpl(PackagingType type,
                    MavenProject project,
@@ -139,11 +140,10 @@ abstract class ErlangMojo extends AbstractMojo {
           this.ebin = new File(base, "ebin");
           this.include = new File(base, "include");
           this.priv = new File(base, "priv");
-          this.resources = this.priv;
           this.src = new File(base, "src");
           this.src_base = base;
           this.test_include = new File(base, "test_include");
-          this.test_resources = new File(base, "test_priv");
+          this.test_priv = new File(base, "test_priv");
           this.test_src = new File(base, "test_src");
           break;
         }
@@ -151,11 +151,10 @@ abstract class ErlangMojo extends AbstractMojo {
           this.ebin = new File(base, "src/main/erlang");
           this.include = new File(base, "src/main/include");
           this.priv = new File(base, "src/main/priv");
-          this.resources = new File(base, "src/main/resources");
           this.src = this.ebin;
           this.src_base = new File(base, "src/main");
           this.test_include = new File(base, "src/test/include");
-          this.test_resources = new File(base, "src/test/resources");
+          this.test_priv = new File(base, "src/test/priv");
           this.test_src = new File(base, "src/test/erlang");
           break;
         }
@@ -163,11 +162,10 @@ abstract class ErlangMojo extends AbstractMojo {
           this.ebin = base;
           this.include = base;
           this.priv = base;
-          this.resources = base;
           this.src = base;
           this.src_base = base;
           this.test_include = base;
-          this.test_resources = base;
+          this.test_priv = base;
           this.test_src = base;
           break;
         }
@@ -183,7 +181,9 @@ abstract class ErlangMojo extends AbstractMojo {
       this.targetReleases = new File(this.target, "releases");
       this.targetSrc = new File(this.targetProject, "src");
       this.targetSurefireReports = new File(this.target, "surefire-reports");
-      this.targetTest = new File(this.target, "test");
+      this.targetTest = new File(this.target, "test-" + this.projectName);
+      this.targetTestEbin = new File(this.targetTest, "ebin");
+      this.targetTestPriv = new File(this.targetTest, "priv");
     }
 
     @Override
@@ -232,11 +232,6 @@ abstract class ErlangMojo extends AbstractMojo {
     }
 
     @Override
-    public File resources() {
-      return this.resources;
-    }
-
-    @Override
     public File src() {
       return this.src;
     }
@@ -252,8 +247,8 @@ abstract class ErlangMojo extends AbstractMojo {
     }
 
     @Override
-    public File test_resources() {
-      return this.test_resources;
+    public File test_priv() {
+      return this.test_priv;
     }
 
     @Override
@@ -314,6 +309,16 @@ abstract class ErlangMojo extends AbstractMojo {
     @Override
     public File targetTest() {
       return this.targetTest;
+    }
+
+    @Override
+    public File targetTestEbin() {
+      return this.targetTestEbin;
+    }
+
+    @Override
+    public File targetTestPriv() {
+      return this.targetTestPriv;
     }
   }
 }
