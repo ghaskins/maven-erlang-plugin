@@ -107,7 +107,7 @@ public final class Packager extends ErlangMojo {
     if (!appFile.exists()) {
       log.error(appFile.getName() + " does not exist.");
       log.error("Use 'mvn erlang:setup' to create a default .app file");
-      throw new MojoFailureException("no .app file found");
+      throw new MojoFailureException("No .app file found.");
     }
 
     // parse .app file
@@ -131,7 +131,7 @@ public final class Packager extends ErlangMojo {
       if (error != null) {
         log.error(appUpFile.getAbsolutePath() + ":");
         log.error(error);
-        throw new MojoFailureException(".appup file has errors");
+        throw new MojoFailureException("Failed to verify .appup file.");
       }
     }
 
@@ -157,7 +157,7 @@ public final class Packager extends ErlangMojo {
     if (!artifactId.equals(appName)) {
       log.error("Name mismatch.");
       log.error("Project name is " + artifactId + " while .app name is " + appName);
-      throw new MojoFailureException("name mismatch " + artifactId + " != " + appName);
+      throw new MojoFailureException("Name mismatch " + artifactId + " != " + appName + ".");
     }
   }
 
@@ -169,7 +169,7 @@ public final class Packager extends ErlangMojo {
     if (!version.equals(appVersion)) {
       log.error("Version mismatch.");
       log.error("Project version is " + version + " while .app version is " + appVersion);
-      throw new MojoFailureException("version mismatch " + version + " != " + appVersion);
+      throw new MojoFailureException("Version mismatch " + version + " != " + appVersion + ".");
     }
   }
 
@@ -195,18 +195,18 @@ public final class Packager extends ErlangMojo {
         if (behaviours.contains("application")) {
           if (!r.getApplications().contains("sasl")) {
             log.error("Application dependency to 'sasl' is missing.");
-            throw new MojoFailureException("dependency to sasl is missing");
+            throw new MojoFailureException("Dependency to sasl is missing.");
           }
         }
         else {
           log.error("Configured start module \'" + startModule
                     + "\' does not implement the application behaviour");
-          throw new MojoFailureException("Configured start module does not implement the application behaviour");
+          throw new MojoFailureException("Configured start module does not implement the application behaviour.");
         }
       }
       else {
         log.error("Configured start module \'" + startModule + "\' does not exist.");
-        throw new MojoFailureException("configured start module does not exist");
+        throw new MojoFailureException("Configured start module does not exist.");
       }
     }
   }
@@ -228,7 +228,7 @@ public final class Packager extends ErlangMojo {
       unbacked.removeAll(m);
       log.warn("Unbacked modules: " + unbacked.toString());
       if (this.failOnUndeclaredModules) {
-        throw new MojoFailureException("module mismatch found");
+        throw new MojoFailureException("Module mismatch found.");
       }
     }
   }
@@ -253,7 +253,7 @@ public final class Packager extends ErlangMojo {
       }
     }
     if (missingDependencies) {
-      throw new MojoFailureException("missing application dependencies");
+      throw new MojoFailureException("Missing application dependencies.");
     }
   }
 }

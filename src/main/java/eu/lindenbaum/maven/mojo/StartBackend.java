@@ -84,7 +84,7 @@ public class StartBackend extends ErlangMojo {
         command.add("-detached");
         Process process = new ProcessBuilder(command).start();
         if (process.waitFor() != 0) {
-          throw new MojoExecutionException("failed to start " + peer);
+          throw new MojoExecutionException("Failed to start " + peer + ".");
         }
         log.debug("node " + peer + " sucessfully started.");
       }
@@ -102,13 +102,13 @@ public class StartBackend extends ErlangMojo {
       }
     }
     catch (IOException e) {
-      throw new MojoExecutionException("failed to start " + peer, e);
+      throw new MojoExecutionException("Failed to start " + peer + ".", e);
     }
     catch (OtpAuthException e) {
-      throw new MojoExecutionException("failed to connect to " + peer, e);
+      throw new MojoExecutionException("Failed to connect to " + peer + ".", e);
     }
     catch (InterruptedException e) {
-      throw new MojoExecutionException("failed to start " + peer, e);
+      throw new MojoExecutionException("Failed to start " + peer + ".", e);
     }
   }
 }

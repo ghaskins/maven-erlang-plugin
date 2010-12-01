@@ -71,7 +71,7 @@ public final class Compiler extends ErlangMojo {
       result.logOutput(log);
       String failedCompilationUnit = result.getFailed();
       if (failedCompilationUnit != null) {
-        throw new MojoFailureException("failed to compile " + failedCompilationUnit);
+        throw new MojoFailureException("Failed to compile " + failedCompilationUnit + ".");
       }
       log.info("Successfully compiled " + files.size() + " source file(s).");
     }

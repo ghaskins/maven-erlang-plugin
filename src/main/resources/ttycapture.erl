@@ -121,6 +121,11 @@ terminate({error, Reason}, #state{lines = Lines, report_to = Dest}) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% internal function section
 
+%%%-----------------------------------------------------------------------------
+%%% @doc
+%%% Formats the description of a test case or test suite.
+%%% @end
+%%%-----------------------------------------------------------------------------
 format_description(Data) ->
     Line = proplists:get_value(line, Data, 0),
     Source = proplists:get_value(source, Data),
@@ -137,6 +142,7 @@ format_description(Data) ->
 
 %%%-----------------------------------------------------------------------------
 %%% @doc
+%%% Formats the result of the test execution.
 %%% @end
 %%%-----------------------------------------------------------------------------
 format_result(0, 0, 0, 0, Acc) ->
@@ -147,17 +153,18 @@ format_result(Pass, 0, 0, 0, Acc) ->
     {info, Acc ++ [format("  All ~w tests passed.", [Pass])]};
 format_result(Pass, Fail, Skip, 0, Acc) ->
     {error, Acc ++
-     ["=======================================================",
+     ["=======================================================================",
       format("  Failed: ~w.  Skipped: ~w.  Passed: ~w.", 
 	     [Fail, Skip, Pass])]};
 format_result(Pass, Fail, Skip, Cancel, Acc) ->
     {error, Acc ++
-     ["=======================================================",
+     ["=======================================================================",
       format("  Failed: ~w.  Skipped: ~w.  Passed: ~w  Cancelled: ~w.",
 	     [Fail, Skip, Pass, Cancel])]}.
 
 %%%-----------------------------------------------------------------------------
 %%% @doc
+%%% Format the error output of a specific test case.
 %%% @end
 %%%-----------------------------------------------------------------------------
 format_output({error, Exception}, undefined) ->
@@ -174,6 +181,7 @@ format_output({skipped, Reason}, _) ->
 
 %%%-----------------------------------------------------------------------------
 %%% @doc
+%%% Format the output of a skipped test case.
 %%% @end
 %%%-----------------------------------------------------------------------------
 format_skipped({module_not_found, M}) ->
@@ -183,6 +191,7 @@ format_skipped({no_such_function, {M, F, A}}) ->
 
 %%%-----------------------------------------------------------------------------
 %%% @doc
+%%% Format the output of a cancelled test case.
 %%% @end
 %%%-----------------------------------------------------------------------------
 format_cancel(undefined) ->
@@ -200,6 +209,8 @@ format_cancel({abort, Reason}) ->
 
 %%%-----------------------------------------------------------------------------
 %%% @doc
+%%% Creates a flat string using <code>io_lib:format/2</code> and
+%%% <code>lists:flatten/1</code>.
 %%% @end
 %%%-----------------------------------------------------------------------------
 format(FormatString, FormatArgs) ->

@@ -104,7 +104,7 @@ public final class Dialyzer extends ErlangMojo {
         log.warn(warning);
       }
       if (warnings.length > 0 && this.dialyzerWarningsAreErrors) {
-        throw new MojoFailureException("dialyzer emitted warnings");
+        throw new MojoFailureException("Dialyzer emitted warnings.");
       }
       log.info("Dialyzer run successful.");
 
@@ -114,7 +114,7 @@ public final class Dialyzer extends ErlangMojo {
         }
       }
       catch (IOException e) {
-        throw new MojoExecutionException("failed to create " + lastBuildIndicator);
+        throw new MojoExecutionException("Failed to create " + lastBuildIndicator + ".");
       }
     }
     else {

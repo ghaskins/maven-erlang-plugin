@@ -21,8 +21,19 @@ import org.apache.maven.plugin.logging.Log;
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
 public final class CopyTestResources extends ErlangMojo {
+  /**
+   * Setting this to {@code true will} will skip copying the test resources.
+   * 
+   * @parameter expression="${skipTests}" default-value=false
+   */
+  private boolean skipTests;
+
   @Override
   protected void execute(Log log, Properties p) throws MojoExecutionException, MojoFailureException {
+    if (this.skipTests) {
+      return;
+    }
+
     removeDirectory(p.targetTest());
 
     int testResources = 0;

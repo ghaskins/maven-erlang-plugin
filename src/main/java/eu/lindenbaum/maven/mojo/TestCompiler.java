@@ -77,6 +77,7 @@ public final class TestCompiler extends ErlangMojo {
       files.add(new File(p.targetTestEbin(), "mock.erl"));
       files.add(new File(p.targetTestEbin(), "surefire.erl"));
       files.add(new File(p.targetTestEbin(), "cover2.erl"));
+      files.add(new File(p.targetTestEbin(), "ttycapture.erl"));
 
       List<File> includes = new ArrayList<File>();
       includes.addAll(getDependencyIncludes(p.targetLib()));
@@ -100,7 +101,7 @@ public final class TestCompiler extends ErlangMojo {
       result.logOutput(log);
       String failedCompilationUnit = result.getFailed();
       if (failedCompilationUnit != null) {
-        throw new MojoFailureException("failed to compile " + failedCompilationUnit);
+        throw new MojoFailureException("Failed to compile " + failedCompilationUnit + ".");
       }
       log.info("Successfully compiled " + files.size() + " test source file(s).");
     }

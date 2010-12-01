@@ -23,15 +23,15 @@ public final class TestScript implements Script<TestResult> {
   private static final String script = //
   "    Surefire = {report, {surefire, [{dir, \"%s\"}, {package, \"%s\"}]}}," + //
       "Tty = {report, {ttycapture, [{report_to, self()}]}}," + //
-      "case eunit:test(%s, [Surefire, Tty]) of" + //
-      "    ok ->" + //
-      "        receive" + //
-      "            Result ->" + //
-      "                Result" + //
-      "        end;" + //
-      "    {error, Reason} ->" + //
-      "        {error, [lists:flatten(io_lib:format(\"~p\", [Reason]))]} " + //
-      "end.";
+      "{_, Out} = case catch(eunit:test(%s, [Surefire, Tty])) of" + //
+      "               ok ->" + //
+      "                   {info, []};" + //
+      "               error ->" + //
+      "                   {error, []};" + //
+      "               {error, Reason} ->" + //
+      "                   {error, [lists:flatten(io_lib:format(\"~p\", [Reason]))]} " + //
+      "end," + //
+      "receive {Level, Captured} -> {Level, Captured ++ Out} end.";
 
   private final List<File> tests;
   private final File surefireDir;
@@ -69,7 +69,7 @@ public final class TestScript implements Script<TestResult> {
   public TestResult handle(OtpErlangObject result) {
     OtpErlangTuple resultTuple = (OtpErlangTuple) result;
     final OtpErlangAtom level = (OtpErlangAtom) resultTuple.elementAt(0);
-    final OtpErlangList lines = (OtpErlangList) resultTuple.elementAt(1);
+    final OtpErlangList output = (OtpErlangList) resultTuple.elementAt(1);
     return new TestResult() {
       @Override
       public boolean testsPassed() {
@@ -78,22 +78,26 @@ public final class TestScript implements Script<TestResult> {
 
       @Override
       public void logOutput(Log log) {
-        for (int i = 0; i < lines.arity(); ++i) {
-          final String line;
-          if (lines.elementAt(i) instanceof OtpErlangString) {
-            line = ((OtpErlangString) lines.elementAt(i)).stringValue().trim();
+        String loglevel = level.atomValue();
+        for (int i = 0; i < output.arity(); ++i) {
+          final String multiLine;
+          if (output.elementAt(i) instanceof OtpErlangString) {
+            multiLine = ((OtpErlangString) output.elementAt(i)).stringValue().trim();
           }
           else {
-            line = "";
+            multiLine = "";
           }
-          if ("info".equals(level.atomValue())) {
-            log.info(line);
-          }
-          else if ("warn".equals(level.atomValue())) {
-            log.warn(line);
-          }
-          else {
-            log.error(line);
+          String[] lines = multiLine.split("\r?\n");
+          for (String line : lines) {
+            if ("info".equals(loglevel)) {
+              log.info(line);
+            }
+            else if ("warn".equals(loglevel)) {
+              log.warn(line);
+            }
+            else {
+              log.error(line);
+            }
           }
         }
       }
