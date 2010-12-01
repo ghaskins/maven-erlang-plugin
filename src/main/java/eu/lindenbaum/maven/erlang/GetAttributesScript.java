@@ -18,8 +18,7 @@ import eu.lindenbaum.maven.util.ErlUtils;
  */
 public class GetAttributesScript implements Script<String> {
   private static final String script = //
-  "    code:add_patha(\"%s\")," + //
-      "R = lists:flatten(" + //
+  "    lists:flatten(" + //
       "    lists:foldl(" + //
       "      fun(Module, Acc) ->" + //
       "              A = Module:module_info(attributes)," + //
@@ -27,11 +26,8 @@ public class GetAttributesScript implements Script<String> {
       "                  undefined -> Acc;" + //
       "                  Attr -> [Attr | Acc]" + //
       "              end" + //
-      "      end, [], %s))," + //
-      "code:del_path(\"%s\")," + //
-      "R.";
+      "      end, [], %s)).";
 
-  private final File path;
   private final List<File> modules;
   private final String attribute;
 
@@ -41,17 +37,15 @@ public class GetAttributesScript implements Script<String> {
    * @param modules to search for the attribute in
    * @param attribute to look after
    */
-  public GetAttributesScript(File path, List<File> modules, String attribute) {
-    this.path = path;
+  public GetAttributesScript(List<File> modules, String attribute) {
     this.modules = modules;
     this.attribute = attribute;
   }
 
   @Override
   public String get() {
-    String absolutePath = this.path.getAbsolutePath();
     String modules = ErlUtils.toModuleList(this.modules, "'", "'");
-    return String.format(script, absolutePath, this.attribute, modules, absolutePath);
+    return String.format(script, this.attribute, modules);
   }
 
   /**

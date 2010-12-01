@@ -19,9 +19,8 @@ public class GetAttributesScriptTest {
   public void testGet() {
     List<File> modules = Arrays.asList(new File("file1.erl", "file2.beam"));
     String attribute = "attribute";
-    File path = new File("path");
 
-    GetAttributesScript script = new GetAttributesScript(path, modules, attribute);
+    GetAttributesScript script = new GetAttributesScript(modules, attribute);
     String expression = script.get();
     assertNotNull(expression);
     assertFalse(expression.isEmpty());
@@ -32,11 +31,10 @@ public class GetAttributesScriptTest {
   public void testHandleEmpty() {
     List<File> modules = Arrays.asList(new File("file1.erl", "file2.beam"));
     String attribute = "attribute";
-    File path = new File("path");
 
     OtpErlangList result = new OtpErlangList();
 
-    GetAttributesScript script = new GetAttributesScript(path, modules, attribute);
+    GetAttributesScript script = new GetAttributesScript(modules, attribute);
     String filtered = script.handle(result);
     assertEquals("[]", filtered);
   }
@@ -45,13 +43,12 @@ public class GetAttributesScriptTest {
   public void testHandleNotEmpty() {
     List<File> modules = Arrays.asList(new File("file1.erl", "file2.beam"));
     String attribute = "attribute";
-    File path = new File("path");
 
     OtpErlangAtom file1 = new OtpErlangAtom("value1");
     OtpErlangAtom file2 = new OtpErlangAtom("value2");
     OtpErlangList result = new OtpErlangList(new OtpErlangObject[]{ file1, file2 });
 
-    GetAttributesScript script = new GetAttributesScript(path, modules, attribute);
+    GetAttributesScript script = new GetAttributesScript(modules, attribute);
     String filtered = script.handle(result);
     assertEquals("['value1', 'value2']", filtered);
   }

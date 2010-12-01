@@ -86,8 +86,9 @@ public final class Packager extends ErlangMojo {
     String projectVersion = p.project().getVersion();
 
     List<File> modules = getFilesRecursive(p.targetEbin(), ErlConstants.BEAM_SUFFIX);
-    Script<String> registeredScript = new GetAttributesScript(p.targetEbin(), modules, "registered");
-    String registeredNames = MavenSelf.get().eval(p.node(), registeredScript);
+    Script<String> registeredScript = new GetAttributesScript(modules, "registered");
+    List<File> codePaths = Arrays.asList(p.targetEbin());
+    String registeredNames = MavenSelf.get().evalAndPurge(p.node(), registeredScript, codePaths);
 
     Map<String, String> replacements = new HashMap<String, String>();
     replacements.put("${ARTIFACT}", "\'" + p.project().getArtifactId() + "\'");
@@ -188,8 +189,9 @@ public final class Packager extends ErlangMojo {
       File beamFile = new File(p.targetEbin(), startModule + ErlConstants.BEAM_SUFFIX);
       if (beamFile.isFile()) {
         List<File> list = Arrays.asList(beamFile);
-        Script<String> behaviourScript = new GetAttributesScript(p.targetEbin(), list, "behaviour");
-        String behaviours = MavenSelf.get().eval(p.node(), behaviourScript);
+        List<File> codePaths = Arrays.asList(p.targetEbin());
+        Script<String> behaviourScript = new GetAttributesScript(list, "behaviour");
+        String behaviours = MavenSelf.get().evalAndPurge(p.node(), behaviourScript, codePaths);
         if (behaviours.contains("application")) {
           if (!r.getApplications().contains("sasl")) {
             log.error("Application dependency to 'sasl' is missing.");

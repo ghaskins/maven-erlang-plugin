@@ -1,7 +1,9 @@
 package eu.lindenbaum.maven.erlang;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.ericsson.otp.erlang.OtpAuthException;
@@ -13,6 +15,8 @@ import com.ericsson.otp.erlang.OtpErlangString;
 import com.ericsson.otp.erlang.OtpErlangTuple;
 import com.ericsson.otp.erlang.OtpPeer;
 import com.ericsson.otp.erlang.OtpSelf;
+
+import eu.lindenbaum.maven.util.ErlUtils;
 
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -34,6 +38,29 @@ public final class MavenSelf {
    * rpc communication) using {@link OtpSelf#connect(DEFAULT_PEER)}.
    */
   public static final String DEFAULT_PEER = "maven-erlang-plugin-backend";
+
+  private static final String script = //
+  "    code:add_pathsa(%s)," + //
+      "_B_E_F_O_R_E_ = ordsets:from_list(code:all_loaded())," + //
+      "_R_E_S_U_L_T_ = try" + //
+      "                    %s " + //
+      "                catch" + //
+      "                    _E_ -> {exception, throw, _E_};" + //
+      "                    _C_:_E_ -> {exception, _C_, _E_}" + //
+      "                end," + //
+      "[code:del_path(_P_A_T_H_) || _P_A_T_H_ <- %s]," + //
+      "_A_F_T_E_R_ = ordsets:from_list(code:all_loaded())," + //
+      "_T_O_P_U_R_G_E_ = ordsets:subtract(_A_F_T_E_R_, _B_E_F_O_R_E_)," + //
+      "lists:foreach(" + //
+      "  fun({_M_O_D_, _}) ->" + //
+      "          code:delete(_M_O_D_)," + //
+      "          code:purge(_M_O_D_)" + //
+      "  end, ordsets:to_list(_T_O_P_U_R_G_E_))," + //
+      "case _R_E_S_U_L_T_ of" + //
+      "    {exception, _C_L_A_S_S_, _E_X_C_E_P_T_I_O_N_} ->" + //
+      "        throw({_C_L_A_S_S_, _E_X_C_E_P_T_I_O_N_});" + //
+      "    _ -> _R_E_S_U_L_T_ " + // do not kill the whitespace at the end of this line!!!
+      "end.";
 
   private static MavenSelf instance = null;
 
@@ -103,6 +130,29 @@ public final class MavenSelf {
 
   /**
    * Executes a {@link Script} on a specific remote erlang node using RPC. A
+   * connection to the remote node will be established if necessary. The given
+   * code paths will be added before script execution and are guaranteed to be
+   * removed when the script ends (abnormally). Additionally, all dynamically
+   * loaded modules will be purged on the remote node when the script exits.
+   * 
+   * @param peer to evaluate the {@link Script} on
+   * @param script to evaluate
+   * @param codePaths a list of paths needed for the script to run
+   * @return the processed result of the {@link Script}
+   * @throws MojoExecutionException
+   */
+  public <T> T evalAndPurge(String peer, Script<T> script, List<File> codePaths) throws MojoExecutionException {
+    String scriptString = script.get().trim();
+    if (scriptString.endsWith(".")) {
+      scriptString = scriptString.substring(0, scriptString.length() - 1);
+    }
+    String pathsString = ErlUtils.toFileList(codePaths, "\"", "\"");
+    String toEval = String.format(MavenSelf.script, pathsString, scriptString, pathsString);
+    return script.handle(eval(peer, toEval));
+  }
+
+  /**
+   * Executes a {@link Script} on a specific remote erlang node using RPC. A
    * connection to the remote node will be established if necessary.
    * 
    * @param peer to evaluate the {@link Script} on
@@ -123,7 +173,7 @@ public final class MavenSelf {
    * @return the result term of the expression
    * @throws MojoExecutionException
    */
-  public OtpErlangObject eval(String peer, String expression) throws MojoExecutionException {
+  private OtpErlangObject eval(String peer, String expression) throws MojoExecutionException {
     OtpConnection connection = connect(peer);
     try {
       connection.sendRPC("erl_eval", "new_bindings", new OtpErlangList());
