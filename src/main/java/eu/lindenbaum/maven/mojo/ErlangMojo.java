@@ -102,6 +102,9 @@ abstract class ErlangMojo extends AbstractMojo {
     private final File include;
     private final File priv;
     private final File src;
+    private final File srcChanges;
+    private final File srcSite;
+    private final File srcSiteApt;
     private final File src_base;
     private final File test_include;
     private final File test_priv;
@@ -141,6 +144,9 @@ abstract class ErlangMojo extends AbstractMojo {
           this.include = new File(base, "include");
           this.priv = new File(base, "priv");
           this.src = new File(base, "src");
+          this.srcChanges = new File(base, "src/changes");
+          this.srcSite = new File(base, "src/site");
+          this.srcSiteApt = new File(base, "src/site/apt");
           this.src_base = base;
           this.test_include = new File(base, "test_include");
           this.test_priv = new File(base, "test_priv");
@@ -152,6 +158,9 @@ abstract class ErlangMojo extends AbstractMojo {
           this.include = new File(base, "src/main/include");
           this.priv = new File(base, "src/main/priv");
           this.src = this.ebin;
+          this.srcChanges = new File(base, "src/changes");
+          this.srcSite = new File(base, "src/site");
+          this.srcSiteApt = new File(base, "src/site/apt");
           this.src_base = new File(base, "src/main");
           this.test_include = new File(base, "src/test/include");
           this.test_priv = new File(base, "src/test/priv");
@@ -163,6 +172,9 @@ abstract class ErlangMojo extends AbstractMojo {
           this.include = base;
           this.priv = base;
           this.src = base;
+          this.srcChanges = new File(base, "src/changes");
+          this.srcSite = new File(base, "src/site");
+          this.srcSiteApt = new File(base, "src/site/apt");
           this.src_base = base;
           this.test_include = base;
           this.test_priv = base;
@@ -234,6 +246,21 @@ abstract class ErlangMojo extends AbstractMojo {
     @Override
     public File src() {
       return this.src;
+    }
+
+    @Override
+    public File srcChanges() {
+      return this.srcChanges;
+    }
+
+    @Override
+    public File srcSite() {
+      return this.srcSite;
+    }
+
+    @Override
+    public File srcSiteApt() {
+      return this.srcSiteApt;
     }
 
     @Override

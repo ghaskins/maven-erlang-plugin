@@ -22,10 +22,10 @@ public final class CheckAppScript implements Script<CheckAppResult> {
   "    case file:consult(\"%s\") of" + //
       "    {ok, [{application, A, Props}]} ->" + //
       "        V = proplists:get_value(vsn, Props, undefined)," + //
-      "        {S, _} = proplists:get_value(mod, Props, {undefined, []})," + //
+      "        S = proplists:get_value(mod, Props, undefined)," + //
       "        M = proplists:get_value(modules, Props, [])," + //
       "        D = proplists:get_value(applications, Props, [])," + //
-      "        {A, V, S, M, D};" + //
+      "        case S of {Module, _} -> {A, V, Module, M, D}; _ -> {A, V, S, M, D} end;" + //
       "    _ ->" + //
       "        {undefined, undefined, undefined, [], []}" + //
       "end.";

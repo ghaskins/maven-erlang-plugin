@@ -64,6 +64,21 @@ interface Properties {
   public File src();
 
   /**
+   * Returns the directory where the maven site resources reside.
+   */
+  public File srcSite();
+
+  /**
+   * Returns the directory where the maven .apt resources reside.
+   */
+  public File srcSiteApt();
+
+  /**
+   * Returns the directory where the changes resources reside.
+   */
+  public File srcChanges();
+
+  /**
    * Returns the base folder for sources of this project. This may be used to
    * include sources from other languages into the erlang application.
    */
