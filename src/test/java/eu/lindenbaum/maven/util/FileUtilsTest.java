@@ -44,6 +44,34 @@ public class FileUtilsTest {
   }
 
   @Test
+  public void testCopyDirectory() throws Exception {
+    URL resource = getClass().getClassLoader().getResource("file-utils");
+    File fileUtils = new File(resource.getFile());
+    File root = new File(fileUtils, "app-1.0");
+    File to = new File("target");
+    int copied = FileUtils.copyDirectory(root, to, FileUtils.NULL_FILTER);
+    File ebin = new File(to, "ebin");
+    File file = new File(ebin, "file");
+    boolean parent = ebin.isDirectory();
+    boolean child = file.isFile();
+    file.delete();
+    ebin.delete();
+    assertEquals(1, copied);
+    assertTrue(parent);
+    assertTrue(child);
+  }
+
+  @Test
+  public void testCopyDirectoryEmpty() throws Exception {
+    URL resource = getClass().getClassLoader().getResource("file-utils");
+    File fileUtils = new File(resource.getFile());
+    File root = new File(fileUtils, "subdirectory3");
+    File to = new File("target");
+    assertEquals(0, FileUtils.copyDirectory(root, to, FileUtils.NULL_FILTER));
+    assertFalse(new File(to, "subdirectory3").isDirectory());
+  }
+
+  @Test
   public void testOtpDirectoryRegex() {
     assertTrue(FileUtils.EBIN_PATTERN.matcher("test-path/app-1.0/ebin").matches());
     assertTrue(FileUtils.EBIN_PATTERN.matcher("path/app-1.0/ebin").matches());

@@ -321,7 +321,7 @@ public final class FileUtils {
    * directories including the destination folder will be created if necessary,
    * already existing files will be overwritten. By default patterns from
    * {@link org.codehaus.plexus.util.FileUtils#getDefaultExcludes()} will always
-   * be excluded.
+   * be excluded. Empty directories will be skipped.
    * 
    * @param from the source directory to copy from
    * @param to the destination directory to copy to
@@ -349,6 +349,12 @@ public final class FileUtils {
           }
         }
       }
+      for (File src : toCopy) {
+        File dest = new File(to, src.getAbsolutePath().replace(from.getAbsolutePath(), ""));
+        if (dest.isDirectory()) {
+          dest.delete();
+        }
+      }
     }
     return copied;
   }
@@ -361,7 +367,7 @@ public final class FileUtils {
    * applied to all found files. It is assumed that all files are {@code UTF-8}
    * encoded. By default patterns from
    * {@link org.codehaus.plexus.util.FileUtils#getDefaultExcludes()} will always
-   * be excluded.
+   * be excluded. Empty directories will be skipped.
    * 
    * @param from the source directory to copy from
    * @param to the destination directory to copy to
@@ -396,6 +402,12 @@ public final class FileUtils {
           catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
           }
+        }
+      }
+      for (File src : toCopy) {
+        File dest = new File(to, src.getAbsolutePath().replace(from.getAbsolutePath(), ""));
+        if (dest.isDirectory()) {
+          dest.delete();
         }
       }
     }
