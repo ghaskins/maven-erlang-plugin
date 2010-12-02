@@ -5,7 +5,6 @@ import static eu.lindenbaum.maven.util.FileUtils.newerFilesThan;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,38 +20,23 @@ import org.apache.maven.plugin.logging.Log;
 
 /**
  * <p>
- * This {@link Mojo} runs the erlang {@code dialyzer} tool on the project
- * sources as well as the project includes. This means dialyzer will run over
- * the complete project code (excluding test modules).
- * </p>
- * <p>
- * The {@code dialyzer} can be skipped using the {@code skipDialyzer} parameter.
- * Additionally, the user can choose to run {@code dialyzer} also on the
- * projects dependencies using the {@code dialyzerWithDependencies} parameter.
- * This is disabled by default for the {@code erlang-otp} and {@code erlang-std}
- * project packaging.
+ * This {@link Mojo} runs the erlang {@code dialyzer} tool on the release
+ * dependencies. The {@code dialyzer} can be skipped using the
+ * {@code skipDialyzer} parameter.
  * </p>
  * 
- * @goal dialyzer
- * @phase prepare-package
+ * @goal dialyzer-release
+ * @phase compile
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  * @author Olle Törnström <olle.toernstroem@lindenbaum.eu>
  */
-public final class Dialyzer extends ErlangMojo {
+public final class DialyzerRelease extends ErlangMojo {
   /**
    * Setting this to {@code true} will skip the {@code dialyzer} analysis.
    * 
    * @parameter expression="${skipDialyzer}" default-value=false
    */
   private boolean skipDialyzer;
-
-  /**
-   * Setting this to {@code true} will include the projects dependencies into
-   * the {@code dialyzer} run. Note: This may take very long.
-   * 
-   * @parameter expression="${dialyzerWithDependencies}" default-value=false
-   */
-  private boolean dialyzerWithDependencies;
 
   /**
    * Setting this to {@code true} will break the build when a {@code dialyzer}
@@ -84,19 +68,12 @@ public final class Dialyzer extends ErlangMojo {
     }
 
     File lastBuildIndicator = new File(p.target(), ErlConstants.DIALYZER_OK);
-    if (newerFilesThan(p.src(), lastBuildIndicator) || newerFilesThan(p.include(), lastBuildIndicator)
-        || newerFilesThan(p.targetLib(), lastBuildIndicator)) {
+    if (newerFilesThan(p.targetLib(), lastBuildIndicator)) {
       lastBuildIndicator.delete();
-      log.info("Running dialyzer on " + p.src());
+      log.info("Running dialyzer on " + p.targetLib());
 
-      List<File> sources = new ArrayList<File>();
-      sources.add(p.src());
-      if (this.dialyzerWithDependencies) {
-        sources.add(p.targetLib());
-      }
-      List<File> includes = new ArrayList<File>();
-      includes.addAll(Arrays.asList(new File[]{ p.include(), p.targetInclude() }));
-      includes.addAll(getDependencyIncludes(p.targetLib()));
+      List<File> sources = Arrays.asList(new File[]{ p.targetLib() });
+      List<File> includes = getDependencyIncludes(p.targetLib());
 
       DialyzerScript script = new DialyzerScript(sources, includes, this.dialyzerOptions);
       String[] warnings = MavenSelf.get().eval(p.node(), script);

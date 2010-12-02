@@ -98,13 +98,13 @@ abstract class ErlangMojo extends AbstractMojo {
     private final String node;
     private final String cookie;
 
+    private final File apt;
+    private final File changes;
     private final File ebin;
     private final File include;
     private final File priv;
+    private final File site;
     private final File src;
-    private final File srcChanges;
-    private final File srcSite;
-    private final File srcSiteApt;
     private final File src_base;
     private final File test_include;
     private final File test_priv;
@@ -140,13 +140,13 @@ abstract class ErlangMojo extends AbstractMojo {
 
       switch (type) {
         case ERLANG_STD: {
+          this.apt = new File(base, "src/site/apt");
+          this.changes = new File(base, "src/changes");
           this.ebin = new File(base, "ebin");
           this.include = new File(base, "include");
           this.priv = new File(base, "priv");
+          this.site = new File(base, "src/site");
           this.src = new File(base, "src");
-          this.srcChanges = new File(base, "src/changes");
-          this.srcSite = new File(base, "src/site");
-          this.srcSiteApt = new File(base, "src/site/apt");
           this.src_base = base;
           this.test_include = new File(base, "test_include");
           this.test_priv = new File(base, "test_priv");
@@ -154,13 +154,13 @@ abstract class ErlangMojo extends AbstractMojo {
           break;
         }
         case ERLANG_OTP: {
+          this.apt = new File(base, "src/site/apt");
+          this.changes = new File(base, "src/changes");
           this.ebin = new File(base, "src/main/erlang");
           this.include = new File(base, "src/main/include");
           this.priv = new File(base, "src/main/priv");
+          this.site = new File(base, "src/site");
           this.src = this.ebin;
-          this.srcChanges = new File(base, "src/changes");
-          this.srcSite = new File(base, "src/site");
-          this.srcSiteApt = new File(base, "src/site/apt");
           this.src_base = new File(base, "src/main");
           this.test_include = new File(base, "src/test/include");
           this.test_priv = new File(base, "src/test/priv");
@@ -168,13 +168,13 @@ abstract class ErlangMojo extends AbstractMojo {
           break;
         }
         default: { // ERLANG_REL
+          this.apt = new File(base, "src/site/apt");
+          this.changes = new File(base, "src/changes");
           this.ebin = base;
           this.include = base;
           this.priv = base;
+          this.site = new File(base, "src/site");
           this.src = base;
-          this.srcChanges = new File(base, "src/changes");
-          this.srcSite = new File(base, "src/site");
-          this.srcSiteApt = new File(base, "src/site/apt");
           this.src_base = base;
           this.test_include = base;
           this.test_priv = base;
@@ -229,6 +229,16 @@ abstract class ErlangMojo extends AbstractMojo {
     }
 
     @Override
+    public File apt() {
+      return this.apt;
+    }
+
+    @Override
+    public File changes() {
+      return this.changes;
+    }
+
+    @Override
     public File ebin() {
       return this.ebin;
     }
@@ -244,23 +254,13 @@ abstract class ErlangMojo extends AbstractMojo {
     }
 
     @Override
+    public File site() {
+      return this.site;
+    }
+
+    @Override
     public File src() {
       return this.src;
-    }
-
-    @Override
-    public File srcChanges() {
-      return this.srcChanges;
-    }
-
-    @Override
-    public File srcSite() {
-      return this.srcSite;
-    }
-
-    @Override
-    public File srcSiteApt() {
-      return this.srcSiteApt;
     }
 
     @Override
