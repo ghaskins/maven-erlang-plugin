@@ -4,11 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ericsson.otp.erlang.OtpErlangAtom;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.ericsson.otp.erlang.OtpErlangString;
 import com.ericsson.otp.erlang.OtpErlangTuple;
+
+import eu.lindenbaum.maven.util.ErlUtils;
 
 /**
  * A {@link Script} that can be used to extract certain values from an erlang
@@ -67,21 +67,17 @@ public final class CheckAppScript implements Script<CheckAppResult> {
     return new CheckAppResult() {
       @Override
       public String getVersion() {
-        if (version instanceof OtpErlangString) {
-          OtpErlangString versionString = (OtpErlangString) version;
-          return versionString.stringValue();
-        }
-        return "undefined";
+        return ErlUtils.cast(version);
       }
 
       @Override
       public String getStartModule() {
-        return ((OtpErlangAtom) startModule).atomValue();
+        return ErlUtils.cast(startModule);
       }
 
       @Override
       public String getName() {
-        return ((OtpErlangAtom) name).atomValue();
+        return ErlUtils.cast(name);
       }
 
       @Override
@@ -89,7 +85,7 @@ public final class CheckAppScript implements Script<CheckAppResult> {
         List<String> r = new ArrayList<String>();
         OtpErlangList m = (OtpErlangList) modules;
         for (int i = 0; i < m.arity(); ++i) {
-          r.add(((OtpErlangAtom) m.elementAt(i)).atomValue());
+          r.add(ErlUtils.cast(m.elementAt(i)));
         }
         return r;
       }
@@ -99,7 +95,7 @@ public final class CheckAppScript implements Script<CheckAppResult> {
         List<String> r = new ArrayList<String>();
         OtpErlangList a = (OtpErlangList) applications;
         for (int i = 0; i < a.arity(); ++i) {
-          r.add(((OtpErlangAtom) a.elementAt(i)).atomValue());
+          r.add(ErlUtils.cast(a.elementAt(i)));
         }
         return r;
       }

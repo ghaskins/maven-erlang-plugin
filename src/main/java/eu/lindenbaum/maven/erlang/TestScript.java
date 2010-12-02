@@ -6,7 +6,6 @@ import java.util.List;
 import com.ericsson.otp.erlang.OtpErlangAtom;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.ericsson.otp.erlang.OtpErlangString;
 import com.ericsson.otp.erlang.OtpErlangTuple;
 
 import eu.lindenbaum.maven.util.ErlUtils;
@@ -80,13 +79,7 @@ public final class TestScript implements Script<TestResult> {
       public void logOutput(Log log) {
         String loglevel = level.atomValue();
         for (int i = 0; i < output.arity(); ++i) {
-          final String multiLine;
-          if (output.elementAt(i) instanceof OtpErlangString) {
-            multiLine = ((OtpErlangString) output.elementAt(i)).stringValue().trim();
-          }
-          else {
-            multiLine = "";
-          }
+          String multiLine = ErlUtils.cast(output.elementAt(i));
           String[] lines = multiLine.split("\r?\n");
           for (String line : lines) {
             if ("info".equals(loglevel)) {

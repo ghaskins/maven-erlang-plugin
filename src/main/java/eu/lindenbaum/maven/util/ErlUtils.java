@@ -7,6 +7,11 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.ericsson.otp.erlang.OtpErlangAtom;
+import com.ericsson.otp.erlang.OtpErlangList;
+import com.ericsson.otp.erlang.OtpErlangObject;
+import com.ericsson.otp.erlang.OtpErlangString;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -123,6 +128,29 @@ public final class ErlUtils {
     }
     result.append("]");
     return result.toString();
+  }
+
+  /**
+   * Converts an {@link OtpErlangAtom}, {@link OtpErlangString} or an empty
+   * {@link OtpErlangList} into a {@link String} using the object specific
+   * conversion function. If the object is neither the {@link String}
+   * {@code "undefined"} is returned.
+   * 
+   * @param object to convert
+   * @return a non-null, trimmed {@link String} object
+   */
+  public static String cast(OtpErlangObject object) {
+    if (object instanceof OtpErlangString) {
+      return ((OtpErlangString) object).stringValue().trim();
+    }
+    if (object instanceof OtpErlangAtom) {
+      return ((OtpErlangAtom) object).atomValue().trim();
+    }
+    if (object instanceof OtpErlangList && ((OtpErlangList) object).arity() == 0) {
+      return "";
+    }
+
+    return "undefined";
   }
 
   /**

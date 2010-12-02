@@ -3,7 +3,6 @@ package eu.lindenbaum.maven.erlang;
 import java.io.File;
 import java.util.List;
 
-import com.ericsson.otp.erlang.OtpErlangAtom;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
 
@@ -63,8 +62,7 @@ public class FilterForAttributeScript implements Script<String> {
       if (i != 0) {
         filtered.append(", ");
       }
-      OtpErlangAtom module = (OtpErlangAtom) resultList.elementAt(i);
-      filtered.append("'" + module.atomValue() + "'");
+      filtered.append("'" + ErlUtils.cast(resultList.elementAt(i)) + "'");
     }
     filtered.append("]");
     return filtered.toString();

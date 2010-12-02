@@ -103,12 +103,11 @@ public final class BeamCompilerScript implements Script<CompilerResult> {
         for (int i = 0; i < messages.arity(); ++i) {
           OtpErlangTuple messageTuple = (OtpErlangTuple) messages.elementAt(i);
           OtpErlangAtom level = (OtpErlangAtom) messageTuple.elementAt(0);
-          OtpErlangString message = (OtpErlangString) messageTuple.elementAt(1);
           if ("error".equals(level.atomValue())) {
-            log.error(message.stringValue().trim());
+            log.error(ErlUtils.cast(messageTuple.elementAt(1)));
           }
           else {
-            log.warn(message.stringValue().trim());
+            log.warn(ErlUtils.cast(messageTuple.elementAt(1)));
           }
         }
       }
@@ -116,8 +115,7 @@ public final class BeamCompilerScript implements Script<CompilerResult> {
       @Override
       public String getFailed() {
         if (failed instanceof OtpErlangString) {
-          OtpErlangString filename = (OtpErlangString) failed;
-          String converted = filename.stringValue().trim();
+          String converted = ((OtpErlangString) failed).stringValue().trim();
           return converted.isEmpty() ? null : converted;
         }
         return null;

@@ -68,8 +68,7 @@ public final class DialyzerScript implements Script<String[]> {
     OtpErlangList warnings = (OtpErlangList) result;
     String[] messages = new String[warnings.arity()];
     for (int i = 0; i < warnings.arity(); ++i) {
-      OtpErlangString warning = (OtpErlangString) warnings.elementAt(i);
-      messages[i] = warning.stringValue().trim();
+      messages[i] = ErlUtils.cast(warnings.elementAt(i));
     }
     return messages;
   }
