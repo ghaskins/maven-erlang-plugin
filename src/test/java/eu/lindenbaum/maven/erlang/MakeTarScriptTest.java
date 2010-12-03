@@ -17,7 +17,7 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
-public class MakeScriptScriptTest {
+public class MakeTarScriptTest {
   private IMocksControl control;
   private Log log;
 
@@ -31,7 +31,7 @@ public class MakeScriptScriptTest {
   public void testGet() {
     File outdir = new File("outdir");
     File relFile = new File("relfile.rel");
-    MakeScriptScript script = new MakeScriptScript(relFile, outdir, null);
+    MakeTarScript script = new MakeTarScript(relFile, outdir, null);
     String expression = script.get();
     assertNotNull(expression);
     assertFalse(expression.isEmpty());
@@ -48,7 +48,7 @@ public class MakeScriptScriptTest {
 
     File outdir = new File("outdir");
     File relFile = new File("relfile.rel");
-    MakeScriptScript script = new MakeScriptScript(relFile, outdir, null);
+    MakeTarScript script = new MakeTarScript(relFile, outdir, null);
     SystoolsScriptResult scriptResult = script.handle(result);
     assertTrue(scriptResult.success());
     scriptResult.logOutput(this.log);
@@ -68,7 +68,7 @@ public class MakeScriptScriptTest {
 
     File outdir = new File("outdir");
     File relFile = new File("relfile.rel");
-    MakeScriptScript script = new MakeScriptScript(relFile, outdir, null);
+    MakeTarScript script = new MakeTarScript(relFile, outdir, null);
     SystoolsScriptResult scriptResult = script.handle(result);
     assertTrue(scriptResult.success());
     scriptResult.logOutput(this.log);
@@ -88,7 +88,7 @@ public class MakeScriptScriptTest {
 
     File outdir = new File("outdir");
     File relFile = new File("relfile.rel");
-    MakeScriptScript script = new MakeScriptScript(relFile, outdir, null);
+    MakeTarScript script = new MakeTarScript(relFile, outdir, null);
     SystoolsScriptResult scriptResult = script.handle(result);
     assertFalse(scriptResult.success());
     scriptResult.logOutput(this.log);

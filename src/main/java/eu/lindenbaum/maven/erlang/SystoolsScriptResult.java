@@ -3,16 +3,17 @@ package eu.lindenbaum.maven.erlang;
 import org.apache.maven.plugin.logging.Log;
 
 /**
- * Interface representing the result returned by the {@link MakeScriptScript}.
+ * Interface representing the result returned by the {@link MakeScriptScript}
+ * and {@link MakeTarScript} scripts.
  * 
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  * @author Olle Törnström <olle.toernstroem@lindenbaum.eu>
  */
-public interface MakeScriptResult {
+public interface SystoolsScriptResult {
   /**
-   * Returns whether generation of scripts succeeded.
+   * Returns whether script execution was successfull.
    * 
-   * @return {@code true} if generation succeeded, {@code false} otherwise.
+   * @return {@code true} if script succeeded, {@code false} otherwise.
    */
   public boolean success();
 

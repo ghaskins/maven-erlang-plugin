@@ -11,15 +11,15 @@ import eu.lindenbaum.maven.util.ErlUtils;
 import org.apache.maven.plugin.logging.Log;
 
 /**
- * A {@link Script} generating release scripts using
- * <code>systools:make_script/2</code>.
+ * A {@link Script} creating the release {@code .tar.gz} using
+ * <code>systools:make_tar/2</code>.
  * 
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  * @author Olle Törnström <olle.toernstroem@lindenbaum.eu>
  */
-public final class MakeScriptScript implements Script<SystoolsScriptResult> {
+public final class MakeTarScript implements Script<SystoolsScriptResult> {
   private static final String script = //
-  "    case systools:make_script(\"%s\", [silent, {outdir, \"%s\"}] ++ [%s]) of" + //
+  "    case systools:make_tar(\"%s\", [silent, {outdir, \"%s\"}] ++ [%s]) of" + //
       "    ok -> {ok, \"\"};" + //
       "    error -> {error, \"unknown\"};" + //
       "    {ok, Module, Warnings} ->" + //
@@ -33,16 +33,15 @@ public final class MakeScriptScript implements Script<SystoolsScriptResult> {
   private final String options;
 
   /**
-   * Creates a {@link Script} generating the erlang boot scripts for an OTP
-   * release.
+   * Creates a {@link Script} generating the OTP release .tar.gz package.
    * 
-   * @param releaseFile to generate scripts for
-   * @param outdir to place the generated scripts into
+   * @param releaseFile to generate the release package for
+   * @param outdir to place the release package into
    * @param options additional info according to erlang documentation, maybe
    *          {@code null}
    * @see http://www.erlang.org/doc/man/systools.html
    */
-  public MakeScriptScript(File releaseFile, File outdir, String options) {
+  public MakeTarScript(File releaseFile, File outdir, String options) {
     this.releaseFile = releaseFile;
     this.outdir = outdir;
     this.options = options != null ? options : "";

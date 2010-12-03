@@ -10,7 +10,7 @@ import java.util.Set;
 
 import eu.lindenbaum.maven.erlang.CheckAppResult;
 import eu.lindenbaum.maven.erlang.CheckAppScript;
-import eu.lindenbaum.maven.erlang.MakeScriptResult;
+import eu.lindenbaum.maven.erlang.SystoolsScriptResult;
 import eu.lindenbaum.maven.erlang.MakeScriptScript;
 import eu.lindenbaum.maven.erlang.MavenSelf;
 import eu.lindenbaum.maven.erlang.RuntimeInfo;
@@ -92,8 +92,8 @@ public final class ResourceGenerator extends ErlangMojo {
     List<File> codePaths = FileUtils.getDependencies(p.targetLib());
     codePaths.add(p.target());
 
-    Script<MakeScriptResult> script = new MakeScriptScript(relFile, p.target(), this.scriptOptions);
-    MakeScriptResult makeScriptResult = MavenSelf.get().evalAndPurge(p.node(), script, codePaths);
+    Script<SystoolsScriptResult> script = new MakeScriptScript(relFile, p.target(), this.scriptOptions);
+    SystoolsScriptResult makeScriptResult = MavenSelf.get().evalAndPurge(p.node(), script, codePaths);
     makeScriptResult.logOutput(log);
     if (!makeScriptResult.success()) {
       throw new MojoFailureException("Could not create boot scripts.");
