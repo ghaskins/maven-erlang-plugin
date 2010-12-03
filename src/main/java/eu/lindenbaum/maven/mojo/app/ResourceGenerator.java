@@ -1,7 +1,9 @@
-package eu.lindenbaum.maven.mojo;
+package eu.lindenbaum.maven.mojo.app;
 
 import static eu.lindenbaum.maven.util.FileUtils.copyDirectory;
 import static eu.lindenbaum.maven.util.FileUtils.removeDirectory;
+import eu.lindenbaum.maven.mojo.ErlangMojo;
+import eu.lindenbaum.maven.mojo.Properties;
 import eu.lindenbaum.maven.util.FileUtils;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -17,11 +19,11 @@ import org.apache.maven.plugin.logging.Log;
  * <li>resources (*)</li>
  * </ul>
  * 
- * @goal copy-resources
+ * @goal generate-resources
  * @phase generate-resources
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
-public final class CopyResources extends ErlangMojo {
+public final class ResourceGenerator extends ErlangMojo {
   @Override
   protected void execute(Log log, Properties p) throws MojoExecutionException, MojoFailureException {
     removeDirectory(p.targetProject());

@@ -18,12 +18,12 @@ import org.apache.maven.project.MavenProject;
  * {@code target/lib} directory. This is done only in case the dependency has
  * changed since the last unpack process.
  * 
- * @goal unpack-dependencies
+ * @goal extract-dependencies
  * @phase generate-sources
  * @requiresDependencyResolution test
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
-public final class UnpackDependencies extends ErlangMojo {
+public final class DependencyExtracter extends ErlangMojo {
   @Override
   protected void execute(Log log, Properties p) throws MojoExecutionException, MojoFailureException {
     File targetLib = p.targetLib();

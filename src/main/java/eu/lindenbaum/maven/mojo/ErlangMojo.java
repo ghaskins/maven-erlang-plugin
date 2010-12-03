@@ -18,7 +18,7 @@ import org.apache.maven.project.MavenProject;
  * @see PackagingType
  * @see Properties
  */
-abstract class ErlangMojo extends AbstractMojo {
+public abstract class ErlangMojo extends AbstractMojo {
   /**
    * {@link MavenProject} to process.
    * 
@@ -99,6 +99,7 @@ abstract class ErlangMojo extends AbstractMojo {
     private final String cookie;
 
     private final File apt;
+    private final File base;
     private final File changes;
     private final File ebin;
     private final File include;
@@ -183,6 +184,7 @@ abstract class ErlangMojo extends AbstractMojo {
         }
       }
 
+      this.base = base;
       this.target = new File(base, "target");
       this.targetProject = new File(this.target, this.projectName);
       this.targetEbin = new File(this.targetProject, "ebin");
@@ -231,6 +233,11 @@ abstract class ErlangMojo extends AbstractMojo {
     @Override
     public File apt() {
       return this.apt;
+    }
+
+    @Override
+    public File base() {
+      return this.base;
     }
 
     @Override

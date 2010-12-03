@@ -25,16 +25,16 @@
             <id>default</id>
             <phases>
               <validate></validate>
-              <initialize>eu.lindenbaum:maven-erlang-plugin:start-backend</initialize>
-              <generate-sources>eu.lindenbaum:maven-erlang-plugin:unpack-dependencies</generate-sources>
+              <initialize>eu.lindenbaum:maven-erlang-plugin:initialize</initialize>
+              <generate-sources>eu.lindenbaum:maven-erlang-plugin:extract-dependencies</generate-sources>
               <process-sources></process-sources>
-              <generate-resources>eu.lindenbaum:maven-erlang-plugin:copy-resources</generate-resources>
+              <generate-resources>eu.lindenbaum:maven-erlang-plugin:generate-resources</generate-resources>
               <process-resources></process-resources>
               <compile>eu.lindenbaum:maven-erlang-plugin:compile</compile>
               <process-classes></process-classes>
               <generate-test-sources></generate-test-sources>
               <process-test-sources></process-test-sources>
-              <generate-test-resources>eu.lindenbaum:maven-erlang-plugin:copy-test-resources</generate-test-resources>
+              <generate-test-resources>eu.lindenbaum:maven-erlang-plugin:generate-test-resources</generate-test-resources>
               <process-test-resources></process-test-resources>
               <test-compile>eu.lindenbaum:maven-erlang-plugin:test-compile</test-compile>
               <process-test-classes></process-test-classes>
@@ -74,16 +74,16 @@
             <id>default</id>
             <phases>
               <validate></validate>
-              <initialize>eu.lindenbaum:maven-erlang-plugin:start-backend</initialize>
-              <generate-sources>eu.lindenbaum:maven-erlang-plugin:unpack-dependencies</generate-sources>
+              <initialize>eu.lindenbaum:maven-erlang-plugin:initialize</initialize>
+              <generate-sources>eu.lindenbaum:maven-erlang-plugin:extract-dependencies</generate-sources>
               <process-sources></process-sources>
-              <generate-resources>eu.lindenbaum:maven-erlang-plugin:copy-resources</generate-resources>
+              <generate-resources>eu.lindenbaum:maven-erlang-plugin:generate-resources</generate-resources>
               <process-resources></process-resources>
               <compile>eu.lindenbaum:maven-erlang-plugin:compile</compile>
               <process-classes></process-classes>
               <generate-test-sources></generate-test-sources>
               <process-test-sources></process-test-sources>
-              <generate-test-resources>eu.lindenbaum:maven-erlang-plugin:copy-test-resources</generate-test-resources>
+              <generate-test-resources>eu.lindenbaum:maven-erlang-plugin:generate-test-resources</generate-test-resources>
               <process-test-resources></process-test-resources>
               <test-compile>eu.lindenbaum:maven-erlang-plugin:test-compile</test-compile>
               <process-test-classes></process-test-classes>
@@ -123,20 +123,19 @@
             <id>default</id>
             <phases>
               <validate></validate>
-              <initialize>eu.lindenbaum:maven-erlang-plugin:start-backend</initialize>
-              <generate-sources>eu.lindenbaum:maven-erlang-plugin:unpack-dependencies</generate-sources>
+              <initialize>eu.lindenbaum:maven-erlang-plugin:initialize</initialize>
+              <generate-sources>eu.lindenbaum:maven-erlang-plugin:extract-dependencies</generate-sources>
               <process-sources></process-sources>
-              <generate-resources></generate-resources>
-              <process-resources>eu.lindenbaum:maven-erlang-plugin:copy-resources</process-resources>
+              <generate-resources>eu.lindenbaum:maven-erlang-plugin:generate-release-resources</generate-resources>
+              <process-resources></process-resources>
               <compile>eu.lindenbaum:maven-erlang-plugin:dialyzer-release</compile>
-              <process-classes>eu.lindenbaum:maven-erlang-plugin:prepare-release</process-classes>
               <generate-test-sources></generate-test-sources>
               <process-test-sources></process-test-sources>
               <generate-test-resources></generate-test-resources>
               <process-test-resources></process-test-resources>
               <test-compile></test-compile>
               <process-test-classes></process-test-classes>
-              <test></test>
+              <test>eu.lindenbaum:maven-erlang-plugin:test-release</test>
               <prepare-package></prepare-package>
               <package>eu.lindenbaum:maven-erlang-plugin:package-release</package>
               <verify></verify>

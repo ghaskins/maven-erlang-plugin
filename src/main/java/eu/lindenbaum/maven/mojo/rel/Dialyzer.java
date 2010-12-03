@@ -1,4 +1,4 @@
-package eu.lindenbaum.maven.mojo;
+package eu.lindenbaum.maven.mojo.rel;
 
 import static eu.lindenbaum.maven.util.FileUtils.getDependencyIncludes;
 import static eu.lindenbaum.maven.util.FileUtils.newerFilesThan;
@@ -10,6 +10,8 @@ import java.util.List;
 
 import eu.lindenbaum.maven.erlang.DialyzerScript;
 import eu.lindenbaum.maven.erlang.MavenSelf;
+import eu.lindenbaum.maven.mojo.ErlangMojo;
+import eu.lindenbaum.maven.mojo.Properties;
 import eu.lindenbaum.maven.util.ErlConstants;
 import eu.lindenbaum.maven.util.MavenUtils;
 
@@ -30,7 +32,7 @@ import org.apache.maven.plugin.logging.Log;
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  * @author Olle Törnström <olle.toernstroem@lindenbaum.eu>
  */
-public final class DialyzerRelease extends ErlangMojo {
+public final class Dialyzer extends ErlangMojo {
   /**
    * Setting this to {@code true} will skip the {@code dialyzer} analysis.
    * 

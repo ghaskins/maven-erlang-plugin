@@ -10,7 +10,7 @@ import org.apache.maven.project.MavenProject;
  * 
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
-interface Properties {
+public interface Properties {
   /**
    * Returns the {@link MavenProject} to process.
    */
@@ -47,6 +47,11 @@ interface Properties {
    * Returns the directory where the maven .apt resources reside.
    */
   public File apt();
+
+  /**
+   * Returns the base project directory.
+   */
+  public File base();
 
   /**
    * Returns the directory where the changes resources reside.

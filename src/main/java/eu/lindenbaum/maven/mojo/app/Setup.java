@@ -1,4 +1,4 @@
-package eu.lindenbaum.maven.mojo;
+package eu.lindenbaum.maven.mojo.app;
 
 import static eu.lindenbaum.maven.util.FileUtils.extractFilesFromJar;
 import static eu.lindenbaum.maven.util.MavenUtils.getPluginFile;
@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
+import eu.lindenbaum.maven.mojo.ErlangMojo;
+import eu.lindenbaum.maven.mojo.Properties;
 import eu.lindenbaum.maven.util.ErlConstants;
 
 import org.apache.maven.artifact.Artifact;

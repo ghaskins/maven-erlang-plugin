@@ -25,11 +25,11 @@ import org.apache.maven.plugin.logging.Log;
  * {@link Runtime#addShutdownHook(Thread)} which will only be added <b>once</b>
  * each JVM execution.
  * 
- * @goal start-backend
+ * @goal initialize
  * @phase initialize
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
-public class StartBackend extends ErlangMojo {
+public class BackendInitializer extends ErlangMojo {
   /**
    * Setting this to {@code false} will leave the plugins backend node up and
    * running even if the executing jvm exits.
@@ -98,7 +98,7 @@ public class StartBackend extends ErlangMojo {
       }
       else {
         log.info("Node " + peer + " will not be shutdown automatically.");
-        log.info("To shutdown the node run 'mvn erlang:start-backend -DshutdownNode=true'");
+        log.info("To shutdown the node run 'mvn erlang:initialize -DshutdownNode=true'");
       }
     }
     catch (IOException e) {

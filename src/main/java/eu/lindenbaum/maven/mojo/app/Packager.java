@@ -1,4 +1,4 @@
-package eu.lindenbaum.maven.mojo;
+package eu.lindenbaum.maven.mojo.app;
 
 import static eu.lindenbaum.maven.util.ErlConstants.TARGZ_SUFFIX;
 import static eu.lindenbaum.maven.util.FileUtils.APP_FILTER;
@@ -21,6 +21,9 @@ import eu.lindenbaum.maven.erlang.CheckAppUpScript;
 import eu.lindenbaum.maven.erlang.GetAttributesScript;
 import eu.lindenbaum.maven.erlang.MavenSelf;
 import eu.lindenbaum.maven.erlang.Script;
+import eu.lindenbaum.maven.mojo.ErlangMojo;
+import eu.lindenbaum.maven.mojo.PackagingType;
+import eu.lindenbaum.maven.mojo.Properties;
 import eu.lindenbaum.maven.util.ErlConstants;
 import eu.lindenbaum.maven.util.ErlUtils;
 import eu.lindenbaum.maven.util.MavenUtils;
@@ -153,11 +156,11 @@ public final class Packager extends ErlangMojo {
    * Checks whether the application resource files application name equals the
    * projects artifact id.
    */
-  private void checkApplicationName(Log log, String artifactId, String appName) throws MojoFailureException {
-    if (!artifactId.equals(appName)) {
+  private static void checkApplicationName(Log log, String expected, String actual) throws MojoFailureException {
+    if (!expected.equals(actual)) {
       log.error("Name mismatch.");
-      log.error("Project name is " + artifactId + " while .app name is " + appName);
-      throw new MojoFailureException("Name mismatch " + artifactId + " != " + appName + ".");
+      log.error("Project name is " + expected + " while .app name is " + actual);
+      throw new MojoFailureException("Name mismatch " + expected + " != " + actual + ".");
     }
   }
 
@@ -165,11 +168,11 @@ public final class Packager extends ErlangMojo {
    * Checks whether the application resource files application version equals
    * the projects version.
    */
-  private void checkApplicationVersion(Log log, String version, String appVersion) throws MojoFailureException {
-    if (!version.equals(appVersion)) {
+  private static void checkApplicationVersion(Log log, String expected, String actual) throws MojoFailureException {
+    if (!expected.equals(actual)) {
       log.error("Version mismatch.");
-      log.error("Project version is " + version + " while .app version is " + appVersion);
-      throw new MojoFailureException("Version mismatch " + version + " != " + appVersion + ".");
+      log.error("Project version is " + expected + " while .app version is " + actual);
+      throw new MojoFailureException("Version mismatch " + expected + " != " + actual + ".");
     }
   }
 
@@ -178,8 +181,8 @@ public final class Packager extends ErlangMojo {
    * existence, implemented application behaviour and the sasl application
    * dependency.
    */
-  private void checkStartModule(Log log, Properties p, CheckAppResult r) throws MojoExecutionException,
-                                                                        MojoFailureException {
+  private static void checkStartModule(Log log, Properties p, CheckAppResult r) throws MojoExecutionException,
+                                                                               MojoFailureException {
     String startModule = r.getStartModule();
     if ("undefined".equals(startModule)) {
       log.info("No start module configured.");
@@ -215,16 +218,16 @@ public final class Packager extends ErlangMojo {
    * Checks whether the modules to be packaged are declared in the erlang
    * application file.
    */
-  private void checkModules(Log log, List<File> modules, List<String> appModules) throws MojoFailureException {
+  private void checkModules(Log log, List<File> expected, List<String> actual) throws MojoFailureException {
     Set<String> m = new HashSet<String>();
-    for (File module : modules) {
+    for (File module : expected) {
       m.add(module.getName().replace(ErlConstants.BEAM_SUFFIX, "").replace(ErlConstants.ERL_SUFFIX, ""));
     }
-    if (!m.containsAll(appModules) || !appModules.containsAll(m)) {
+    if (!m.containsAll(actual) || !actual.containsAll(m)) {
       Set<String> undeclared = new HashSet<String>(m);
-      undeclared.removeAll(appModules);
+      undeclared.removeAll(actual);
       log.warn("Undeclared modules: " + undeclared.toString());
-      Set<String> unbacked = new HashSet<String>(appModules);
+      Set<String> unbacked = new HashSet<String>(actual);
       unbacked.removeAll(m);
       log.warn("Unbacked modules: " + unbacked.toString());
       if (this.failOnUndeclaredModules) {
@@ -238,14 +241,14 @@ public final class Packager extends ErlangMojo {
    * project pom are correctly configured as application dependencies in the
    * application resource file.
    */
-  private void checkApplications(Log log, List<Dependency> dependencies, List<String> applications) throws MojoFailureException {
+  private static void checkApplications(Log log, List<Dependency> expected, List<String> actual) throws MojoFailureException {
     boolean missingDependencies = false;
-    for (Dependency dependency : dependencies) {
+    for (Dependency dependency : expected) {
       String type = dependency.getType();
       if (PackagingType.ERLANG_OTP.isA(type) || PackagingType.ERLANG_STD.isA(type)) {
         if (!"test".equals(dependency.getScope())) {
           String artifactId = dependency.getArtifactId();
-          if (!applications.contains(artifactId)) {
+          if (!actual.contains(artifactId)) {
             log.error("Application dependency to '" + artifactId + "' is missing.");
             missingDependencies = true;
           }

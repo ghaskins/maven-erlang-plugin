@@ -1,7 +1,9 @@
-package eu.lindenbaum.maven.mojo;
+package eu.lindenbaum.maven.mojo.app;
 
 import static eu.lindenbaum.maven.util.FileUtils.copyDirectory;
 import static eu.lindenbaum.maven.util.FileUtils.removeDirectory;
+import eu.lindenbaum.maven.mojo.ErlangMojo;
+import eu.lindenbaum.maven.mojo.Properties;
 import eu.lindenbaum.maven.util.FileUtils;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -16,11 +18,11 @@ import org.apache.maven.plugin.logging.Log;
  * <li>test resources (*)</li>
  * </ul>
  * 
- * @goal copy-test-resources
+ * @goal generate-test-resources
  * @phase generate-test-resources
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
-public final class CopyTestResources extends ErlangMojo {
+public final class TestResourceGenerator extends ErlangMojo {
   /**
    * Setting this to {@code true will} will skip copying the test resources.
    * 

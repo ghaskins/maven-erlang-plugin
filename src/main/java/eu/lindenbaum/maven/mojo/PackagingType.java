@@ -12,7 +12,7 @@ package eu.lindenbaum.maven.mojo;
  * 
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
-enum PackagingType {
+public enum PackagingType {
   /**
    * Packaging type for erlang/OTP applications with maven standard directory
    * layout: *
