@@ -1,11 +1,12 @@
 package eu.lindenbaum.maven.erlang;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.File;
-
+import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangString;
+import com.ericsson.otp.erlang.OtpErlangTuple;
 
 import org.junit.Test;
 
@@ -21,12 +22,14 @@ public class RuntimeInfoScriptTest {
 
   @Test
   public void testHandle() {
-    OtpErlangString result = new OtpErlangString("/path/");
+    OtpErlangString path = new OtpErlangString("/path");
+    OtpErlangString version = new OtpErlangString("version");
+    OtpErlangTuple result = new OtpErlangTuple(new OtpErlangObject[]{ path, version });
 
     RuntimeInfoScript script = new RuntimeInfoScript();
     RuntimeInfo info = script.handle(result);
     assertNotNull(info);
-    File libDirectory = info.libDirectory();
-    assertNotNull(libDirectory);
+    assertEquals("path", info.getLibDirectory().getName());
+    assertEquals("version", info.getVersion());
   }
 }

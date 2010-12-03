@@ -63,13 +63,15 @@ public final class MakeScriptScript implements Script<MakeScriptResult> {
 
       @Override
       public void logOutput(Log log) {
-        String[] lines = messages.split("\r?\n");
-        for (String line : lines) {
-          if ("error".equals(level)) {
-            log.error(line);
-          }
-          else if ("warn".equals(level)) {
-            log.warn(line);
+        if (!messages.isEmpty()) {
+          String[] lines = messages.split("\r?\n");
+          for (String line : lines) {
+            if ("error".equals(level)) {
+              log.error(line);
+            }
+            if ("warn".equals(level)) {
+              log.warn(line);
+            }
           }
         }
       }

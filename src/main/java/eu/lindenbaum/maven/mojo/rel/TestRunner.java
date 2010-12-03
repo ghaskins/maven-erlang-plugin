@@ -58,6 +58,8 @@ public final class TestRunner extends ErlangMojo {
     checkReleaseName(log, releaseName, relResult.getName());
     checkReleaseVersion(log, releaseVersion, relResult.getReleaseVersion());
     checkDependencies(log, artifacts, relResult.getApplications());
+
+    log.info("Integrity checks successfully passed.");
   }
 
   /**

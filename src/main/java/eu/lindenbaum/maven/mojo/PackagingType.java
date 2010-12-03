@@ -55,6 +55,7 @@ public enum PackagingType {
    * 
    * <pre>
    *  BASE
+   *    +-- ebin (*.rel, *.relup)
    *    +-- target (build artifacts)
    *    +-- pom.xml
    *    +-- *.rel

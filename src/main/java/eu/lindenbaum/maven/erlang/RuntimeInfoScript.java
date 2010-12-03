@@ -3,6 +3,7 @@ package eu.lindenbaum.maven.erlang;
 import java.io.File;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.ericsson.otp.erlang.OtpErlangTuple;
 
 import eu.lindenbaum.maven.util.ErlUtils;
 
@@ -13,7 +14,7 @@ import eu.lindenbaum.maven.util.ErlUtils;
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
 public class RuntimeInfoScript implements Script<RuntimeInfo> {
-  private static final String script = "code:lib_dir().";
+  private static final String script = "{code:lib_dir(), erlang:system_info(version)}.";
 
   public RuntimeInfoScript() {
     // ignored
@@ -32,10 +33,16 @@ public class RuntimeInfoScript implements Script<RuntimeInfo> {
    */
   @Override
   public RuntimeInfo handle(final OtpErlangObject result) {
+    final OtpErlangTuple resultTuple = (OtpErlangTuple) result;
     return new RuntimeInfo() {
       @Override
-      public File libDirectory() {
-        return new File(ErlUtils.cast(result));
+      public File getLibDirectory() {
+        return new File(ErlUtils.cast(resultTuple.elementAt(0)));
+      }
+
+      @Override
+      public String getVersion() {
+        return ErlUtils.cast(resultTuple.elementAt(1));
       }
     };
   }

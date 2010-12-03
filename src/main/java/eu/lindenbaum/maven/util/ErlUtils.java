@@ -149,7 +149,6 @@ public final class ErlUtils {
     if (object instanceof OtpErlangList && ((OtpErlangList) object).arity() == 0) {
       return "";
     }
-
     return "undefined";
   }
 

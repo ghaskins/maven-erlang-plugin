@@ -14,5 +14,13 @@ public interface RuntimeInfo {
    * 
    * @return The erlang runtime's library directory.
    */
-  public File libDirectory();
+  public File getLibDirectory();
+
+  /**
+   * Returns the erlang runtime version (ERTS version) of the backend node as
+   * returned by <code>erlang:system_info(version)</code>.
+   * 
+   * @return The erlang runtime's system version.
+   */
+  public String getVersion();
 }

@@ -171,7 +171,7 @@ public abstract class ErlangMojo extends AbstractMojo {
         default: { // ERLANG_REL
           this.apt = new File(base, "src/site/apt");
           this.changes = new File(base, "src/changes");
-          this.ebin = base;
+          this.ebin = new File(base, "ebin");
           this.include = base;
           this.priv = base;
           this.site = new File(base, "src/site");

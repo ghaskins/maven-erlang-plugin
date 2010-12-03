@@ -77,10 +77,11 @@ public final class ResourceGenerator extends ErlangMojo {
     Map<String, String> replacements = new HashMap<String, String>();
     replacements.put("${ARTIFACT}", "\"" + releaseName + "\"");
     replacements.put("${VERSION}", "\"" + releaseVersion + "\"");
-    replacements.putAll(getApplicationMappings(p, runtimeInfo));
+    replacements.putAll(getApplicationMappings(p, runtimeInfo.getLibDirectory()));
+    replacements.put("${ERTS}", "\"" + runtimeInfo.getVersion() + "\"");
     replacements.put("${APPLICATIONS}", getReleaseDependencies(artifacts));
 
-    int resources = copyDirectory(p.base(), p.target(), FileUtils.REL_FILTER, replacements);
+    int resources = copyDirectory(p.ebin(), p.target(), FileUtils.REL_FILTER, replacements);
     log.debug("Copied " + resources + " release files.");
 
     File relFile = new File(p.target(), relFileBaseName + ErlConstants.REL_SUFFIX);
@@ -95,7 +96,7 @@ public final class ResourceGenerator extends ErlangMojo {
     MakeScriptResult makeScriptResult = MavenSelf.get().evalAndPurge(p.node(), script, codePaths);
     makeScriptResult.logOutput(log);
     if (!makeScriptResult.success()) {
-      throw new MojoFailureException("Failed to make scripts.");
+      throw new MojoFailureException("Could not create boot scripts.");
     }
   }
 
@@ -104,8 +105,7 @@ public final class ResourceGenerator extends ErlangMojo {
    * <code>${APP_NAME}</code> for all applications available in the local OTP
    * installation.
    */
-  private static Map<String, String> getApplicationMappings(Properties p, RuntimeInfo runtimeInfo) throws MojoExecutionException {
-    File libDirectory = runtimeInfo.libDirectory();
+  private static Map<String, String> getApplicationMappings(Properties p, File libDirectory) throws MojoExecutionException {
     HashMap<String, String> appMap = new HashMap<String, String>();
     for (File appFile : FileUtils.getFilesRecursive(libDirectory, ErlConstants.APP_SUFFIX)) {
       Script<CheckAppResult> script = new CheckAppScript(appFile);
