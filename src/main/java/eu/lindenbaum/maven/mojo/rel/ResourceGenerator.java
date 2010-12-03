@@ -92,7 +92,7 @@ public final class ResourceGenerator extends ErlangMojo {
     List<File> codePaths = FileUtils.getDependencies(p.targetLib());
     codePaths.add(p.target());
 
-    Script<MakeScriptResult> script = new MakeScriptScript(relFileBaseName, p.target(), this.scriptOptions);
+    Script<MakeScriptResult> script = new MakeScriptScript(relFile, p.target(), this.scriptOptions);
     MakeScriptResult makeScriptResult = MavenSelf.get().evalAndPurge(p.node(), script, codePaths);
     makeScriptResult.logOutput(log);
     if (!makeScriptResult.success()) {

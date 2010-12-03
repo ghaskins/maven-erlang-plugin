@@ -54,8 +54,7 @@ public enum PackagingType {
    * Packaging type for erlang/OTP releases with trivial directory layout:
    * 
    * <pre>
-   *  BASE
-   *    +-- ebin (*.rel, *.relup)
+   *  BASE (*.rel, *.relup)
    *    +-- target (build artifacts)
    *    +-- pom.xml
    *    +-- *.rel

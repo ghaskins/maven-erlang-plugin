@@ -5,6 +5,7 @@ import java.io.File;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
 
+import eu.lindenbaum.maven.util.ErlConstants;
 import eu.lindenbaum.maven.util.ErlUtils;
 
 import org.apache.maven.plugin.logging.Log;
@@ -27,20 +28,21 @@ public final class MakeScriptScript implements Script<MakeScriptResult> {
       "        {error, Module:format_error(Error)}" + //
       "end.";
 
-  private final String releaseName;
+  private final File releaseFile;
   private final File outdir;
   private final String options;
 
-  public MakeScriptScript(String releaseName, File outdir, String options) {
-    this.releaseName = releaseName;
+  public MakeScriptScript(File releaseFile, File outdir, String options) {
+    this.releaseFile = releaseFile;
     this.outdir = outdir;
     this.options = options != null ? options : "";
   }
 
   @Override
   public String get() {
+    String rel = this.releaseFile.getAbsolutePath().replace(ErlConstants.REL_SUFFIX, "");
     String outPath = this.outdir.getAbsolutePath();
-    return String.format(script, this.releaseName, outPath, this.options);
+    return String.format(script, rel, outPath, this.options);
   }
 
   /**

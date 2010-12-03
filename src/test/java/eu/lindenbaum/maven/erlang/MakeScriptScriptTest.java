@@ -30,7 +30,8 @@ public class MakeScriptScriptTest {
   @Test
   public void testGet() {
     File outdir = new File("outdir");
-    MakeScriptScript script = new MakeScriptScript("releaseName", outdir, null);
+    File relFile = new File("relfile.rel");
+    MakeScriptScript script = new MakeScriptScript(relFile, outdir, null);
     String expression = script.get();
     assertNotNull(expression);
     assertFalse(expression.isEmpty());
@@ -46,7 +47,8 @@ public class MakeScriptScriptTest {
     OtpErlangTuple result = new OtpErlangTuple(new OtpErlangObject[]{ level, message });
 
     File outdir = new File("outdir");
-    MakeScriptScript script = new MakeScriptScript("releaseName", outdir, null);
+    File relFile = new File("relfile.rel");
+    MakeScriptScript script = new MakeScriptScript(relFile, outdir, null);
     MakeScriptResult scriptResult = script.handle(result);
     assertTrue(scriptResult.success());
     scriptResult.logOutput(this.log);
@@ -65,7 +67,8 @@ public class MakeScriptScriptTest {
     OtpErlangTuple result = new OtpErlangTuple(new OtpErlangObject[]{ level, message });
 
     File outdir = new File("outdir");
-    MakeScriptScript script = new MakeScriptScript("releaseName", outdir, null);
+    File relFile = new File("relfile.rel");
+    MakeScriptScript script = new MakeScriptScript(relFile, outdir, null);
     MakeScriptResult scriptResult = script.handle(result);
     assertTrue(scriptResult.success());
     scriptResult.logOutput(this.log);
@@ -84,7 +87,8 @@ public class MakeScriptScriptTest {
     OtpErlangTuple result = new OtpErlangTuple(new OtpErlangObject[]{ level, message });
 
     File outdir = new File("outdir");
-    MakeScriptScript script = new MakeScriptScript("releaseName", outdir, null);
+    File relFile = new File("relfile.rel");
+    MakeScriptScript script = new MakeScriptScript(relFile, outdir, null);
     MakeScriptResult scriptResult = script.handle(result);
     assertFalse(scriptResult.success());
     scriptResult.logOutput(this.log);
