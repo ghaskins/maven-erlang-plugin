@@ -1,4 +1,4 @@
-package eu.lindenbaum.maven.mojo.app;
+package eu.lindenbaum.maven.mojo;
 
 import static eu.lindenbaum.maven.util.FileUtils.extractFilesFromJar;
 import static eu.lindenbaum.maven.util.MavenUtils.getPluginFile;
@@ -7,8 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
-import eu.lindenbaum.maven.mojo.ErlangMojo;
-import eu.lindenbaum.maven.mojo.Properties;
 import eu.lindenbaum.maven.util.ErlConstants;
 
 import org.apache.maven.artifact.Artifact;
@@ -64,6 +62,13 @@ public class Setup extends ErlangMojo {
 
   @Override
   protected void execute(Log log, Properties p) throws MojoExecutionException, MojoFailureException {
+    PackagingType packagingType = p.packagingType();
+    if (packagingType != PackagingType.ERLANG_OTP && packagingType != PackagingType.ERLANG_STD) {
+      log.info("--> There's nothing to do for packaging " + packagingType + ".");
+      log.info("--> Done!");
+      return;
+    }
+
     this.plugin = getPluginFile("maven-erlang-plugin", p.project(), p.repository());
 
     if (noSite(p)) {
@@ -150,10 +155,10 @@ public class Setup extends ErlangMojo {
       logSkipping();
     }
 
-    getLog().info("-->");
-    getLog().info("--> Checking dependencies...");
+    log.info("-->");
+    log.info("--> Checking dependencies...");
     checkIfProjectHasDependentArtifact(p, "maven-changes-plugin");
-    getLog().info("--> Done!");
+    log.info("--> Done!");
   }
 
   private void checkIfProjectHasDependentArtifact(Properties p, String artifactId) {
