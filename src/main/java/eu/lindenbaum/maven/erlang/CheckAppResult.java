@@ -25,7 +25,8 @@ public interface CheckAppResult {
   /**
    * Returns the applications start module as stated in the {@code .app} file.
    * 
-   * @return The start module name or {@code "undefined"} if not present.
+   * @return The start module name or {@code "omitted"} if the application seems
+   *         to be a library application.
    */
   public String getStartModule();
 
