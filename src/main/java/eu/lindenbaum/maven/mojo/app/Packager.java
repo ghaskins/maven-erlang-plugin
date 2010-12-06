@@ -109,7 +109,7 @@ public final class Packager extends ErlangMojo {
     File appFile = new File(p.targetEbin(), p.project().getArtifactId() + ErlConstants.APP_SUFFIX);
     if (!appFile.exists()) {
       log.error(appFile.getName() + " does not exist.");
-      log.error("Use 'mvn erlang:setup' to create a default .app file");
+      log.error("Use 'mvn erlang:setup' to create a default library application .app file");
       throw new MojoFailureException("No .app file found.");
     }
 
@@ -184,11 +184,7 @@ public final class Packager extends ErlangMojo {
   private static void checkStartModule(Log log, Properties p, CheckAppResult r) throws MojoExecutionException,
                                                                                MojoFailureException {
     String startModule = r.getStartModule();
-    if ("undefined".equals(startModule)) {
-      log.info("No start module configured.");
-      log.info("This is ok for library applications.");
-    }
-    else {
+    if (!"omitted".equals(startModule)) {
       File beamFile = new File(p.targetEbin(), startModule + ErlConstants.BEAM_SUFFIX);
       if (beamFile.isFile()) {
         List<File> list = Arrays.asList(beamFile);
