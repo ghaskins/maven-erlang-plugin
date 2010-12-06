@@ -41,7 +41,7 @@ public final class MavenSelf {
 
   private static final String script = //
   "    code:add_pathsa(%s)," + //
-      "_B_E_F_O_R_E_ = ordsets:from_list(code:all_loaded())," + //
+      "_B_E_F_O_R_E_ = code:all_loaded()," + //
       "_R_E_S_U_L_T_ = try" + //
       "                    %s " + //
       "                catch" + //
@@ -49,13 +49,11 @@ public final class MavenSelf {
       "                    _C_:_E_ -> {exception, _C_, _E_}" + //
       "                end," + //
       "[code:del_path(_P_A_T_H_) || _P_A_T_H_ <- %s]," + //
-      "_A_F_T_E_R_ = ordsets:from_list(code:all_loaded())," + //
-      "_T_O_P_U_R_G_E_ = ordsets:subtract(_A_F_T_E_R_, _B_E_F_O_R_E_)," + //
       "lists:foreach(" + //
       "  fun({_M_O_D_, _}) ->" + //
       "          code:delete(_M_O_D_)," + //
       "          code:purge(_M_O_D_)" + //
-      "  end, ordsets:to_list(_T_O_P_U_R_G_E_))," + //
+      "  end, code:all_loaded() -- _B_E_F_O_R_E_)," + //
       "case _R_E_S_U_L_T_ of" + //
       "    {exception, _C_L_A_S_S_, _E_X_C_E_P_T_I_O_N_} ->" + //
       "        throw({_C_L_A_S_S_, _E_X_C_E_P_T_I_O_N_});" + //
