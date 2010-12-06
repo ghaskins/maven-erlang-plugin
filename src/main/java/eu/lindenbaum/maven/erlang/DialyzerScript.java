@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.ericsson.otp.erlang.OtpErlangString;
 
 import eu.lindenbaum.maven.util.ErlUtils;
 

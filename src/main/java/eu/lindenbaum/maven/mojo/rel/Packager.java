@@ -58,10 +58,11 @@ public final class Packager extends ErlangMojo {
       throw new MojoFailureException("Could not create release package.");
     }
 
-    File packageFile = new File(p.target(), releaseName + ErlConstants.TARGZ_SUFFIX);
-    if (!packageFile.isFile()) {
-      throw new MojoFailureException("Could not find packaged release " + packageFile.getName());
+    File relTarGz = new File(p.target(), relFileBaseName + ErlConstants.TARGZ_SUFFIX);
+    if (!relTarGz.isFile()) {
+      throw new MojoFailureException("Could not find packaged release " + relTarGz.getPath());
     }
-    p.project().getArtifact().setFile(packageFile);
+    p.project().getArtifact().setFile(relTarGz);
+    log.info("Successfully created release package " + relTarGz.getPath());
   }
 }
