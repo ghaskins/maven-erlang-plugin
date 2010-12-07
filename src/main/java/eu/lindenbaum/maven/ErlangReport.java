@@ -1,24 +1,26 @@
 package eu.lindenbaum.maven;
 
 import java.io.File;
+import java.util.Locale;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.reporting.AbstractMavenReport;
+import org.apache.maven.reporting.MavenReport;
+import org.apache.maven.reporting.MavenReportException;
 
 /**
- * A base class for all {@link Mojo}s that need to operate on values provided by
- * the {@link PropertiesImpl} bean.
+ * A base class for all {@link MavenReport}s that need to operate on values
+ * provided by the {@link PropertiesImpl} bean.
  * 
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  * @see PackagingType
  * @see Properties
  */
-public abstract class ErlangMojo extends AbstractMojo {
+public abstract class ErlangReport extends AbstractMavenReport {
   /**
    * {@link MavenProject} to process.
    * 
@@ -68,18 +70,29 @@ public abstract class ErlangMojo extends AbstractMojo {
    * {@link #execute(Log, Properties)} method to be implemented by subclasses.
    */
   @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
+  protected void executeReport(Locale locale) throws MavenReportException {
     PackagingType type = PackagingType.fromString(this.project.getPackaging());
     Properties p = new PropertiesImpl(type, this.project, this.repository, this.base, this.node, this.cookie);
-    execute(getLog(), p);
+    try {
+      execute(getLog(), locale, p);
+    }
+    catch (MojoExecutionException e) {
+      throw new MavenReportException(e.getMessage());
+    }
+    catch (MojoFailureException e) {
+      throw new MavenReportException(e.getMessage());
+    }
   }
 
   /**
    * Will be invoked when {@link #execute()} gets invoked on the base class.
    * 
    * @param log logger to be used for output logging
+   * @param l the demanded locale as passed to {@link #executeReport(Locale)}
    * @param p to be passed by the base class.
-   * @see AbstractMojo#execute()
+   * @see AbstractMavenReport#executeReport(Locale)
    */
-  protected abstract void execute(Log log, Properties p) throws MojoExecutionException, MojoFailureException;
+  protected abstract void execute(Log log, Locale l, Properties p) throws MojoExecutionException,
+                                                                  MojoFailureException,
+                                                                  MavenReportException;
 }
