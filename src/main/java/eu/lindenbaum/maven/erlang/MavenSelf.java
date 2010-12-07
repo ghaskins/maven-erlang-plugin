@@ -48,12 +48,12 @@ public final class MavenSelf {
       "                    _E_ -> {exception, throw, _E_};" + //
       "                    _C_:_E_ -> {exception, _C_, _E_}" + //
       "                end," + //
-      "[code:del_path(_P_A_T_H_) || _P_A_T_H_ <- %s]," + //
       "lists:foreach(" + //
       "  fun({_M_O_D_, _}) ->" + //
       "          code:delete(_M_O_D_)," + //
       "          code:purge(_M_O_D_)" + //
       "  end, code:all_loaded() -- _B_E_F_O_R_E_)," + //
+      "[code:del_path(_P_A_T_H_) || _P_A_T_H_ <- %s]," + //
       "case _R_E_S_U_L_T_ of" + //
       "    {exception, _C_L_A_S_S_, _E_X_C_E_P_T_I_O_N_} ->" + //
       "        throw({_C_L_A_S_S_, _E_X_C_E_P_T_I_O_N_});" + //
