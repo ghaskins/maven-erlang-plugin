@@ -41,10 +41,10 @@ public class StopApplicationScript implements Script<Void> {
 
   @Override
   public String get() {
-    String paths = ErlUtils.toFileList(this.codePaths, "\"", "\"");
-    String moduleString = ErlUtils.toModuleList(this.modules, "'", "'");
     String excluded = ErlUtils.toList(this.preservedApplications, null, "'", "'");
-    return String.format(script, paths, moduleString, excluded);
+    String moduleString = ErlUtils.toModuleList(this.modules, "'", "'");
+    String paths = ErlUtils.toFileList(this.codePaths, "\"", "\"");
+    return String.format(script, excluded, moduleString, paths);
   }
 
   /**

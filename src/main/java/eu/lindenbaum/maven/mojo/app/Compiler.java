@@ -15,6 +15,7 @@ import eu.lindenbaum.maven.erlang.Script;
 import eu.lindenbaum.maven.mojo.ErlangMojo;
 import eu.lindenbaum.maven.mojo.Properties;
 import eu.lindenbaum.maven.util.ErlConstants;
+import eu.lindenbaum.maven.util.FileUtils;
 import eu.lindenbaum.maven.util.MavenUtils;
 
 import org.apache.maven.plugin.Mojo;
@@ -69,7 +70,8 @@ public final class Compiler extends ErlangMojo {
       }
 
       Script<CompilerResult> script = new BeamCompilerScript(files, p.targetEbin(), includes, options);
-      CompilerResult result = MavenSelf.get().eval(p.node(), script);
+      List<File> codePaths = FileUtils.getDependencies(p.targetLib());
+      CompilerResult result = MavenSelf.get().evalAndPurge(p.node(), script, codePaths);
       result.logOutput(log);
       String failedCompilationUnit = result.getFailed();
       if (failedCompilationUnit != null) {
