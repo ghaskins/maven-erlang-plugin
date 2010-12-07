@@ -68,7 +68,7 @@ public abstract class ErlangMojo extends AbstractMojo {
    * {@link #execute(Log, Properties)} method to be implemented by subclasses.
    */
   @Override
-  public void execute() throws MojoExecutionException, MojoFailureException {
+  public final void execute() throws MojoExecutionException, MojoFailureException {
     PackagingType type = PackagingType.fromString(this.project.getPackaging());
     Properties p = new PropertiesImpl(type, this.project, this.repository, this.base, this.node, this.cookie);
     execute(getLog(), p);

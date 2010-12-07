@@ -146,6 +146,11 @@ public interface Properties {
   public File targetReleases();
 
   /**
+   * Returns the directory where site documentation will be generated into.
+   */
+  public File targetSite();
+
+  /**
    * Returns the directory where sources to package will be put into.
    */
   public File targetSrc();

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Locale;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -29,6 +30,15 @@ public abstract class ErlangReport extends AbstractMavenReport {
    * @readonly
    */
   private MavenProject project;
+
+  /**
+   * Doxia Site Renderer.
+   * 
+   * @component
+   * @required
+   * @readonly
+   */
+  private Renderer renderer;
 
   /**
    * {@link ArtifactRepository} storing dependencies of this
@@ -65,12 +75,22 @@ public abstract class ErlangReport extends AbstractMavenReport {
    */
   private String cookie;
 
+  @Override
+  protected final MavenProject getProject() {
+    return this.project;
+  }
+
+  @Override
+  protected final Renderer getSiteRenderer() {
+    return this.renderer;
+  }
+
   /**
    * Injects the needed {@link Properties} into the abstract
    * {@link #execute(Log, Properties)} method to be implemented by subclasses.
    */
   @Override
-  protected void executeReport(Locale locale) throws MavenReportException {
+  protected final void executeReport(Locale locale) throws MavenReportException {
     PackagingType type = PackagingType.fromString(this.project.getPackaging());
     Properties p = new PropertiesImpl(type, this.project, this.repository, this.base, this.node, this.cookie);
     try {

@@ -42,6 +42,7 @@ final class PropertiesImpl implements Properties {
   private final File targetPriv;
   private final File targetProject;
   private final File targetReleases;
+  private final File targetSite;
   private final File targetSrc;
   private final File targetSurefireReports;
   private final File targetTest;
@@ -116,6 +117,7 @@ final class PropertiesImpl implements Properties {
     this.targetMibs = new File(this.targetProject, "mibs");
     this.targetPriv = new File(this.targetProject, "priv");
     this.targetReleases = new File(this.target, "releases");
+    this.targetSite = new File(this.target, "site");
     this.targetSrc = new File(this.targetProject, "src");
     this.targetSurefireReports = new File(this.target, "surefire-reports");
     this.targetTest = new File(this.target, "test-" + this.projectName);
@@ -251,6 +253,11 @@ final class PropertiesImpl implements Properties {
   @Override
   public File targetReleases() {
     return this.targetReleases;
+  }
+
+  @Override
+  public File targetSite() {
+    return this.targetSite;
   }
 
   @Override
