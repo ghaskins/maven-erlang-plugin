@@ -10,12 +10,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.lindenbaum.maven.ErlangMojo;
+import eu.lindenbaum.maven.Properties;
 import eu.lindenbaum.maven.erlang.BeamCompilerScript;
 import eu.lindenbaum.maven.erlang.CompilerResult;
 import eu.lindenbaum.maven.erlang.MavenSelf;
 import eu.lindenbaum.maven.erlang.Script;
-import eu.lindenbaum.maven.mojo.ErlangMojo;
-import eu.lindenbaum.maven.mojo.Properties;
 import eu.lindenbaum.maven.util.ErlConstants;
 import eu.lindenbaum.maven.util.FileUtils;
 import eu.lindenbaum.maven.util.MavenUtils;

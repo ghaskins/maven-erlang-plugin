@@ -9,6 +9,9 @@ import java.util.Set;
 
 import com.ericsson.otp.erlang.OtpPeer;
 
+import eu.lindenbaum.maven.ErlangMojo;
+import eu.lindenbaum.maven.PackagingType;
+import eu.lindenbaum.maven.Properties;
 import eu.lindenbaum.maven.erlang.MavenSelf;
 import eu.lindenbaum.maven.erlang.Script;
 import eu.lindenbaum.maven.erlang.StartApplicationScript;

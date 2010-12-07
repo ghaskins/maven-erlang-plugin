@@ -9,6 +9,8 @@ import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpPeer;
 import com.ericsson.otp.erlang.OtpSelf;
 
+import eu.lindenbaum.maven.ErlangMojo;
+import eu.lindenbaum.maven.Properties;
 import eu.lindenbaum.maven.erlang.MavenSelf;
 import eu.lindenbaum.maven.util.ErlConstants;
 import eu.lindenbaum.maven.util.MavenUtils;

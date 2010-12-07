@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import eu.lindenbaum.maven.ErlangMojo;
+import eu.lindenbaum.maven.Properties;
 import eu.lindenbaum.maven.erlang.CheckAppResult;
 import eu.lindenbaum.maven.erlang.CheckAppScript;
 import eu.lindenbaum.maven.erlang.SystoolsScriptResult;
@@ -16,8 +18,6 @@ import eu.lindenbaum.maven.erlang.MavenSelf;
 import eu.lindenbaum.maven.erlang.RuntimeInfo;
 import eu.lindenbaum.maven.erlang.RuntimeInfoScript;
 import eu.lindenbaum.maven.erlang.Script;
-import eu.lindenbaum.maven.mojo.ErlangMojo;
-import eu.lindenbaum.maven.mojo.Properties;
 import eu.lindenbaum.maven.util.ErlConstants;
 import eu.lindenbaum.maven.util.FileUtils;
 

@@ -1,6 +1,7 @@
-package eu.lindenbaum.maven.mojo;
+package eu.lindenbaum.maven;
 
 import java.io.File;
+
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;

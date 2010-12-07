@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
+import eu.lindenbaum.maven.ErlangMojo;
+import eu.lindenbaum.maven.PackagingType;
+import eu.lindenbaum.maven.Properties;
 import eu.lindenbaum.maven.archiver.TarGzUnarchiver;
 
 import org.apache.maven.artifact.Artifact;

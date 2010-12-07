@@ -2,8 +2,8 @@ package eu.lindenbaum.maven.mojo.app;
 
 import static eu.lindenbaum.maven.util.FileUtils.copyDirectory;
 import static eu.lindenbaum.maven.util.FileUtils.removeDirectory;
-import eu.lindenbaum.maven.mojo.ErlangMojo;
-import eu.lindenbaum.maven.mojo.Properties;
+import eu.lindenbaum.maven.ErlangMojo;
+import eu.lindenbaum.maven.Properties;
 import eu.lindenbaum.maven.util.FileUtils;
 
 import org.apache.maven.plugin.MojoExecutionException;

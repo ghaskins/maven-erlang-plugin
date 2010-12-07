@@ -1,4 +1,4 @@
-package eu.lindenbaum.maven.mojo;
+package eu.lindenbaum.maven;
 
 /**
  * Enum for the supported packaging types.

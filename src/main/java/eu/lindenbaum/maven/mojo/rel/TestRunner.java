@@ -4,11 +4,11 @@ import java.io.File;
 import java.util.Map;
 import java.util.Set;
 
+import eu.lindenbaum.maven.ErlangMojo;
+import eu.lindenbaum.maven.Properties;
 import eu.lindenbaum.maven.erlang.CheckRelResult;
 import eu.lindenbaum.maven.erlang.CheckRelScript;
 import eu.lindenbaum.maven.erlang.MavenSelf;
-import eu.lindenbaum.maven.mojo.ErlangMojo;
-import eu.lindenbaum.maven.mojo.Properties;
 import eu.lindenbaum.maven.util.ErlConstants;
 import eu.lindenbaum.maven.util.MavenUtils;
 

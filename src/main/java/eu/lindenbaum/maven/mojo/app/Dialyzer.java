@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import eu.lindenbaum.maven.ErlangMojo;
+import eu.lindenbaum.maven.Properties;
 import eu.lindenbaum.maven.erlang.DialyzerScript;
 import eu.lindenbaum.maven.erlang.MavenSelf;
-import eu.lindenbaum.maven.mojo.ErlangMojo;
-import eu.lindenbaum.maven.mojo.Properties;
 import eu.lindenbaum.maven.util.ErlConstants;
 import eu.lindenbaum.maven.util.MavenUtils;
 
