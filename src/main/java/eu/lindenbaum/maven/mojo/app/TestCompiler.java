@@ -28,12 +28,14 @@ import org.apache.maven.plugin.logging.Log;
 /**
  * Compile erlang test sources and recompile erlang sources with the options
  * {@code debug_info}, {@code export_all} and <code>{d, 'TEST'}</code>. This
- * will also compile the erlang sources provided along with the plugin.
+ * will also compile the supporting erlang sources provided along with the
+ * plugin.
  * 
  * @goal test-compile
  * @phase test-compile
  * @author Olivier Sambourg
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
+ * @author Olle Törnström <olle.toernstroem@lindenbaum.eu>
  */
 public final class TestCompiler extends ErlangMojo {
   /**
@@ -71,16 +73,17 @@ public final class TestCompiler extends ErlangMojo {
     log.debug("Removed " + removed + " stale " + ErlConstants.BEAM_SUFFIX + "-files from "
               + p.targetTestEbin());
 
+    log.debug("Looking up test sources under " + p.test_src() + " with file suffix "
+              + ErlConstants.ERL_SUFFIX);
     List<File> files = getFilesRecursive(p.test_src(), ErlConstants.ERL_SUFFIX);
     if (!files.isEmpty()) {
       File plugin = getPluginFile("maven-erlang-plugin", p.project(), p.repository());
       extractFilesFromJar(plugin, ErlConstants.ERL_SUFFIX, p.targetTestEbin());
 
       files.addAll(getFilesRecursive(p.src(), ErlConstants.ERL_SUFFIX));
-      files.add(new File(p.targetTestEbin(), "mock.erl"));
-      files.add(new File(p.targetTestEbin(), "surefire.erl"));
-      files.add(new File(p.targetTestEbin(), "cover2.erl"));
-      files.add(new File(p.targetTestEbin(), "ttycapture.erl"));
+
+      List<File> supportFiles = getTestSupportFiles(p);
+      files.addAll(supportFiles);
 
       List<File> includes = new ArrayList<File>();
       includes.addAll(getDependencyIncludes(p.targetLib()));
@@ -107,10 +110,21 @@ public final class TestCompiler extends ErlangMojo {
       if (failedCompilationUnit != null) {
         throw new MojoFailureException("Failed to compile " + failedCompilationUnit + ".");
       }
-      log.info("Successfully compiled " + files.size() + " test source file(s).");
+
+      int numberOfTestFiles = files.size() - supportFiles.size();
+      log.info("Successfully compiled " + numberOfTestFiles + " test source file(s).");
     }
     else {
       log.info("No test source files to compile.");
     }
+  }
+
+  private List<File> getTestSupportFiles(Properties p) {
+    List<File> supportFiles = new ArrayList<File>();
+    supportFiles.add(new File(p.targetTestEbin(), "mock.erl"));
+    supportFiles.add(new File(p.targetTestEbin(), "surefire.erl"));
+    supportFiles.add(new File(p.targetTestEbin(), "cover2.erl"));
+    supportFiles.add(new File(p.targetTestEbin(), "ttycapture.erl"));
+    return supportFiles;
   }
 }
