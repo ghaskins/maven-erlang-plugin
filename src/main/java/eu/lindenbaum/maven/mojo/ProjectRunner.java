@@ -27,11 +27,16 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 
 /**
+ * <p>
  * A {@link Mojo} that runs erlang applications packaged with packaging type
  * {@link PackagingType#ERLANG_OTP} or {@link PackagingType#ERLANG_STD}. This
  * will start the application with all dependent applications and all modules
  * pre-loaded in the plugins backend node. When finished the {@link Mojo} will
  * stop the started applications and purge the loaded modules.
+ * </p>
+ * <p>
+ * TODO: release projects cannot be run
+ * </p>
  * 
  * @goal run
  * @execute phase="package"
