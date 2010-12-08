@@ -1,8 +1,9 @@
 package eu.lindenbaum.maven.mojo.rel;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import eu.lindenbaum.maven.ErlangMojo;
 import eu.lindenbaum.maven.Properties;
@@ -46,15 +47,14 @@ public final class TestRunner extends ErlangMojo {
       return;
     }
 
-    @SuppressWarnings("unchecked")
-    Set<Artifact> artifacts = p.project().getArtifacts();
+    List<Artifact> artifacts = MavenUtils.getNonTestArtifacts(p.project());
     String releaseName = p.project().getArtifactId();
     String releaseVersion = p.project().getVersion();
     String relFileBaseName = releaseName + "-" + releaseVersion;
 
     File relFile = new File(p.target(), relFileBaseName + ErlConstants.REL_SUFFIX);
     CheckRelScript relScript = new CheckRelScript(relFile);
-    CheckRelResult relResult = MavenSelf.get().eval(p.node(), relScript);
+    CheckRelResult relResult = MavenSelf.get().eval(p.node(), relScript, new ArrayList<File>());
     checkReleaseName(log, releaseName, relResult.getName());
     checkReleaseVersion(log, releaseVersion, relResult.getReleaseVersion());
     checkDependencies(log, artifacts, relResult.getApplications());
@@ -66,7 +66,7 @@ public final class TestRunner extends ErlangMojo {
    * Checks whether all project dependencies are declared in the .rel file and
    * whether the versions match.
    */
-  private static void checkDependencies(Log log, Set<Artifact> expected, Map<String, String> actual) throws MojoFailureException {
+  private static void checkDependencies(Log log, List<Artifact> expected, Map<String, String> actual) throws MojoFailureException {
     boolean errors = false;
     for (Artifact artifact : expected) {
       String version = actual.get(artifact.getArtifactId());

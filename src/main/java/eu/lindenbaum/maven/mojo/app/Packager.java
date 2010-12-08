@@ -7,6 +7,7 @@ import static eu.lindenbaum.maven.util.FileUtils.getFilesRecursive;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -91,7 +92,7 @@ public final class Packager extends ErlangMojo {
     List<File> modules = getFilesRecursive(p.targetEbin(), ErlConstants.BEAM_SUFFIX);
     Script<String> registeredScript = new GetAttributesScript(modules, "registered");
     List<File> codePaths = Arrays.asList(p.targetEbin());
-    String registeredNames = MavenSelf.get().evalAndPurge(p.node(), registeredScript, codePaths);
+    String registeredNames = MavenSelf.get().eval(p.node(), registeredScript, codePaths);
 
     Map<String, String> replacements = new HashMap<String, String>();
     replacements.put("${ARTIFACT}", "\'" + p.project().getArtifactId() + "\'");
@@ -115,7 +116,7 @@ public final class Packager extends ErlangMojo {
 
     // parse .app file
     Script<CheckAppResult> appScript = new CheckAppScript(appFile);
-    CheckAppResult appResult = MavenSelf.get().eval(p.node(), appScript);
+    CheckAppResult appResult = MavenSelf.get().eval(p.node(), appScript, new ArrayList<File>());
     checkApplicationName(log, p.project().getArtifactId(), appResult.getName());
     checkApplicationVersion(log, projectVersion, appResult.getVersion());
     checkStartModule(log, p, appResult);
@@ -130,7 +131,7 @@ public final class Packager extends ErlangMojo {
     else {
       // check .appup file
       Script<String> appUpScript = new CheckAppUpScript(appUpFile, projectVersion);
-      String error = MavenSelf.get().eval(p.node(), appUpScript);
+      String error = MavenSelf.get().eval(p.node(), appUpScript, new ArrayList<File>());
       if (error != null) {
         log.error(appUpFile.getAbsolutePath() + ":");
         log.error(error);
@@ -190,7 +191,7 @@ public final class Packager extends ErlangMojo {
         List<File> list = Arrays.asList(beamFile);
         List<File> codePaths = Arrays.asList(p.targetEbin());
         Script<String> behaviourScript = new GetAttributesScript(list, "behaviour");
-        String behaviours = MavenSelf.get().evalAndPurge(p.node(), behaviourScript, codePaths);
+        String behaviours = MavenSelf.get().eval(p.node(), behaviourScript, codePaths);
         if (behaviours.contains("application")) {
           if (!r.getApplications().contains("sasl")) {
             log.error("Application dependency to 'sasl' is missing.");

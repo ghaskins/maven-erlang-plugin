@@ -2,6 +2,7 @@ package eu.lindenbaum.maven.archiver;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
@@ -55,7 +56,7 @@ public final class TarGzUnarchiver {
         if (this.destination.isDirectory()) {
           Script<String> script = new TarGzUnarchiverScript(archive, this.destination);
           try {
-            String error = MavenSelf.get().eval(this.peer, script);
+            String error = MavenSelf.get().eval(this.peer, script, new ArrayList<File>());
             if (error != null) {
               throw new IOException("failed to extract archive: " + error);
             }

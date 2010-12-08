@@ -92,7 +92,7 @@ public final class TestRunner extends ErlangMojo {
     String suiteName = p.project().getArtifactId();
     Script<TestResult> script = new TestScript(tests, p.targetSurefireReports(), suiteName);
 
-    TestResult result = MavenSelf.get().evalAndPurge(p.node(), script, codePaths);
+    TestResult result = MavenSelf.get().eval(p.node(), script, codePaths);
     result.logOutput(log);
     if (!result.testsPassed()) {
       throw new MojoFailureException("There were test failures.");

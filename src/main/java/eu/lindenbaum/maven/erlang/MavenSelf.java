@@ -40,7 +40,8 @@ public final class MavenSelf {
   public static final String DEFAULT_PEER = "maven-erlang-plugin-backend";
 
   private static final String script = //
-  "    code:add_pathsa(%s)," + //
+  "    C_O_D_E_P_A_T_H_S_ = %s," + //
+      "code:add_pathsa(C_O_D_E_P_A_T_H_S_)," + //
       "_B_E_F_O_R_E_ = code:all_loaded()," + //
       "_R_E_S_U_L_T_ = try" + //
       "                    %s " + //
@@ -48,12 +49,11 @@ public final class MavenSelf {
       "                    _E_ -> {exception, throw, _E_};" + //
       "                    _C_:_E_ -> {exception, _C_, _E_}" + //
       "                end," + //
-      "lists:foreach(" + //
-      "  fun({_M_O_D_, _}) ->" + //
-      "          code:delete(_M_O_D_)," + //
-      "          code:purge(_M_O_D_)" + //
-      "  end, code:all_loaded() -- _B_E_F_O_R_E_)," + //
-      "[code:del_path(_P_A_T_H_) || _P_A_T_H_ <- %s]," + //
+      "[code:del_path(_P_A_T_H_) || _P_A_T_H_ <- C_O_D_E_P_A_T_H_S_]," + //
+      "_P_U_R_G_E_ = code:all_loaded() -- _B_E_F_O_R_E_," + //
+      "[code:purge(_M_O_D_) || {_M_O_D_, _} <- _P_U_R_G_E_]," + //
+      "[code:delete(_M_O_D_) || {_M_O_D_, _} <- _P_U_R_G_E_]," + //
+      "[code:purge(_M_O_D_) || {_M_O_D_, _} <- _P_U_R_G_E_]," + //
       "case _R_E_S_U_L_T_ of" + //
       "    {exception, _C_L_A_S_S_, _E_X_C_E_P_T_I_O_N_} ->" + //
       "        throw({_C_L_A_S_S_, _E_X_C_E_P_T_I_O_N_});" + //
@@ -139,26 +139,27 @@ public final class MavenSelf {
    * @return the processed result of the {@link Script}
    * @throws MojoExecutionException
    */
-  public <T> T evalAndPurge(String peer, Script<T> script, List<File> codePaths) throws MojoExecutionException {
+  public <T> T eval(String peer, Script<T> script, List<File> codePaths) throws MojoExecutionException {
     String scriptString = script.get().trim();
     if (scriptString.endsWith(".")) {
       scriptString = scriptString.substring(0, scriptString.length() - 1);
     }
     String pathsString = ErlUtils.toFileList(codePaths, "\"", "\"");
-    String toEval = String.format(MavenSelf.script, pathsString, scriptString, pathsString);
+    String toEval = String.format(MavenSelf.script, pathsString, scriptString);
     return script.handle(eval(peer, toEval));
   }
 
   /**
-   * Executes a {@link Script} on a specific remote erlang node using RPC. A
-   * connection to the remote node will be established if necessary.
+   * This will simply run the given {@link Script} on the backend node. NOTE:
+   * This will <b>not</b> automatically purge the loaded modules neither will it
+   * cleanup the lib path of the backend node's code server.
    * 
    * @param peer to evaluate the {@link Script} on
    * @param script to evaluate
    * @return the processed result of the {@link Script}
    * @throws MojoExecutionException
    */
-  public <T> T eval(String peer, Script<T> script) throws MojoExecutionException {
+  public <T> T run(String peer, Script<T> script) throws MojoExecutionException {
     return script.handle(eval(peer, script.get()));
   }
 

@@ -71,7 +71,7 @@ public final class Compiler extends ErlangMojo {
 
       Script<CompilerResult> script = new BeamCompilerScript(files, p.targetEbin(), includes, options);
       List<File> codePaths = FileUtils.getDependencies(p.targetLib());
-      CompilerResult result = MavenSelf.get().evalAndPurge(p.node(), script, codePaths);
+      CompilerResult result = MavenSelf.get().eval(p.node(), script, codePaths);
       result.logOutput(log);
       String failedCompilationUnit = result.getFailed();
       if (failedCompilationUnit != null) {

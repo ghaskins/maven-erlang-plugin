@@ -2,6 +2,7 @@ package eu.lindenbaum.maven.archiver;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -78,7 +79,7 @@ public final class TarGzArchiver {
     else {
       Script<String> script = new TarGzArchiverScript(this.archive, this.files);
       try {
-        String error = MavenSelf.get().eval(this.peer, script);
+        String error = MavenSelf.get().eval(this.peer, script, new ArrayList<File>());
         if (error != null) {
           throw new IOException("failed to create archive: " + error);
         }

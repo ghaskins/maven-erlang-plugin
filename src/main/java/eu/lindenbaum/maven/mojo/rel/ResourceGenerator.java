@@ -3,23 +3,24 @@ package eu.lindenbaum.maven.mojo.rel;
 import static eu.lindenbaum.maven.util.FileUtils.copyDirectory;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import eu.lindenbaum.maven.ErlangMojo;
 import eu.lindenbaum.maven.Properties;
 import eu.lindenbaum.maven.erlang.CheckAppResult;
 import eu.lindenbaum.maven.erlang.CheckAppScript;
-import eu.lindenbaum.maven.erlang.SystoolsScriptResult;
 import eu.lindenbaum.maven.erlang.MakeScriptScript;
 import eu.lindenbaum.maven.erlang.MavenSelf;
 import eu.lindenbaum.maven.erlang.RuntimeInfo;
 import eu.lindenbaum.maven.erlang.RuntimeInfoScript;
 import eu.lindenbaum.maven.erlang.Script;
+import eu.lindenbaum.maven.erlang.SystoolsScriptResult;
 import eu.lindenbaum.maven.util.ErlConstants;
 import eu.lindenbaum.maven.util.FileUtils;
+import eu.lindenbaum.maven.util.MavenUtils;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.Mojo;
@@ -66,10 +67,9 @@ public final class ResourceGenerator extends ErlangMojo {
   @Override
   protected void execute(Log log, Properties p) throws MojoExecutionException, MojoFailureException {
     RuntimeInfoScript infoScript = new RuntimeInfoScript();
-    RuntimeInfo runtimeInfo = MavenSelf.get().eval(p.node(), infoScript);
+    RuntimeInfo runtimeInfo = MavenSelf.get().eval(p.node(), infoScript, new ArrayList<File>());
 
-    @SuppressWarnings("unchecked")
-    Set<Artifact> artifacts = p.project().getArtifacts();
+    List<Artifact> artifacts = MavenUtils.getNonTestArtifacts(p.project());
     String releaseName = p.project().getArtifactId();
     String releaseVersion = p.project().getVersion();
     String relFileBaseName = releaseName + "-" + releaseVersion;
@@ -93,7 +93,7 @@ public final class ResourceGenerator extends ErlangMojo {
     codePaths.add(p.target());
 
     Script<SystoolsScriptResult> script = new MakeScriptScript(relFile, p.target(), this.scriptOptions);
-    SystoolsScriptResult makeScriptResult = MavenSelf.get().evalAndPurge(p.node(), script, codePaths);
+    SystoolsScriptResult makeScriptResult = MavenSelf.get().eval(p.node(), script, codePaths);
     makeScriptResult.logOutput(log);
     if (!makeScriptResult.success()) {
       throw new MojoFailureException("Could not create boot scripts.");
@@ -109,7 +109,7 @@ public final class ResourceGenerator extends ErlangMojo {
     HashMap<String, String> appMap = new HashMap<String, String>();
     for (File appFile : FileUtils.getFilesRecursive(libDirectory, ErlConstants.APP_SUFFIX)) {
       Script<CheckAppResult> script = new CheckAppScript(appFile);
-      CheckAppResult result = MavenSelf.get().eval(p.node(), script);
+      CheckAppResult result = MavenSelf.get().eval(p.node(), script, new ArrayList<File>());
       String appName = "${" + result.getName().toUpperCase() + "}";
       String appVersion = "\"" + result.getVersion() + "\"";
       appMap.put(appName, appVersion);
@@ -122,7 +122,7 @@ public final class ResourceGenerator extends ErlangMojo {
    * dependency section in the form of a valid erlang list. From is
    * <code>[{"application", "version"}, ...]</code>.
    */
-  private static String getReleaseDependencies(Set<Artifact> artifacts) {
+  private static String getReleaseDependencies(List<Artifact> artifacts) {
     int i = 0;
     StringBuilder applications = new StringBuilder("[");
     for (Artifact artifact : artifacts) {

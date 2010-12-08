@@ -28,8 +28,8 @@ public final class TestScript implements Script<TestResult> {
       "               error ->" + //
       "                   {error, []};" + //
       "               {error, Reason} ->" + //
-      "                   {error, [lists:flatten(io_lib:format(\"~p\", [Reason]))]} " + //
-      "end," + //
+      "                   {error, [lists:flatten(io_lib:format(\"~p\", [Reason]))]}" + //
+      "           end," + //
       "receive {Level, Captured} -> {Level, Captured ++ Out} end.";
 
   private final List<File> tests;

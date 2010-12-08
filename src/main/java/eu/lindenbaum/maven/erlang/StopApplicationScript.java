@@ -16,10 +16,14 @@ import eu.lindenbaum.maven.util.ErlUtils;
  */
 public class StopApplicationScript implements Script<Void> {
   private static final String script = //
-  "    After = [A || {A, _, _} <- application:which_applications()]," + //
-      "[application:stop(A) || A <- After -- %s]," + //
-      "lists:foreach(fun(M) -> code:delete(M), code:purge(M) end, %s)," + //
-      "[code:del_path(P) || P <- %s].";
+  "    CodePaths = %s, Modules = %s, ToPreserve = %s, " + //
+      "[code:del_path(P) || P <- CodePaths]," + //
+      "After = [A || {A, _, _} <- application:which_applications()]," + //
+      "[application:stop(A) || A <- After -- ToPreserve]," + //
+      "[application:unload(A) || A <- After -- ToPreserve]," + //
+      "[code:purge(M) || M <- Modules]," + //
+      "[code:delete(M) || M <- Modules]," + //
+      "[code:purge(M) || M <- Modules].";
 
   private final List<File> codePaths;
   private final List<File> modules;
@@ -42,9 +46,9 @@ public class StopApplicationScript implements Script<Void> {
   @Override
   public String get() {
     String excluded = ErlUtils.toList(this.preservedApplications, null, "'", "'");
-    String moduleString = ErlUtils.toModuleList(this.modules, "'", "'");
+    String modules = ErlUtils.toModuleList(this.modules, "'", "'");
     String paths = ErlUtils.toFileList(this.codePaths, "\"", "\"");
-    return String.format(script, excluded, moduleString, paths);
+    return String.format(script, paths, modules, excluded);
   }
 
   /**

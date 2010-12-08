@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import com.ericsson.otp.erlang.OtpPeer;
 
@@ -59,19 +58,17 @@ public final class ProjectRunner extends ErlangMojo {
     codePaths.add(p.targetEbin());
 
     List<File> modules = FileUtils.getFilesRecursive(p.targetLib(), ErlConstants.BEAM_SUFFIX);
-    modules.addAll(FileUtils.getFilesRecursive(p.targetLib(), ErlConstants.BEAM_SUFFIX));
+    modules.addAll(FileUtils.getFilesRecursive(p.targetEbin(), ErlConstants.BEAM_SUFFIX));
 
     List<String> applications = new ArrayList<String>();
     applications.add(p.project().getArtifactId());
-    @SuppressWarnings("unchecked")
-    Set<Artifact> artifacts = p.project().getArtifacts();
-    for (Artifact artifact : artifacts) {
+    for (Artifact artifact : MavenUtils.getNonTestArtifacts(p.project())) {
       applications.add(artifact.getArtifactId());
     }
     Collections.reverse(applications);
 
     Script<StartResult> startScript = new StartApplicationScript(codePaths, modules, applications);
-    StartResult startResult = MavenSelf.get().eval(p.node(), startScript);
+    StartResult startResult = MavenSelf.get().run(p.node(), startScript);
     if (startResult.startSucceeded()) {
       String cookie = p.cookie() != null ? " -set_cookie " + p.cookie() + " " : "";
       String peer = new OtpPeer(p.node()).toString();
@@ -90,6 +87,6 @@ public final class ProjectRunner extends ErlangMojo {
     }
     List<String> toPreserve = startResult.getBeforeApplications();
     Script<Void> stopScript = new StopApplicationScript(codePaths, modules, toPreserve);
-    MavenSelf.get().eval(p.node(), stopScript);
+    MavenSelf.get().run(p.node(), stopScript);
   }
 }
