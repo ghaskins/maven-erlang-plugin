@@ -83,7 +83,9 @@ public final class ProjectRunner extends ErlangMojo {
       }
     }
     else {
-      log.error("Failed to run project, cleaning up.");
+      log.error("Failed to run project:");
+      startResult.logError(log);
+      log.error("Cleaning up.");
     }
     List<String> toPreserve = startResult.getBeforeApplications();
     Script<Void> stopScript = new StopApplicationScript(codePaths, modules, toPreserve);

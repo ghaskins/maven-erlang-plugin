@@ -10,6 +10,8 @@ import com.ericsson.otp.erlang.OtpErlangTuple;
 
 import eu.lindenbaum.maven.util.ErlUtils;
 
+import org.apache.maven.plugin.logging.Log;
+
 /**
  * A {@link Script} starting a list of erlang applications.
  * 
@@ -81,6 +83,16 @@ public class StartApplicationScript implements Script<StartResult> {
       @Override
       public boolean startSucceeded() {
         return "ok".equals(ErlUtils.cast(sucess));
+      }
+
+      @Override
+      public void logError(Log log) {
+        if (!startSucceeded()) {
+          String[] lines = sucess.toString().split("\r?\n");
+          for (String line : lines) {
+            log.error(line);
+          }
+        }
       }
 
       @Override

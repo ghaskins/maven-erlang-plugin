@@ -2,6 +2,8 @@ package eu.lindenbaum.maven.erlang;
 
 import java.util.List;
 
+import org.apache.maven.plugin.logging.Log;
+
 /**
  * Interface representing the result returned by the
  * {@link StartApplicationScript}.
@@ -17,6 +19,13 @@ public interface StartResult {
    *         {@code false} otherwise.
    */
   public boolean startSucceeded();
+
+  /**
+   * Log starting errors using the provided logger.
+   * 
+   * @param log to use
+   */
+  public void logError(Log log);
 
   /**
    * Returns a list of applications that were already running before the

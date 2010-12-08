@@ -1,5 +1,6 @@
 package eu.lindenbaum.maven.erlang;
 
+import static org.easymock.EasyMock.createStrictControl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -14,9 +15,21 @@ import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
 
+import org.apache.maven.plugin.logging.Log;
+import org.easymock.IMocksControl;
+import org.junit.Before;
 import org.junit.Test;
 
 public class StartApplicationScriptTest {
+  private IMocksControl control;
+  private Log log;
+
+  @Before
+  public void setUp() {
+    this.control = createStrictControl();
+    this.log = this.control.createMock("log", Log.class);
+  }
+
   @Test
   public void testGetHandle() {
     List<File> codePaths = Arrays.asList(new File("codePath"));
@@ -31,6 +44,8 @@ public class StartApplicationScriptTest {
 
   @Test
   public void testHandleSuccess() {
+    this.control.replay();
+
     OtpErlangAtom success = new OtpErlangAtom("ok");
     OtpErlangAtom beforeApp = new OtpErlangAtom("beforeApp");
     OtpErlangList beforeApps = new OtpErlangList(new OtpErlangObject[]{ beforeApp });
@@ -41,14 +56,21 @@ public class StartApplicationScriptTest {
     List<String> applications = Arrays.asList("application");
     StartApplicationScript script = new StartApplicationScript(codePaths, modules, applications);
     StartResult startResult = script.handle(result);
+    startResult.logError(this.log);
     assertTrue(startResult.startSucceeded());
     List<String> apps = startResult.getBeforeApplications();
     assertEquals(1, apps.size());
     assertEquals("beforeApp", apps.get(0));
+
+    this.control.verify();
   }
 
   @Test
   public void testHandleFailure() {
+    this.log.error("{error,what}");
+
+    this.control.replay();
+
     OtpErlangAtom success = new OtpErlangAtom("error");
     OtpErlangAtom what = new OtpErlangAtom("what");
     OtpErlangTuple error = new OtpErlangTuple(new OtpErlangObject[]{ success, what });
@@ -61,9 +83,12 @@ public class StartApplicationScriptTest {
     List<String> applications = Arrays.asList("application");
     StartApplicationScript script = new StartApplicationScript(codePaths, modules, applications);
     StartResult startResult = script.handle(result);
+    startResult.logError(this.log);
     assertFalse(startResult.startSucceeded());
     List<String> apps = startResult.getBeforeApplications();
     assertEquals(1, apps.size());
     assertEquals("beforeApp", apps.get(0));
+
+    this.control.verify();
   }
 }
