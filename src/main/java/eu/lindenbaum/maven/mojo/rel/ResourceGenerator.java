@@ -89,7 +89,7 @@ public final class ResourceGenerator extends ErlangMojo {
       throw new MojoFailureException("Could not find release file " + relFile.getName() + ".");
     }
 
-    List<File> codePaths = FileUtils.getDependencies(p.targetLib());
+    List<File> codePaths = FileUtils.getDirectoriesRecursive(p.targetLib(), ErlConstants.BEAM_SUFFIX);
     codePaths.add(p.target());
 
     Script<SystoolsScriptResult> script = new MakeScriptScript(relFile, p.target(), this.scriptOptions);

@@ -54,7 +54,7 @@ public final class ProjectRunner extends ErlangMojo {
   }
 
   private static void runApplication(Log log, Properties p) throws MojoExecutionException {
-    List<File> codePaths = FileUtils.getDependencies(p.targetLib());
+    List<File> codePaths = FileUtils.getDirectoriesRecursive(p.targetLib(), ErlConstants.BEAM_SUFFIX);
     codePaths.add(p.targetEbin());
 
     List<File> modules = FileUtils.getFilesRecursive(p.targetLib(), ErlConstants.BEAM_SUFFIX);

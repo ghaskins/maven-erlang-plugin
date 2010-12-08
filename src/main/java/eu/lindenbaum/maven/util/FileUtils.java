@@ -128,7 +128,7 @@ public final class FileUtils {
    * 
    * @param root directory to start recursion from
    * @param suffix file extension to match, can be e.g. eiter {@code ".erl"} or
-   * {@code "erl"}
+   *          {@code "erl"}
    * @return a {@link List} of found files
    */
   public static List<File> getFilesRecursive(File root, final String suffix) {
@@ -227,40 +227,20 @@ public final class FileUtils {
   }
 
   /**
-   * Returns the list of sub directories containing <code>.beam</code> files. By
-   * default patterns from
+   * Returns the list of sub directories containing files with the specified
+   * file suffix. By default patterns from
    * {@link org.codehaus.plexus.util.FileUtils#getDefaultExcludes()} will always
    * be excluded.
    * 
    * @param root directory to start the scan from
-   * @return a list of matching directories containg .beam resources
+   * @param suffix file suffix to search for
+   * @return a non-{@code null} list of directories containg files with a
+   *         certain suffix
    */
-  public static List<File> getDependencies(File root) {
+  public static List<File> getDirectoriesRecursive(File root, String suffix) {
     Set<File> result = new HashSet<File>();
     if (root != null && root.exists()) {
-      for (File beam : getFilesRecursive(root, ErlConstants.BEAM_SUFFIX)) {
-        File parentFile = beam.getParentFile();
-        if (parentFile != null) {
-          result.add(parentFile);
-        }
-      }
-    }
-    return new ArrayList<File>(result);
-  }
-
-  /**
-   * Returns the list of sub directories containing <code>.hrl</code> files. By
-   * default patterns from
-   * {@link org.codehaus.plexus.util.FileUtils#getDefaultExcludes()} will always
-   * be excluded.
-   * 
-   * @param root directory to start the scan from
-   * @return a list of matching {@link File}s
-   */
-  public static List<File> getDependencyIncludes(File root) {
-    Set<File> result = new HashSet<File>();
-    if (root != null && root.exists()) {
-      for (File beam : getFilesRecursive(root, ErlConstants.HRL_SUFFIX)) {
+      for (File beam : getFilesRecursive(root, suffix)) {
         File parentFile = beam.getParentFile();
         if (parentFile != null) {
           result.add(parentFile);

@@ -1,6 +1,6 @@
 package eu.lindenbaum.maven.mojo.app;
 
-import static eu.lindenbaum.maven.util.FileUtils.getDependencyIncludes;
+import static eu.lindenbaum.maven.util.FileUtils.getDirectoriesRecursive;
 import static eu.lindenbaum.maven.util.FileUtils.newerFilesThan;
 
 import java.io.File;
@@ -98,7 +98,7 @@ public final class Dialyzer extends ErlangMojo {
       }
       List<File> includes = new ArrayList<File>();
       includes.addAll(Arrays.asList(new File[]{ p.include(), p.targetInclude() }));
-      includes.addAll(getDependencyIncludes(p.targetLib()));
+      includes.addAll(getDirectoriesRecursive(p.targetLib(), ErlConstants.HRL_SUFFIX));
 
       DialyzerScript script = new DialyzerScript(sources, includes, this.dialyzerOptions);
       String[] warnings = MavenSelf.get().eval(p.node(), script, new ArrayList<File>());

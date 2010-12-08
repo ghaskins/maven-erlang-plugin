@@ -58,10 +58,10 @@ public class FileUtilsTest {
   }
 
   @Test
-  public void testGetDependencies() {
+  public void testGetDirectoriesRecursive() {
     URL resource = getClass().getClassLoader().getResource("file-utils");
     File root = new File(resource.getFile());
-    List<File> files = FileUtils.getDependencies(root);
+    List<File> files = FileUtils.getDirectoriesRecursive(root, ErlConstants.BEAM_SUFFIX);
     assertEquals(1, files.size());
   }
 }

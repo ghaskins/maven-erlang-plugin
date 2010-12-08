@@ -1,6 +1,6 @@
 package eu.lindenbaum.maven.mojo.app;
 
-import static eu.lindenbaum.maven.util.FileUtils.getDependencyIncludes;
+import static eu.lindenbaum.maven.util.FileUtils.getDirectoriesRecursive;
 import static eu.lindenbaum.maven.util.FileUtils.getFilesRecursive;
 import static eu.lindenbaum.maven.util.FileUtils.removeFilesRecursive;
 
@@ -15,7 +15,6 @@ import eu.lindenbaum.maven.erlang.CompilerResult;
 import eu.lindenbaum.maven.erlang.MavenSelf;
 import eu.lindenbaum.maven.erlang.Script;
 import eu.lindenbaum.maven.util.ErlConstants;
-import eu.lindenbaum.maven.util.FileUtils;
 import eu.lindenbaum.maven.util.MavenUtils;
 
 import org.apache.maven.plugin.Mojo;
@@ -58,7 +57,7 @@ public final class Compiler extends ErlangMojo {
     List<File> files = getFilesRecursive(p.src(), ErlConstants.ERL_SUFFIX);
     if (!files.isEmpty()) {
       List<File> includes = new ArrayList<File>();
-      includes.addAll(getDependencyIncludes(p.targetLib()));
+      includes.addAll(getDirectoriesRecursive(p.targetLib(), ErlConstants.HRL_SUFFIX));
       includes.add(p.include());
       includes.add(p.targetInclude());
       includes.add(p.src());
@@ -70,7 +69,7 @@ public final class Compiler extends ErlangMojo {
       }
 
       Script<CompilerResult> script = new BeamCompilerScript(files, p.targetEbin(), includes, options);
-      List<File> codePaths = FileUtils.getDependencies(p.targetLib());
+      List<File> codePaths = getDirectoriesRecursive(p.targetLib(), ErlConstants.BEAM_SUFFIX);
       CompilerResult result = MavenSelf.get().eval(p.node(), script, codePaths);
       result.logOutput(log);
       String failedCompilationUnit = result.getFailed();

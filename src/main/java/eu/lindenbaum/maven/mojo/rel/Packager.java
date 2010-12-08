@@ -48,7 +48,7 @@ public final class Packager extends ErlangMojo {
     String relFileBaseName = releaseName + "-" + releaseVersion;
 
     File relFile = new File(p.target(), relFileBaseName + ErlConstants.REL_SUFFIX);
-    List<File> codePaths = FileUtils.getDependencies(p.targetLib());
+    List<File> codePaths = FileUtils.getDirectoriesRecursive(p.targetLib(), ErlConstants.BEAM_SUFFIX);
     codePaths.add(p.target());
 
     Script<SystoolsScriptResult> script = new MakeTarScript(relFile, p.target(), this.tarOptions);

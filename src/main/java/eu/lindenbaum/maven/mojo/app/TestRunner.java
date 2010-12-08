@@ -86,7 +86,7 @@ public final class TestRunner extends ErlangMojo {
 
     List<File> codePaths = new ArrayList<File>();
     codePaths.add(p.targetTestEbin());
-    codePaths.addAll(FileUtils.getDependencies(p.targetLib()));
+    codePaths.addAll(FileUtils.getDirectoriesRecursive(p.targetLib(), ErlConstants.BEAM_SUFFIX));
 
     p.targetSurefireReports().mkdirs();
     String suiteName = p.project().getArtifactId();
