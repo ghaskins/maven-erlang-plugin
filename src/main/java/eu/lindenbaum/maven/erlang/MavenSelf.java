@@ -126,7 +126,7 @@ public final class MavenSelf {
         throw new MojoExecutionException("failed to connect to " + peer + ": " + msg);
       }
       if (connection == null) {
-        msg = " after " + MAX_RETRIES + "retries: " + msg;
+        msg = " after " + MAX_RETRIES + " retries: " + msg;
         throw new MojoExecutionException("failed to connect to " + peer + msg);
       }
     }
