@@ -11,16 +11,16 @@ import com.ericsson.otp.erlang.OtpErlangObject;
  */
 public final class PurgeModulesScript implements Script<Void> {
   private static final String script = //
-  "    C = code:lib_dir()," + //
+  "    LibDir = code:lib_dir()," + //
       "lists:foreach(" + //
-      "  fun({Mod, Path}) ->" + //
-      "        case string:str(Path, C) of" + //
+      "  fun({Module, Path}) ->" + //
+      "        case string:str(Path, LibDir) of" + //
       "             1 ->" + //
       "                 ok;" + //
       "             _ ->" + //
-      "                 code:purge(Mod)," + //
-      "                 code:delete(Mod)," + //
-      "                 code:purge(Mod)" + //
+      "                 code:purge(Module)," + //
+      "                 code:delete(Module)," + //
+      "                 code:purge(Module)" + //
       "        end," + //
       "  end, code:all_loaded()).";
 
