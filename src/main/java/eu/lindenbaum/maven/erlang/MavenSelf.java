@@ -32,6 +32,8 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
 public final class MavenSelf {
+  private static final int MAX_RETRIES = 10;
+
   /**
    * The name of the pluins backend erlang node. This can be used by any
    * implementing {@link Mojo} to establish a connection to the erlang node (for
@@ -101,26 +103,31 @@ public final class MavenSelf {
   public OtpConnection connect(String peer) throws MojoExecutionException {
     OtpConnection connection = this.connections.get(peer);
     if (connection == null) {
+      String msg = null;
       try {
-        for (int i = 0; i < 50; ++i) {
+        for (int i = 0; i < MAX_RETRIES; ++i) {
           try {
             connection = this.self.connect(new OtpPeer(peer));
             this.connections.put(peer, connection);
             break;
           }
           catch (IOException e) {
+            msg = e.getMessage();
             Thread.sleep(500L);
           }
         }
       }
       catch (OtpAuthException e) {
-        throw new MojoExecutionException("failed to connect to " + peer);
+        msg = e.getMessage();
+        throw new MojoExecutionException("failed to connect to " + peer + ": " + msg);
       }
       catch (InterruptedException e) {
-        throw new MojoExecutionException("failed to connect to " + peer);
+        msg = e.getMessage();
+        throw new MojoExecutionException("failed to connect to " + peer + ": " + msg);
       }
       if (connection == null) {
-        throw new MojoExecutionException("failed to connect to " + peer);
+        msg = " after " + MAX_RETRIES + "retries: " + msg;
+        throw new MojoExecutionException("failed to connect to " + peer + msg);
       }
     }
     return connection;
