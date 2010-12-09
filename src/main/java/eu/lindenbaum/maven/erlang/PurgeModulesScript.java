@@ -13,7 +13,9 @@ public final class PurgeModulesScript implements Script<Void> {
   private static final String script = //
   "    LibDir = code:lib_dir()," + //
       "lists:foreach(" + //
-      "  fun({Module, Path}) ->" + //
+      "  fun({_, preloaded}) ->" + //
+      "        ok;" + //
+      "     ({Module, Path}) ->" + //
       "        case string:str(Path, LibDir) of" + //
       "             1 ->" + //
       "                 ok;" + //
@@ -21,7 +23,7 @@ public final class PurgeModulesScript implements Script<Void> {
       "                 code:purge(Module)," + //
       "                 code:delete(Module)," + //
       "                 code:purge(Module)" + //
-      "        end," + //
+      "        end" + //
       "  end, code:all_loaded()).";
 
   public PurgeModulesScript() {
