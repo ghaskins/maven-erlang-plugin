@@ -171,6 +171,15 @@ public final class MavenSelf {
   }
 
   /**
+   * Removes the cached connection to the given peer.
+   * 
+   * @param peer to remove connections for
+   */
+  private void removeConnection(String peer) {
+    this.connections.remove(peer);
+  }
+
+  /**
    * Executes an erlang script on a specific remote erlang node using RPC. A
    * connection to the remote node will be established if necessary.
    * 
@@ -221,12 +230,15 @@ public final class MavenSelf {
       }
     }
     catch (IOException e) {
+      removeConnection(peer);
       throw new MojoExecutionException(e.getMessage(), e);
     }
     catch (OtpErlangExit e) {
+      removeConnection(peer);
       throw new MojoExecutionException(e.getMessage(), e);
     }
     catch (OtpAuthException e) {
+      removeConnection(peer);
       throw new MojoExecutionException(e.getMessage(), e);
     }
   }
