@@ -1,7 +1,6 @@
 package eu.lindenbaum.maven.report;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Locale;
 
 import eu.lindenbaum.maven.ErlangReport;
@@ -81,7 +80,7 @@ public class EDocReport extends ErlangReport {
 
     outdir.mkdirs();
     Script<Boolean> script = new EDocScript(application, p.src(), outdir, overview);
-    Boolean success = MavenSelf.get().eval(p.node(), script, new ArrayList<File>());
+    Boolean success = MavenSelf.get().exec(p.node(), script);
     if (!success) {
       throw new MojoExecutionException("failed to generate documentation");
     }

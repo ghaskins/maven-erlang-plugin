@@ -18,7 +18,6 @@ import com.ericsson.otp.erlang.OtpSelf;
 
 import eu.lindenbaum.maven.util.ErlUtils;
 
-import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
@@ -33,13 +32,6 @@ import org.apache.maven.plugin.MojoExecutionException;
  */
 public final class MavenSelf {
   private static final int MAX_RETRIES = 10;
-
-  /**
-   * The name of the pluins backend erlang node. This can be used by any
-   * implementing {@link Mojo} to establish a connection to the erlang node (for
-   * rpc communication) using {@link OtpSelf#connect(DEFAULT_PEER)}.
-   */
-  public static final String DEFAULT_PEER = "maven-erlang-plugin-backend";
 
   private static final String script = //
   "    C_O_D_E_P_A_T_H_S_ = %s," + //
@@ -157,16 +149,17 @@ public final class MavenSelf {
   }
 
   /**
-   * This will simply run the given {@link Script} on the backend node. NOTE:
-   * This will <b>not</b> automatically purge the loaded modules neither will it
-   * cleanup the lib path of the backend node's code server.
+   * Executes a {@link Script} on a specific remote erlang node using RPC. A
+   * connection to the remote node will be established if necessary. NOTE: This
+   * will <b>not</b> automatically purge dynamically loaded modules neither will
+   * it cleanup the code path of the backend node's code server.
    * 
    * @param peer to evaluate the {@link Script} on
    * @param script to evaluate
    * @return the processed result of the {@link Script}
    * @throws MojoExecutionException
    */
-  public <T> T run(String peer, Script<T> script) throws MojoExecutionException {
+  public <T> T exec(String peer, Script<T> script) throws MojoExecutionException {
     return script.handle(eval(peer, script.get()));
   }
 
