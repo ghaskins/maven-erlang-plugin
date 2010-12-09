@@ -48,6 +48,15 @@ public abstract class ErlangMojo extends AbstractMojo {
   private File base;
 
   /**
+   * The projects build directory.
+   * 
+   * @parameter expression="${project.build.directory}"
+   * @required
+   * @readonly
+   */
+  private File target;
+
+  /**
    * The name of the backend node to use.
    * 
    * @parameter expression="${node}" default-value="maven-erlang-plugin-backend"
@@ -70,8 +79,13 @@ public abstract class ErlangMojo extends AbstractMojo {
   @Override
   public final void execute() throws MojoExecutionException, MojoFailureException {
     PackagingType type = PackagingType.fromString(this.project.getPackaging());
-    Properties p = new PropertiesImpl(type, this.project, this.repository, this.base, this.node, this.cookie);
-    execute(getLog(), p);
+    execute(getLog(), new PropertiesImpl(type,
+                                         this.project,
+                                         this.repository,
+                                         this.base,
+                                         this.target,
+                                         this.node,
+                                         this.cookie));
   }
 
   /**

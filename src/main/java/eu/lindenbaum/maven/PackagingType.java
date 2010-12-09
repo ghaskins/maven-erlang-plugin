@@ -19,9 +19,12 @@ public enum PackagingType {
    * 
    * <pre>
    *  BASE
-   *    +-- src/main/erlang (*.app, *.appup, *.erl, *.mib, *.funcs)
+   *    +-- src/changes (changes.xml)
+   *    +-- src/main/erlang (*.app, *.appup, *.erl, private *.hrl)
    *    +-- src/main/include (*.hrl)
    *    +-- src/main/priv (*)
+   *    +-- src/site (overview.edoc, site.xml)
+   *    +-- src/site/apt (*.apt)
    *    +-- src/test/include (*.hrl)
    *    +-- src/test/erlang (*.erl)
    *    +-- src/test/priv (*)
@@ -41,7 +44,10 @@ public enum PackagingType {
    *    +-- ebin (*.app, *.appup)
    *    +-- include (*.hrl)
    *    +-- priv (*)
-   *    +-- src (*.erl, *.mib, *.funcs)
+   *    +-- src (*.erl, private *.hrl)
+   *    +-- src/changes (changes.xml)
+   *    +-- src/site (overview.edoc, site.xml)
+   *    +-- src/site/apt (*.apt)
    *    +-- test_include (*.hrl)
    *    +-- test_priv (*)
    *    +-- test_src (*.erl)

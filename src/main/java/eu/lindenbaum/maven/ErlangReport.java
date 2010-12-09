@@ -60,6 +60,15 @@ public abstract class ErlangReport extends AbstractMavenReport {
   private File base;
 
   /**
+   * The projects build directory.
+   * 
+   * @parameter expression="${project.build.directory}"
+   * @required
+   * @readonly
+   */
+  private File target;
+
+  /**
    * The name of the backend node to use.
    * 
    * @parameter expression="${node}" default-value="maven-erlang-plugin-backend"
@@ -86,15 +95,29 @@ public abstract class ErlangReport extends AbstractMavenReport {
   }
 
   /**
+   * This may be overwritten by implementing reports, default return value is
+   * the absolute path of {@link #getReportOutputDirectory()}.
+   */
+  @Override
+  protected String getOutputDirectory() {
+    return getReportOutputDirectory().getAbsolutePath();
+  }
+
+  /**
    * Injects the needed {@link Properties} into the abstract
    * {@link #execute(Log, Properties)} method to be implemented by subclasses.
    */
   @Override
   protected final void executeReport(Locale locale) throws MavenReportException {
     PackagingType type = PackagingType.fromString(this.project.getPackaging());
-    Properties p = new PropertiesImpl(type, this.project, this.repository, this.base, this.node, this.cookie);
     try {
-      execute(getLog(), locale, p);
+      execute(getLog(), locale, new PropertiesImpl(type,
+                                                   this.project,
+                                                   this.repository,
+                                                   this.base,
+                                                   this.target,
+                                                   this.node,
+                                                   this.cookie));
     }
     catch (MojoExecutionException e) {
       throw new MavenReportException(e.getMessage());

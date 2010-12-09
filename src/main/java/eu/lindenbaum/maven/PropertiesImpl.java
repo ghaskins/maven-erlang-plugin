@@ -2,7 +2,6 @@ package eu.lindenbaum.maven;
 
 import java.io.File;
 
-
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
 
@@ -53,6 +52,7 @@ final class PropertiesImpl implements Properties {
                  MavenProject project,
                  ArtifactRepository repository,
                  File base,
+                 File target,
                  String node,
                  String cookie) {
     this.project = project;
@@ -109,7 +109,7 @@ final class PropertiesImpl implements Properties {
     }
 
     this.base = base;
-    this.target = new File(base, "target");
+    this.target = target;
     this.targetProject = new File(this.target, this.projectName);
     this.targetEbin = new File(this.targetProject, "ebin");
     this.targetInclude = new File(this.targetProject, "include");
