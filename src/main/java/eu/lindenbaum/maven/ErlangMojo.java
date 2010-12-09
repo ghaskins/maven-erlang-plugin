@@ -68,7 +68,6 @@ public abstract class ErlangMojo extends AbstractMojo {
    * The name of the backend node to use.
    * 
    * @parameter expression="${cookie}" default-value=""
-   * @required
    */
   private String cookie;
 
