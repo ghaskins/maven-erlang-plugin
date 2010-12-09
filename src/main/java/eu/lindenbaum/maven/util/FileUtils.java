@@ -2,12 +2,8 @@ package eu.lindenbaum.maven.util;
 
 import static eu.lindenbaum.maven.util.ErlConstants.APPUP_SUFFIX;
 import static eu.lindenbaum.maven.util.ErlConstants.APP_SUFFIX;
-import static eu.lindenbaum.maven.util.ErlConstants.BEAM_SUFFIX;
-import static eu.lindenbaum.maven.util.ErlConstants.BIN_SUFFIX;
 import static eu.lindenbaum.maven.util.ErlConstants.ERL_SUFFIX;
-import static eu.lindenbaum.maven.util.ErlConstants.FUNCS_SUFFIX;
 import static eu.lindenbaum.maven.util.ErlConstants.HRL_SUFFIX;
-import static eu.lindenbaum.maven.util.ErlConstants.MIB_SUFFIX;
 import static eu.lindenbaum.maven.util.ErlConstants.REL_SUFFIX;
 import static org.codehaus.plexus.util.FileUtils.copyFile;
 import static org.codehaus.plexus.util.FileUtils.deleteDirectory;
@@ -60,19 +56,6 @@ public final class FileUtils {
    * accepted.
    */
   public static final FileFilter REL_FILTER = getSuffixFilter(new String[]{ REL_SUFFIX });
-
-  /**
-   * Filename filter to filter snmp files (.mib, .bin & .funcs). Directories are
-   * always accepted.
-   */
-  public static final FileFilter SNMP_FILTER = getSuffixFilter(new String[]{ MIB_SUFFIX, FUNCS_SUFFIX,
-                                                                            BIN_SUFFIX });
-
-  /**
-   * Filename filter to filter compiled files (.beam). Directories are always
-   * accepted.
-   */
-  public static final FileFilter BEAM_FILTER = getSuffixFilter(new String[]{ BEAM_SUFFIX });
 
   /**
    * a {@link FileFilter} accepting all input

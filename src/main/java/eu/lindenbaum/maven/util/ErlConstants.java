@@ -14,16 +14,6 @@ public interface ErlConstants {
   public static final String ERL = "erl";
 
   /**
-   * Name of the erlang compiler.
-   */
-  public static final String ERLC = "erlc";
-
-  /**
-   * Name of the dialyzer tool.
-   */
-  public static final String DIALYZER = "dialyzer";
-
-  /**
    * Suffix for erlang source files.
    */
   public static final String ERL_SUFFIX = ".erl";
@@ -44,21 +34,6 @@ public interface ErlConstants {
   public static final String APPUP_SUFFIX = ".appup";
 
   /**
-   * Suffix for mibs.
-   */
-  public static final String MIB_SUFFIX = ".mib";
-
-  /**
-   * Suffix for funcs (mibs handlers).
-   */
-  public static final String FUNCS_SUFFIX = ".funcs";
-
-  /**
-   * Suffix for mibs binaries
-   */
-  public static final String BIN_SUFFIX = ".bin";
-
-  /**
    * Suffix for erlang binary files.
    */
   public static final String BEAM_SUFFIX = ".beam";
@@ -74,21 +49,6 @@ public interface ErlConstants {
   public static final String TARGZ_SUFFIX = ".tar.gz";
 
   /**
-   * Suffix for eunit tests.
-   */
-  public static final String TEST_SUFFIX = "_test" + BEAM_SUFFIX;
-
-  /**
-   * Suffix for eunit tests.
-   */
-  public static final String TESTS_SUFFIX = "_tests" + BEAM_SUFFIX;
-
-  /**
-   * Suffix for source directories containing non-erlang sources.
-   */
-  public static final String SRC_SUFFIX = "_src";
-
-  /**
    * Name of the coverdata binary (coverdata) file.
    */
   public static final String COVERDATA_BIN = "coverdata.coverdata";
@@ -97,36 +57,4 @@ public interface ErlConstants {
    * Name of the dialyzer ok file.
    */
   public static final String DIALYZER_OK = ".dialyzer.ok";
-
-  /**
-   * Type of artifacts for applications, i.e. zip archive containing an
-   * erlang-otp application.
-   */
-  public static final String ARTIFACT_TYPE_OTP = "erlang-otp";
-
-  /**
-   * Type of artifacts for releases, i.e. tar gz archive containing an
-   * erlang-otp release.
-   */
-  public static final String ARTIFACT_TYPE_REL = "erlang-rel";
-
-  /**
-   * Name of the directory that contains the beam files.
-   */
-  public static final String EBIN_DIRECTORY = "ebin";
-
-  /**
-   * Name of the directory that contains the beam files.
-   */
-  public static final String MIBS_DIRECTORY = "mibs";
-
-  /**
-   * Name of the directory that contains the beam files.
-   */
-  public static final String PRIV_DIRECTORY = "priv";
-
-  /**
-   * Name of the directory that contains the include files.
-   */
-  public static final String INCLUDE_DIRECTORY = "include";
 }
