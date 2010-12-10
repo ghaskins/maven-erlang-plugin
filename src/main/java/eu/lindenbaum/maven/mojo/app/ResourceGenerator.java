@@ -55,15 +55,18 @@ public final class ResourceGenerator extends ErlangMojo {
       p.targetPriv().delete();
     }
 
-    for (Artifact artifact : MavenUtils.getForeignArtifacts(p.project())) {
+    int foreignArtifacts = 0;
+    for (Artifact artifact : MavenUtils.getForeignArtifactsToPackage(p.project())) {
       File source = artifact.getFile();
       File destination = new File(p.targetPriv(), source.getName());
       try {
         org.codehaus.plexus.util.FileUtils.copyFile(source, destination);
+        foreignArtifacts++;
       }
       catch (IOException e) {
         log.error("Failed to copy artifact " + source.getPath() + " to " + p.targetPriv() + ".", e);
       }
     }
+    log.debug("copied " + foreignArtifacts + " foreign artifacts");
   }
 }

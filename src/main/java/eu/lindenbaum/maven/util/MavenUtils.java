@@ -109,9 +109,9 @@ public final class MavenUtils {
    * @param project to get the dependencies for
    * @return a non-{@code null} {@link List} of dependency artifacts
    */
-  public static List<Artifact> getApplicationArtifactsToPackage(MavenProject project) {
+  public static List<Artifact> getErlangArtifactsToPackage(MavenProject project) {
     ArrayList<Artifact> result = new ArrayList<Artifact>();
-    for (Artifact artifact : getApplicationArtifacts(project)) {
+    for (Artifact artifact : getErlangArtifacts(project)) {
       String scope = artifact.getScope();
       if (!"test".equals(scope) && !"provided".equals(scope)) {
         result.add(artifact);
@@ -129,11 +129,31 @@ public final class MavenUtils {
    * @param project to get the dependencies for
    * @return a non-{@code null} {@link List} of dependency artifacts
    */
-  public static List<Artifact> getApplicationArtifacts(MavenProject project) {
+  public static List<Artifact> getErlangArtifacts(MavenProject project) {
     ArrayList<Artifact> result = new ArrayList<Artifact>();
     for (Artifact artifact : getArtifacts(project)) {
       String type = artifact.getType();
       if (PackagingType.ERLANG_OTP.isA(type) || PackagingType.ERLANG_STD.isA(type)) {
+        result.add(artifact);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Returns the non-erlang artifacts of a project using
+   * {@link MavenProject#getArtifacts()}. All erlang artifacts will be filtered
+   * out. This will return all {@link Artifact} with scopes other than
+   * {@code test} and {@code provided}.
+   * 
+   * @param project to get the dependencies for
+   * @return a non-{@code null} {@link List} of dependency artifacts
+   */
+  public static List<Artifact> getForeignArtifactsToPackage(MavenProject project) {
+    ArrayList<Artifact> result = new ArrayList<Artifact>();
+    for (Artifact artifact : getForeignArtifacts(project)) {
+      String scope = artifact.getScope();
+      if (!"test".equals(scope) && !"provided".equals(scope)) {
         result.add(artifact);
       }
     }

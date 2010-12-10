@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 import eu.lindenbaum.maven.ErlangMojo;
-import eu.lindenbaum.maven.PackagingType;
 import eu.lindenbaum.maven.Properties;
 import eu.lindenbaum.maven.archiver.TarGzArchiver;
 import eu.lindenbaum.maven.erlang.CheckAppResult;
@@ -85,7 +84,7 @@ public final class Packager extends ErlangMojo {
     log.info(" P A C K A G E R");
     log.info(MavenUtils.SEPARATOR);
 
-    List<Artifact> dependencies = MavenUtils.getApplicationArtifactsToPackage(p.project());
+    List<Artifact> dependencies = MavenUtils.getErlangArtifactsToPackage(p.project());
     String projectVersion = p.project().getVersion();
 
     List<File> modules = getFilesRecursive(p.targetEbin(), ErlConstants.BEAM_SUFFIX);
@@ -240,13 +239,10 @@ public final class Packager extends ErlangMojo {
   private static void checkApplications(Log log, List<Artifact> expected, List<String> actual) throws MojoFailureException {
     boolean missingDependencies = false;
     for (Artifact artifact : expected) {
-      String type = artifact.getType();
-      if (PackagingType.ERLANG_OTP.isA(type) || PackagingType.ERLANG_STD.isA(type)) {
-        String artifactId = artifact.getArtifactId();
-        if (!actual.contains(artifactId)) {
-          log.error("Application dependency to '" + artifactId + "' is missing.");
-          missingDependencies = true;
-        }
+      String artifactId = artifact.getArtifactId();
+      if (!actual.contains(artifactId)) {
+        log.error("Application dependency to '" + artifactId + "' is missing.");
+        missingDependencies = true;
       }
     }
     if (missingDependencies) {

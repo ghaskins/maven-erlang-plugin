@@ -32,7 +32,7 @@ public final class DependencyExtracter extends ErlangMojo {
     File targetLib = p.targetLib();
     targetLib.mkdirs();
     TarGzUnarchiver unarchiver = new TarGzUnarchiver(p.node(), targetLib);
-    List<Artifact> artifacts = MavenUtils.getApplicationArtifacts(p.project());
+    List<Artifact> artifacts = MavenUtils.getErlangArtifacts(p.project());
     log.debug("found artifacts " + artifacts);
     for (Artifact artifact : artifacts) {
       extractArtifact(log, artifact, unarchiver);

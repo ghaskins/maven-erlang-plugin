@@ -51,7 +51,7 @@ public final class ProjectRunner extends ErlangMojo {
     log.info(MavenUtils.SEPARATOR);
 
     PackagingType packagingType = p.packagingType();
-    if (PackagingType.ERLANG_OTP.equals(packagingType) || PackagingType.ERLANG_STD.equals(packagingType)) {
+    if (PackagingType.ERLANG_OTP == packagingType || PackagingType.ERLANG_STD == packagingType) {
       runApplication(log, p);
     }
     else {
@@ -72,7 +72,7 @@ public final class ProjectRunner extends ErlangMojo {
 
     List<String> applications = new ArrayList<String>();
     applications.add(p.project().getArtifactId());
-    for (Artifact artifact : MavenUtils.getApplicationArtifactsToPackage(p.project())) {
+    for (Artifact artifact : MavenUtils.getErlangArtifactsToPackage(p.project())) {
       applications.add(artifact.getArtifactId());
     }
     Collections.reverse(applications);
