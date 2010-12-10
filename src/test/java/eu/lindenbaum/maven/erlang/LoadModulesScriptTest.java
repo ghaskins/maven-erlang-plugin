@@ -1,14 +1,14 @@
 package eu.lindenbaum.maven.erlang;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import com.ericsson.otp.erlang.OtpErlangAtom;
+import com.ericsson.otp.erlang.OtpErlangInt;
 
 import org.junit.Test;
 
@@ -26,11 +26,11 @@ public class LoadModulesScriptTest {
 
   @Test
   public void testHandle() {
-    OtpErlangAtom ignored = new OtpErlangAtom("ignored");
+    OtpErlangInt result = new OtpErlangInt(2);
 
     List<File> modules = Arrays.asList(new File("module"));
     List<File> codePaths = Arrays.asList(new File("path"));
     LoadModulesScript script = new LoadModulesScript(modules, codePaths);
-    assertNull(script.handle(ignored));
+    assertEquals(new Integer(2), script.handle(result));
   }
 }

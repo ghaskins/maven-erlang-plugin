@@ -3,7 +3,9 @@ package eu.lindenbaum.maven.erlang;
 import java.io.File;
 import java.util.List;
 
+import com.ericsson.otp.erlang.OtpErlangLong;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.ericsson.otp.erlang.OtpErlangRangeException;
 
 import eu.lindenbaum.maven.util.ErlUtils;
 
@@ -15,19 +17,23 @@ import eu.lindenbaum.maven.util.ErlUtils;
  * 
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
-public final class LoadModulesScript implements Script<Void> {
+public final class LoadModulesScript implements Script<Integer> {
   private static final String script = //
   "    CodePaths = %s," + //
       "Modules = %s," + //
       "code:add_pathsa(CodePaths)," + //
-      "lists:foreach(" + //
-      "  fun(Module) ->" + //
-      "        code:purge(Module)," + //
-      "        code:delete(Module)," + //
-      "        code:purge(Module)," + //
-      "        code:load_file(Module)" + //
-      "  end, Modules)," + //
-      "[code:del_path(P) || P <- CodePaths].";
+      "L = lists:foldl(" + //
+      "      fun(Module, Acc) ->" + //
+      "            code:purge(Module)," + //
+      "            code:delete(Module)," + //
+      "            code:purge(Module)," + //
+      "            case code:load_file(Module) of" + //
+      "                {module, _} -> Acc + 1;" + //
+      "                _ -> Acc" + //
+      "            end" + //
+      "      end, 0, Modules)," + //
+      "[code:del_path(P) || P <- CodePaths]," + //
+      "L.";
 
   private final List<File> modules;
   private final List<File> codePaths;
@@ -45,10 +51,18 @@ public final class LoadModulesScript implements Script<Void> {
   }
 
   /**
-   * The result of the {@link Script} execution is ignored.
+   * The result of the {@link Script} execution will be converted into an
+   * {@link Integer} indicating how many modules were actually loaded.
+   * 
+   * @return The number of loaded modules, {@code -1} on conversion errors.
    */
   @Override
-  public Void handle(OtpErlangObject result) {
-    return null;
+  public Integer handle(OtpErlangObject result) {
+    try {
+      return ((OtpErlangLong) result).intValue();
+    }
+    catch (OtpErlangRangeException e) {
+      return -1;
+    }
   }
 }

@@ -12,6 +12,8 @@ import com.ericsson.otp.erlang.OtpSelf;
 import eu.lindenbaum.maven.ErlangMojo;
 import eu.lindenbaum.maven.Properties;
 import eu.lindenbaum.maven.erlang.MavenSelf;
+import eu.lindenbaum.maven.erlang.PurgeModulesScript;
+import eu.lindenbaum.maven.erlang.Script;
 import eu.lindenbaum.maven.util.ErlConstants;
 import eu.lindenbaum.maven.util.MavenUtils;
 
@@ -38,7 +40,7 @@ public class BackendInitializer extends ErlangMojo {
    * 
    * @parameter expression="${shutdownNode}" default-value=true
    */
-  boolean shutdownNode = true;
+  private volatile boolean shutdownNode = true;
 
   /**
    * Static placeholder to insert the actual (configured) node name into the
@@ -73,7 +75,7 @@ public class BackendInitializer extends ErlangMojo {
       try {
         long serial = System.nanoTime();
         new OtpSelf("maven-erlang-plugin-startup-" + serial).connect(peer);
-        log.debug("node " + peer + " is already running.");
+        log.debug("Node " + peer + " is already running.");
       }
       catch (IOException e) {
         log.debug("starting " + peer + ".");
@@ -88,7 +90,7 @@ public class BackendInitializer extends ErlangMojo {
         if (process.waitFor() != 0) {
           throw new MojoExecutionException("Failed to start " + peer + ".");
         }
-        log.debug("node " + peer + " sucessfully started.");
+        log.debug("Node " + peer + " sucessfully started.");
       }
       if (this.shutdownNode) {
         try {
@@ -102,6 +104,10 @@ public class BackendInitializer extends ErlangMojo {
         log.info("Node " + peer + " will not be shutdown automatically.");
         log.info("To shutdown the node run 'mvn erlang:initialize -DshutdownNode=true'");
       }
+
+      // clean up dynamically loaded modules on backend from previous runs
+      Script<Void> purgeScript = new PurgeModulesScript();
+      MavenSelf.get().exec(nodeName, purgeScript);
     }
     catch (IOException e) {
       throw new MojoExecutionException("Failed to start " + peer + ".", e);

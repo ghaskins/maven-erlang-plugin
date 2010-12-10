@@ -4,7 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,10 +14,8 @@ import org.junit.Test;
 public class StopApplicationScriptTest {
   @Test
   public void testGetHandle() {
-    List<File> codePaths = Arrays.asList(new File("codePath"));
-    List<File> modules = Arrays.asList(new File("module"));
     List<String> applications = Arrays.asList("application");
-    StopApplicationScript script = new StopApplicationScript(codePaths, modules, applications);
+    StopApplicationScript script = new StopApplicationScript(applications);
     String expression = script.get();
     assertNotNull(expression);
     assertFalse(expression.isEmpty());
@@ -29,10 +26,8 @@ public class StopApplicationScriptTest {
   public void testHandle() {
     OtpErlangAtom ignored = new OtpErlangAtom("ignored");
 
-    List<File> codePaths = Arrays.asList(new File("codePath"));
-    List<File> modules = Arrays.asList(new File("module"));
     List<String> applications = Arrays.asList("application");
-    StopApplicationScript script = new StopApplicationScript(codePaths, modules, applications);
+    StopApplicationScript script = new StopApplicationScript(applications);
     assertNull(script.handle(ignored));
   }
 }

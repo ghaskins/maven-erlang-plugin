@@ -33,9 +33,8 @@ public class StartApplicationScriptTest {
   @Test
   public void testGetHandle() {
     List<File> codePaths = Arrays.asList(new File("codePath"));
-    List<File> modules = Arrays.asList(new File("module"));
     List<String> applications = Arrays.asList("application");
-    StartApplicationScript script = new StartApplicationScript(codePaths, modules, applications);
+    StartApplicationScript script = new StartApplicationScript(codePaths, applications);
     String expression = script.get();
     assertNotNull(expression);
     assertFalse(expression.isEmpty());
@@ -52,9 +51,8 @@ public class StartApplicationScriptTest {
     OtpErlangTuple result = new OtpErlangTuple(new OtpErlangObject[]{ success, beforeApps });
 
     List<File> codePaths = Arrays.asList(new File("codePath"));
-    List<File> modules = Arrays.asList(new File("module"));
     List<String> applications = Arrays.asList("application");
-    StartApplicationScript script = new StartApplicationScript(codePaths, modules, applications);
+    StartApplicationScript script = new StartApplicationScript(codePaths, applications);
     StartResult startResult = script.handle(result);
     startResult.logError(this.log);
     assertTrue(startResult.startSucceeded());
@@ -79,9 +77,8 @@ public class StartApplicationScriptTest {
     OtpErlangTuple result = new OtpErlangTuple(new OtpErlangObject[]{ error, beforeApps });
 
     List<File> codePaths = Arrays.asList(new File("codePath"));
-    List<File> modules = Arrays.asList(new File("module"));
     List<String> applications = Arrays.asList("application");
-    StartApplicationScript script = new StartApplicationScript(codePaths, modules, applications);
+    StartApplicationScript script = new StartApplicationScript(codePaths, applications);
     StartResult startResult = script.handle(result);
     startResult.logError(this.log);
     assertFalse(startResult.startSucceeded());

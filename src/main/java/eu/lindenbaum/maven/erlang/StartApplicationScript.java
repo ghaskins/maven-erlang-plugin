@@ -20,8 +20,9 @@ import org.apache.maven.plugin.logging.Log;
  */
 public class StartApplicationScript implements Script<StartResult> {
   private static final String script = //
-  "    code:add_pathsa(%s)," + //
-      "[code:load_file(M) || M <- %s]," + //
+  "    CodePaths = %s," + //
+      "Applications = %s," + //
+      "code:add_pathsa(CodePaths)," + //
       "Before = [A || {A, _, _} <- application:which_applications()]," + //
       "Fun = fun([], ok, _) ->" + //
       "              ok;" + //
@@ -39,31 +40,29 @@ public class StartApplicationScript implements Script<StartResult> {
       "         (_, Error, _) ->" + //
       "              Error" + //
       "      end," + //
-      "{Fun(%s, ok, Fun), Before}.";
+      "Result = Fun(Applications, ok, Fun)," + //
+      "[code:del_path(P) || P <- CodePaths]," + //
+      "{Result, Before}.";
 
   private final List<File> codePaths;
-  private final List<File> modules;
   private final List<String> applications;
 
   /**
    * Creates a {@link Script} trying to start a set of erlang applications.
    * 
    * @param codePaths needed to find the code
-   * @param modules part of the applications to start
    * @param applications to start
    */
-  public StartApplicationScript(List<File> codePaths, List<File> modules, List<String> applications) {
+  public StartApplicationScript(List<File> codePaths, List<String> applications) {
     this.codePaths = codePaths;
-    this.modules = modules;
     this.applications = applications;
   }
 
   @Override
   public String get() {
     String paths = ErlUtils.toFileList(this.codePaths, "\"", "\"");
-    String moduleString = ErlUtils.toModuleList(this.modules, "'", "'");
     String applications = ErlUtils.toList(this.applications, null, "'", "'");
-    return String.format(script, paths, moduleString, applications);
+    return String.format(script, paths, applications);
   }
 
   /**

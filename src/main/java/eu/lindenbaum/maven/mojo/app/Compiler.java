@@ -1,9 +1,5 @@
 package eu.lindenbaum.maven.mojo.app;
 
-import static eu.lindenbaum.maven.util.FileUtils.getDirectoriesRecursive;
-import static eu.lindenbaum.maven.util.FileUtils.getFilesRecursive;
-import static eu.lindenbaum.maven.util.FileUtils.removeFilesRecursive;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +8,11 @@ import eu.lindenbaum.maven.ErlangMojo;
 import eu.lindenbaum.maven.Properties;
 import eu.lindenbaum.maven.erlang.BeamCompilerScript;
 import eu.lindenbaum.maven.erlang.CompilerResult;
+import eu.lindenbaum.maven.erlang.LoadModulesScript;
 import eu.lindenbaum.maven.erlang.MavenSelf;
 import eu.lindenbaum.maven.erlang.Script;
 import eu.lindenbaum.maven.util.ErlConstants;
+import eu.lindenbaum.maven.util.FileUtils;
 import eu.lindenbaum.maven.util.MavenUtils;
 
 import org.apache.maven.plugin.Mojo;
@@ -51,13 +49,13 @@ public final class Compiler extends ErlangMojo {
     log.info(MavenUtils.SEPARATOR);
 
     p.targetEbin().mkdirs();
-    int removed = removeFilesRecursive(p.targetEbin(), ErlConstants.BEAM_SUFFIX);
+    int removed = FileUtils.removeFilesRecursive(p.targetEbin(), ErlConstants.BEAM_SUFFIX);
     log.debug("Removed " + removed + " stale " + ErlConstants.BEAM_SUFFIX + "-files from " + p.targetEbin());
 
-    List<File> files = getFilesRecursive(p.src(), ErlConstants.ERL_SUFFIX);
+    List<File> files = FileUtils.getFilesRecursive(p.src(), ErlConstants.ERL_SUFFIX);
     if (!files.isEmpty()) {
       List<File> includes = new ArrayList<File>();
-      includes.addAll(getDirectoriesRecursive(p.targetLib(), ErlConstants.HRL_SUFFIX));
+      includes.addAll(FileUtils.getDirectoriesRecursive(p.targetLib(), ErlConstants.HRL_SUFFIX));
       includes.add(p.include());
       includes.add(p.targetInclude());
       includes.add(p.src());
@@ -69,7 +67,8 @@ public final class Compiler extends ErlangMojo {
       }
 
       Script<CompilerResult> script = new BeamCompilerScript(files, p.targetEbin(), includes, options);
-      List<File> codePaths = getDirectoriesRecursive(p.targetLib(), ErlConstants.BEAM_SUFFIX);
+      List<File> codePaths = FileUtils.getDirectoriesRecursive(p.targetLib(), ErlConstants.BEAM_SUFFIX);
+      codePaths.add(p.targetEbin());
       CompilerResult result = MavenSelf.get().eval(p.node(), script, codePaths);
       result.logOutput(log);
       String failedCompilationUnit = result.getFailed();
@@ -77,6 +76,12 @@ public final class Compiler extends ErlangMojo {
         throw new MojoFailureException("Failed to compile " + failedCompilationUnit + ".");
       }
       log.info("Successfully compiled " + files.size() + " source file(s).");
+
+      List<File> modules = FileUtils.getFilesRecursive(p.targetLib(), ErlConstants.BEAM_SUFFIX);
+      modules.addAll(FileUtils.getFilesRecursive(p.targetEbin(), ErlConstants.BEAM_SUFFIX));
+      Script<Integer> loadScript = new LoadModulesScript(modules, codePaths);
+      Integer loaded = MavenSelf.get().exec(p.node(), loadScript);
+      log.debug("Successfully loaded " + loaded + " .beam file(s).");
     }
     else {
       log.info("No source files to compile.");

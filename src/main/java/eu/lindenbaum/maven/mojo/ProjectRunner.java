@@ -11,6 +11,7 @@ import com.ericsson.otp.erlang.OtpPeer;
 import eu.lindenbaum.maven.ErlangMojo;
 import eu.lindenbaum.maven.PackagingType;
 import eu.lindenbaum.maven.Properties;
+import eu.lindenbaum.maven.erlang.LoadModulesScript;
 import eu.lindenbaum.maven.erlang.MavenSelf;
 import eu.lindenbaum.maven.erlang.Script;
 import eu.lindenbaum.maven.erlang.StartApplicationScript;
@@ -65,14 +66,17 @@ public final class ProjectRunner extends ErlangMojo {
     List<File> modules = FileUtils.getFilesRecursive(p.targetLib(), ErlConstants.BEAM_SUFFIX);
     modules.addAll(FileUtils.getFilesRecursive(p.targetEbin(), ErlConstants.BEAM_SUFFIX));
 
+    LoadModulesScript loadScript = new LoadModulesScript(modules, codePaths);
+    Integer loaded = MavenSelf.get().exec(p.node(), loadScript);
+    log.info("Successfully loaded " + loaded + " .beam file(s) into backend node.");
+
     List<String> applications = new ArrayList<String>();
     applications.add(p.project().getArtifactId());
     for (Artifact artifact : MavenUtils.getArtifactsToPackage(p.project())) {
       applications.add(artifact.getArtifactId());
     }
     Collections.reverse(applications);
-
-    Script<StartResult> startScript = new StartApplicationScript(codePaths, modules, applications);
+    Script<StartResult> startScript = new StartApplicationScript(codePaths, applications);
     StartResult startResult = MavenSelf.get().exec(p.node(), startScript);
     if (startResult.startSucceeded()) {
       String cookie = p.cookie() != null ? " -set_cookie " + p.cookie() + " " : "";
@@ -93,7 +97,7 @@ public final class ProjectRunner extends ErlangMojo {
       log.error("Cleaning up.");
     }
     List<String> toPreserve = startResult.getBeforeApplications();
-    Script<Void> stopScript = new StopApplicationScript(codePaths, modules, toPreserve);
+    Script<Void> stopScript = new StopApplicationScript(toPreserve);
     MavenSelf.get().exec(p.node(), stopScript);
   }
 }
