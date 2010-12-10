@@ -4,6 +4,12 @@
   </properties>
   <body>
     <release version="1.0.0" date="TBA" description="Initial release">
+      <action dev="schlagert" type="add">
+        Added support for test resource which will override main resources.
+      </action>
+      <action dev="schlagert" type="add">
+        Added support for test and provided scope dependencies.
+      </action>
       <action dev="schlagert, heyll" type="add">
         Added mock system (formerly known as ltest_mock, formerly known as
         erlymock). The system is automatically available for test modules during
@@ -14,7 +20,8 @@
         from dependency applications.
       </action>
       <action dev="schlagert" type="update">
-        Changed dialyzer to run on sources not beams.
+        Changed dialyzer to run on sources not beams, so that dependencies do
+        not need to be compiled with debug information.
       </action>
       <action dev="schlagert" type="add">
         New (fixed) surefire report generation handling each test module as
@@ -22,14 +29,14 @@
         provided by the plugin.
       </action>
       <action dev="schlagert" type="add">
-        Added run goal for packaging erlang-otp to compile/test and run an
+        Added run goal for erlang applications to compile/test and run an
         erlang/OTP application for easy testing.
       </action>
       <action dev="schlagert" type="add">
-        Release file generation and management support.
+        Added more checks for release file management support.
       </action>
       <action dev="schlagert" type="add">
-        Application file generation and management support.
+        Added more checks for application file management support.
       </action>
       <action dev="olle-t" type="add">
         Added initial site documentation, generation of plugin-docs, changes
@@ -48,30 +55,35 @@
         Added support for the maven-release-plugin by using application and
         release packaging variables in .app and .rel files.
       </action>
-      <action dev="schlagert" type="add">
-        Added possibility to include non-erlang sources into application packages.
-      </action>
       <action dev="schlagert" type="fix">
         Fixed different problems with release packaging.
       </action>
       <action dev="schlagert" type="add">
-        Changed erlang-otp packaging to .tar.gz internally.
+        Changed application packaging to .tar.gz internally.
       </action>
       <action dev="schlagert" type="add">
         Added several unit and integration tests.
       </action>
       <action dev="schlagert" type="add">
-        Rewritten all mojos from the original maven-erlang plugin.
+        All mojos now use jinterface for erlang rpcs instead of using
+        erl -run or erl -eval. First of all this speeds up the build
+        significantly. Another big advantage is that the plugin can now be
+        integrated into the development using emacs with the distel extension
+        since the plugin can use the emacs distel node or vice versa.
+      </action>
+      <action dev="schlagert" type="add">
+        Added packaging type erlang-std which respects the default erlang/OTP
+        application directory layout.
       </action>
       <action dev="schlagert" type="add">
         Initial feature set: Compile project and test sources
       </action>
       <action dev="schlagert" type="add">
-        Initial feature set: Execute eunit tests
+        Initial feature set: Execute eunit tests.
       </action>
       <action dev="schlagert" type="add">
         Initial feature set: Execute dialyzer on erlang/OTP applications and
-        releases
+        releases.
       </action>
       <action dev="schlagert" type="add">
         Initial feature set: Generate site documentation with edoc for project

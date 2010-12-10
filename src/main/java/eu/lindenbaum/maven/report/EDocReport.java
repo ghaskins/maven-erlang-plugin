@@ -21,6 +21,7 @@ import org.apache.maven.reporting.MavenReportException;
  * This {@link Mojo} will generate source code documentation for an application.
  * 
  * @goal edoc
+ * @execute phase="initialize"
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
 public class EDocReport extends ErlangReport {
