@@ -149,7 +149,7 @@ public final class Packager extends ErlangMojo {
     catch (IOException e) {
       throw new MojoExecutionException(e.getMessage(), e);
     }
-    log.info(MavenUtils.SEPARATOR);
+    log.info("Successfully packaged application: " + toFile.getName());
   }
 
   /**
