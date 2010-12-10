@@ -98,18 +98,20 @@ public final class MavenUtils {
   }
 
   /**
-   * Returns the dependency artifacts of a project without the {@code test}
-   * scope artifacts.
+   * Returns the dependency artifacts of a project that are relevant for
+   * packaging. This will return all {@link Artifact} with scopes other than
+   * {@code test} and {@code provided}.
    * 
    * @param project to get the dependencies for
    * @return a non-{@code null} {@link List} of dependency artifacts
    */
-  public static List<Artifact> getNonTestArtifacts(MavenProject project) {
+  public static List<Artifact> getArtifactsToPackage(MavenProject project) {
     ArrayList<Artifact> result = new ArrayList<Artifact>();
     @SuppressWarnings("unchecked")
     Set<Artifact> artifacts = project.getArtifacts();
     for (Artifact artifact : artifacts) {
-      if (!"test".equals(artifact.getScope())) {
+      String scope = artifact.getScope();
+      if (!"test".equals(scope) && !"provided".equals(scope)) {
         result.add(artifact);
       }
     }

@@ -29,7 +29,7 @@ import eu.lindenbaum.maven.util.ErlConstants;
 import eu.lindenbaum.maven.util.ErlUtils;
 import eu.lindenbaum.maven.util.MavenUtils;
 
-import org.apache.maven.model.Dependency;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -85,8 +85,7 @@ public final class Packager extends ErlangMojo {
     log.info(" P A C K A G E R");
     log.info(MavenUtils.SEPARATOR);
 
-    @SuppressWarnings("unchecked")
-    List<Dependency> dependencies = p.project().getDependencies();
+    List<Artifact> dependencies = MavenUtils.getArtifactsToPackage(p.project());
     String projectVersion = p.project().getVersion();
 
     List<File> modules = getFilesRecursive(p.targetEbin(), ErlConstants.BEAM_SUFFIX);
@@ -238,17 +237,15 @@ public final class Packager extends ErlangMojo {
    * project pom are correctly configured as application dependencies in the
    * application resource file.
    */
-  private static void checkApplications(Log log, List<Dependency> expected, List<String> actual) throws MojoFailureException {
+  private static void checkApplications(Log log, List<Artifact> expected, List<String> actual) throws MojoFailureException {
     boolean missingDependencies = false;
-    for (Dependency dependency : expected) {
-      String type = dependency.getType();
+    for (Artifact artifact : expected) {
+      String type = artifact.getType();
       if (PackagingType.ERLANG_OTP.isA(type) || PackagingType.ERLANG_STD.isA(type)) {
-        if (!"test".equals(dependency.getScope())) {
-          String artifactId = dependency.getArtifactId();
-          if (!actual.contains(artifactId)) {
-            log.error("Application dependency to '" + artifactId + "' is missing.");
-            missingDependencies = true;
-          }
+        String artifactId = artifact.getArtifactId();
+        if (!actual.contains(artifactId)) {
+          log.error("Application dependency to '" + artifactId + "' is missing.");
+          missingDependencies = true;
         }
       }
     }

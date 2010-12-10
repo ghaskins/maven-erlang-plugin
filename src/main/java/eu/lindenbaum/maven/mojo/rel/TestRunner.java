@@ -47,7 +47,7 @@ public final class TestRunner extends ErlangMojo {
       return;
     }
 
-    List<Artifact> artifacts = MavenUtils.getNonTestArtifacts(p.project());
+    List<Artifact> artifacts = MavenUtils.getArtifactsToPackage(p.project());
     String releaseName = p.project().getArtifactId();
     String releaseVersion = p.project().getVersion();
     String relFileBaseName = releaseName + "-" + releaseVersion;
