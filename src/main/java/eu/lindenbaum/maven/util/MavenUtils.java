@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import eu.lindenbaum.maven.PackagingType;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -98,18 +100,18 @@ public final class MavenUtils {
   }
 
   /**
-   * Returns the dependency artifacts of a project that are relevant for
-   * packaging. This will return all {@link Artifact} with scopes other than
-   * {@code test} and {@code provided}.
+   * Returns the erlang artifacts of a project using
+   * {@link MavenProject#getArtifacts()} filtered for
+   * {@link PackagingType#ERLANG_OTP} and {@link PackagingType#ERLANG_STD}
+   * packaged projects. This will return all {@link Artifact} with scopes other
+   * than {@code test} and {@code provided}.
    * 
    * @param project to get the dependencies for
    * @return a non-{@code null} {@link List} of dependency artifacts
    */
-  public static List<Artifact> getArtifactsToPackage(MavenProject project) {
+  public static List<Artifact> getApplicationArtifactsToPackage(MavenProject project) {
     ArrayList<Artifact> result = new ArrayList<Artifact>();
-    @SuppressWarnings("unchecked")
-    Set<Artifact> artifacts = project.getArtifacts();
-    for (Artifact artifact : artifacts) {
+    for (Artifact artifact : getApplicationArtifacts(project)) {
       String scope = artifact.getScope();
       if (!"test".equals(scope) && !"provided".equals(scope)) {
         result.add(artifact);
@@ -119,7 +121,49 @@ public final class MavenUtils {
   }
 
   /**
-   * Returns the dependency artifacts of a project.
+   * Returns the erlang artifacts of a project using
+   * {@link MavenProject#getArtifacts()} filtered for
+   * {@link PackagingType#ERLANG_OTP} and {@link PackagingType#ERLANG_STD}
+   * packaged projects.
+   * 
+   * @param project to get the dependencies for
+   * @return a non-{@code null} {@link List} of dependency artifacts
+   */
+  public static List<Artifact> getApplicationArtifacts(MavenProject project) {
+    ArrayList<Artifact> result = new ArrayList<Artifact>();
+    for (Artifact artifact : getArtifacts(project)) {
+      String type = artifact.getType();
+      if (PackagingType.ERLANG_OTP.isA(type) || PackagingType.ERLANG_STD.isA(type)) {
+        result.add(artifact);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Returns the non-erlang artifacts of a project using
+   * {@link MavenProject#getArtifacts()}. All erlang artifacts will be filtered
+   * out.
+   * 
+   * @param project to get the dependencies for
+   * @return a non-{@code null} {@link List} of dependency artifacts
+   */
+  public static List<Artifact> getForeignArtifacts(MavenProject project) {
+    ArrayList<Artifact> result = new ArrayList<Artifact>();
+    for (Artifact artifact : getArtifacts(project)) {
+      String type = artifact.getType();
+      if (!PackagingType.ERLANG_OTP.isA(type) //
+          && !PackagingType.ERLANG_STD.isA(type) //
+          && !PackagingType.ERLANG_REL.isA(type)) {
+        result.add(artifact);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Returns the dependency artifacts of a project using
+   * {@link MavenProject#getArtifacts()}.
    * 
    * @param project to get the dependencies for
    * @return a non-{@code null} {@link List} of dependency artifacts

@@ -2,10 +2,16 @@ package eu.lindenbaum.maven.mojo.app;
 
 import static eu.lindenbaum.maven.util.FileUtils.copyDirectory;
 import static eu.lindenbaum.maven.util.FileUtils.removeDirectory;
+
+import java.io.File;
+import java.io.IOException;
+
 import eu.lindenbaum.maven.ErlangMojo;
 import eu.lindenbaum.maven.Properties;
 import eu.lindenbaum.maven.util.FileUtils;
+import eu.lindenbaum.maven.util.MavenUtils;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -49,6 +55,15 @@ public final class ResourceGenerator extends ErlangMojo {
       p.targetPriv().delete();
     }
 
-    // TODO get other dependencies and copy to priv dir
+    for (Artifact artifact : MavenUtils.getForeignArtifacts(p.project())) {
+      File source = artifact.getFile();
+      File destination = new File(p.targetPriv(), source.getName());
+      try {
+        org.codehaus.plexus.util.FileUtils.copyFile(source, destination);
+      }
+      catch (IOException e) {
+        log.error("Failed to copy artifact " + source.getPath() + " to " + p.targetPriv() + ".", e);
+      }
+    }
   }
 }

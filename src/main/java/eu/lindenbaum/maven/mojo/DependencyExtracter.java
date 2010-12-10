@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.List;
 
 import eu.lindenbaum.maven.ErlangMojo;
-import eu.lindenbaum.maven.PackagingType;
 import eu.lindenbaum.maven.Properties;
 import eu.lindenbaum.maven.archiver.TarGzUnarchiver;
 import eu.lindenbaum.maven.util.MavenUtils;
@@ -33,13 +32,10 @@ public final class DependencyExtracter extends ErlangMojo {
     File targetLib = p.targetLib();
     targetLib.mkdirs();
     TarGzUnarchiver unarchiver = new TarGzUnarchiver(p.node(), targetLib);
-    List<Artifact> artifacts = MavenUtils.getArtifacts(p.project());
+    List<Artifact> artifacts = MavenUtils.getApplicationArtifacts(p.project());
     log.debug("found artifacts " + artifacts);
     for (Artifact artifact : artifacts) {
-      String type = artifact.getType();
-      if (PackagingType.ERLANG_OTP.isA(type) || PackagingType.ERLANG_STD.isA(type)) {
-        extractArtifact(log, artifact, unarchiver);
-      }
+      extractArtifact(log, artifact, unarchiver);
     }
   }
 

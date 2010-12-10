@@ -72,7 +72,7 @@ public final class ProjectRunner extends ErlangMojo {
 
     List<String> applications = new ArrayList<String>();
     applications.add(p.project().getArtifactId());
-    for (Artifact artifact : MavenUtils.getArtifactsToPackage(p.project())) {
+    for (Artifact artifact : MavenUtils.getApplicationArtifactsToPackage(p.project())) {
       applications.add(artifact.getArtifactId());
     }
     Collections.reverse(applications);
