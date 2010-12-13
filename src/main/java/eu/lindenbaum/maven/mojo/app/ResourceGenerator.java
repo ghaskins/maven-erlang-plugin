@@ -4,7 +4,10 @@ import static eu.lindenbaum.maven.util.FileUtils.copyDirectory;
 import static eu.lindenbaum.maven.util.FileUtils.removeDirectory;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import eu.lindenbaum.maven.ErlangMojo;
 import eu.lindenbaum.maven.Properties;
@@ -68,5 +71,19 @@ public final class ResourceGenerator extends ErlangMojo {
       }
     }
     log.debug("copied " + foreignArtifacts + " foreign artifacts");
+
+    Map<String, String> replacements = new HashMap<String, String>();
+    replacements.put("${ARTIFACT}", p.project().getArtifactId());
+    replacements.put("${DESCRIPTION}", p.project().getDescription());
+    replacements.put("${ID}", p.project().getId());
+    replacements.put("${VERSION}", p.project().getVersion());
+    int overview = 0;
+    overview += copyDirectory(p.site(), p.target(), new FileFilter() {
+      @Override
+      public boolean accept(File pathname) {
+        return pathname.isFile() && pathname.getName().equals("overview.edoc");
+      }
+    }, replacements);
+    log.debug("copied " + overview + " overview.edoc file(s)");
   }
 }

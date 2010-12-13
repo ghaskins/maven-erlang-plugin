@@ -315,7 +315,8 @@ public final class FileUtils {
           try {
             String content = fileRead(src, "UTF-8");
             for (Entry<String, String> replacement : replacements.entrySet()) {
-              content = content.replace(replacement.getKey(), replacement.getValue());
+              String value = replacement.getValue() == null ? "" : replacement.getValue();
+              content = content.replace(replacement.getKey(), value);
             }
             File parent = dest.getParentFile();
             if (parent != null) {

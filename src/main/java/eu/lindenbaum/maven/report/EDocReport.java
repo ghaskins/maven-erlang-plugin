@@ -21,7 +21,7 @@ import org.apache.maven.reporting.MavenReportException;
  * This {@link Mojo} will generate source code documentation for an application.
  * 
  * @goal edoc
- * @execute phase="initialize"
+ * @execute phase="generate-resources"
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
 public class EDocReport extends ErlangReport {
@@ -72,7 +72,7 @@ public class EDocReport extends ErlangReport {
 
     String application = p.project().getArtifactId();
     File outdir = new File(getReportOutputDirectory(), "edoc");
-    File overview = new File(p.site(), "overview.edoc");
+    File overview = new File(p.target(), "overview.edoc");
 
     outdir.mkdirs();
     Script<Boolean> script = new EDocScript(application, p.src(), outdir, overview);
