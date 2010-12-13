@@ -2,6 +2,7 @@ package eu.lindenbaum.maven.util;
 
 import static eu.lindenbaum.maven.util.ErlConstants.APPUP_SUFFIX;
 import static eu.lindenbaum.maven.util.ErlConstants.APP_SUFFIX;
+import static eu.lindenbaum.maven.util.ErlConstants.BEAM_SUFFIX;
 import static eu.lindenbaum.maven.util.ErlConstants.ERL_SUFFIX;
 import static eu.lindenbaum.maven.util.ErlConstants.HRL_SUFFIX;
 import static eu.lindenbaum.maven.util.ErlConstants.REL_SUFFIX;
@@ -44,6 +45,12 @@ public final class FileUtils {
    * always accepted.
    */
   public static final FileFilter SOURCE_FILTER = getSuffixFilter(new String[]{ HRL_SUFFIX, ERL_SUFFIX });
+
+  /**
+   * Filename filter to filter compiled beam files (.beam). Directories are
+   * always accepted.
+   */
+  public static final FileFilter BEAM_FILTER = getSuffixFilter(new String[]{ BEAM_SUFFIX });
 
   /**
    * Filename filter to filter app files (.app & .appup). Directories are always
