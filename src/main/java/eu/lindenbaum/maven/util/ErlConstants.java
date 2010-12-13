@@ -49,6 +49,11 @@ public interface ErlConstants {
   public static final String TARGZ_SUFFIX = ".tar.gz";
 
   /**
+   * Name of the edoc application overview file.
+   */
+  public static final String OVERVIEW_EDOC = "overview.edoc";
+
+  /**
    * Name of the coverdata binary (coverdata) file.
    */
   public static final String COVERDATA_BIN = "coverdata.coverdata";

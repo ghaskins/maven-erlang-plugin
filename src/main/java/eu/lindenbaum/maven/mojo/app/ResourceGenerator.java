@@ -11,6 +11,7 @@ import java.util.Map;
 
 import eu.lindenbaum.maven.ErlangMojo;
 import eu.lindenbaum.maven.Properties;
+import eu.lindenbaum.maven.util.ErlConstants;
 import eu.lindenbaum.maven.util.FileUtils;
 import eu.lindenbaum.maven.util.MavenUtils;
 
@@ -25,6 +26,7 @@ import org.apache.maven.plugin.logging.Log;
  * <ul>
  * <li>erlang source files (*.erl)</li>
  * <li>erlang include files (*.hrl)</li>
+ * <li>edoc overviews (overview.edoc)</li>
  * <li>resources (*)</li>
  * </ul>
  * 
@@ -81,7 +83,7 @@ public final class ResourceGenerator extends ErlangMojo {
     overview += copyDirectory(p.site(), p.target(), new FileFilter() {
       @Override
       public boolean accept(File pathname) {
-        return pathname.isFile() && pathname.getName().equals("overview.edoc");
+        return pathname.isFile() && pathname.getName().equals(ErlConstants.OVERVIEW_EDOC);
       }
     }, replacements);
     log.debug("copied " + overview + " overview.edoc file(s)");
