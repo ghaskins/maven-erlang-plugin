@@ -41,6 +41,30 @@ import org.codehaus.plexus.util.FileUtils;
  * <li>apt source folder with <code>index.apt[.vm]</code></li>
  * <li>changelog folder with <code>changes.xml</code></li>
  * </ul>
+ * <p>
+ * The default application resource file will look like:
+ * 
+ * <pre>
+ * {application, ${ARTIFACT},
+ *  [{description, ${DESCRIPTION}},
+ *   {id, ${ID}},
+ *    {vsn, ${VERSION}},
+ *    {modules, ${MODULES}},
+ *    {maxT, infinity},
+ *    {registered, ${REGISTERED}},
+ *    {included_applications, []},
+ *    {applications, []},
+ *    {env, []}, 
+ *    {start_phases, []}]}.
+ * </pre>
+ * </p>
+ * <p>
+ * The default application upgrade file will look like:
+ * 
+ * <pre>
+ * {${VERSION}, [], []}.
+ * </pre>
+ * </p>
  * 
  * @goal setup
  * @author Olle Törnström <olle.toernstroem@lindenbaum.eu>

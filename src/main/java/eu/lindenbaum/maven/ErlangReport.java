@@ -77,7 +77,7 @@ public abstract class ErlangReport extends AbstractMavenReport {
   private String node;
 
   /**
-   * The name of the backend node to use.
+   * The cookie to use for the java and the backend node.
    * 
    * @parameter expression="${cookie}" default-value=""
    * @required
