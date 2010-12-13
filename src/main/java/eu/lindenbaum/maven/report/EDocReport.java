@@ -45,11 +45,6 @@ public class EDocReport extends ErlangReport {
     return true;
   }
 
-  @Override
-  protected String getOutputDirectory() {
-    return new File(super.getOutputDirectory(), "edoc").getAbsolutePath();
-  }
-
   /**
    * Returns whether this report can generate any output.
    * 
@@ -76,7 +71,7 @@ public class EDocReport extends ErlangReport {
     }
 
     String application = p.project().getArtifactId();
-    File outdir = new File(getOutputDirectory());
+    File outdir = new File(getReportOutputDirectory(), "edoc");
     File overview = new File(p.site(), "overview.edoc");
 
     outdir.mkdirs();

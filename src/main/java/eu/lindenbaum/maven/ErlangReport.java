@@ -100,7 +100,7 @@ public abstract class ErlangReport extends AbstractMavenReport {
    */
   @Override
   protected String getOutputDirectory() {
-    return getReportOutputDirectory().getAbsolutePath();
+    return this.target.getAbsolutePath();
   }
 
   /**

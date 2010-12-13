@@ -20,7 +20,7 @@ import org.apache.maven.plugin.logging.Log;
  */
 public final class TestScript implements Script<TestResult> {
   private static final String script = //
-  "    Surefire = {report, {surefire, [{dir, \"%s\"}, {package, \"%s\"}]}}," + //
+  "    Surefire = {report, {surefire, [{dir, \"%s\"}, {package, \"%s.\"}]}}," + //
       "Tty = {report, {ttycapture, [{report_to, self()}]}}," + //
       "{_, Out} = case catch(eunit:test(%s, [Surefire, Tty])) of" + //
       "               ok ->" + //
