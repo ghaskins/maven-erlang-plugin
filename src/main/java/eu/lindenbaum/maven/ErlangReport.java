@@ -109,15 +109,9 @@ public abstract class ErlangReport extends AbstractMavenReport {
    */
   @Override
   protected final void executeReport(Locale locale) throws MavenReportException {
-    PackagingType type = PackagingType.fromString(this.project.getPackaging());
+    Properties properties = getProperties();
     try {
-      execute(getLog(), locale, new PropertiesImpl(type,
-                                                   this.project,
-                                                   this.repository,
-                                                   this.base,
-                                                   this.target,
-                                                   this.node,
-                                                   this.cookie));
+      execute(getLog(), locale, properties);
     }
     catch (MojoExecutionException e) {
       throw new MavenReportException(e.getMessage());
@@ -125,6 +119,23 @@ public abstract class ErlangReport extends AbstractMavenReport {
     catch (MojoFailureException e) {
       throw new MavenReportException(e.getMessage());
     }
+  }
+
+  /**
+   * Returns properties built from the mojo parameters of this report and based
+   * on the packaging type of this project.
+   * 
+   * @return properties for this report
+   */
+  protected Properties getProperties() {
+    PackagingType type = PackagingType.fromString(this.project.getPackaging());
+    return new PropertiesImpl(type,
+                              this.project,
+                              this.repository,
+                              this.base,
+                              this.target,
+                              this.node,
+                              this.cookie);
   }
 
   /**
