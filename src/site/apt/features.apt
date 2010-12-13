@@ -1,2 +1,12 @@
 
 Features (a detailed description)
+
+* Emacs/distel Integration
+
+* EDoc Application Overview
+
+ The EDoc application overview is supported by the edoc report mojo. The file
+ <<<overview.edoc>>> has to be located in the <<<src/site>>> directory. The
+ packaging variables <<<$\{ARTIFACT\}>>>, <<<$\{DESCRIPTION\}>>>, <<<$\{ID\}>>>
+ and <<<$\{VERSION\}>>> are available to the overview file and may be used
+ accordingly.
