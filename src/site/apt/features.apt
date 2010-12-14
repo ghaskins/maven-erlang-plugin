@@ -103,7 +103,7 @@ Features (a detailed description)
  the original <<<erlymock>>> by Sven Heyll. For detailed information and API
  see:
  
- * {{{http://sheyll.blogspot.com/2009/02/erlang-mock-erlymock.html}the original erlymock}}
+ * {{{http://sheyll.blogspot.com/2009/02/erlang-mock-erlymock.html}erlymock}}
  
  * {{{http://github.com/lambdastream/ltest_mock}ltest_mock}}
 
@@ -115,6 +115,30 @@ Features (a detailed description)
 * Managed Application Packaging
 
 * Managed Release Packaging
+
+ The plug-in will package your release according to the OTP design principles
+ into a <<<.tar.gz>>> package that can be installed by the erlang release
+ handler.
+
+ Because dependencies to standard applications have to be resolved at this point
+ the release should be built on a backend node that can deliver the required
+ versions of standard applications. E.g. if you decide to run your release on
+ top of <<<R13B04>>> your backend node must actually run this version of erlang.
+ This can be achieved by building your release on a central build server like
+ {{{http://hudson-ci.org/}hudson}} or by building your release on a remote
+ erlang node (remember that you can specify the erlang node to use as backend
+ node).
+
+ To simplify the erlang release file the plug-in provides several release
+ packaging variables that may be used in the release file. These will be
+ replaced with sensible values on packaging time. For a list of available
+ variables see the {{{./project-configuration.html}project configuration}} page.
+
+ On top of that the plug-in will generate the necessary scripts to package with
+ the release (e.g. <<<.boot>>> file, ...). <<<.relup>>> files will not (yet) be
+ generated but will be packaged when provided. Finally the plug-in checks the
+ resulting release file for plausability (e.g. whether all application
+ dependencies are present, ...).
 
 * EDoc Application Overview
 

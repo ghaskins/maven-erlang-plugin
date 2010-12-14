@@ -32,7 +32,7 @@ Project Configuration
  * <<<$\{MODULES\}>>>: all compiled <<<.beam>>> files found in the target ebin
  folder (list)
 
- * <<<$\{REGISTERED\}>>>: all registered names, based on the
+ * <<<$\{REGISTERED\}>>>: all registered names of the application, based on the
  <<<-registered(Names).>>> attribute retrieved from the compiled <<<.beam>>>
  files (list)
 
@@ -45,7 +45,7 @@ Project Configuration
 
  * <<<$\{APPLICATION_NAME\}>>>: will be replaced by a string representing
  the available version of the application denoted by <<<APPLICATION_NAME>>> on
- this host
+ the backend node
 
 ** File Generation
 
