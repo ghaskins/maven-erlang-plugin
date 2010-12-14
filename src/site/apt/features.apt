@@ -14,14 +14,23 @@ Features (a detailed description)
 * Backend Node Usage
 
  The plug-in uses an erlang node as a backend to execute scripts via remote
- procedure calls. Usually all dynamically loaded modules will be purged and all
- added code paths will be deleted after each script execution in order to keep
- the backend node clean. Allthough certain goals (e.g. <<<compile>>> or
- <<<run>>>) will leave all project and dependency modules loaded. This allows
- a better integration into the development process using Emacs/distel (see later
- sections for detailed information on that). Besides that you can assume that
- when a build has finished (either successful or with failures) the backend
- node will be regarding dynamically loaded modules or added code paths.
+ procedure calls. The backend node is started and stoppend automatically by the
+ plug-in unless you configured it otherwise. The backend node can be reused (the
+ plug-in can reconnect to it) if it is still running. To keep the backend node
+ up and running after a build set the plug-in parameter <<<shutdownNode>>> to
+ <<<false>>>. The backend node can be specified using the <<<node>>> parameter.
+ To be able to start in a clean environment the plug-in purges all currently
+ loaded modules that are not <<<preloaded>>> or loaded from the backend node's
+ library directory when a new build is started.
+
+ Usually all dynamically loaded modules will be purged and all added code paths
+ will be deleted after each script execution in order to keep the backend node
+ clean. Allthough certain goals (e.g. <<<compile>>> or <<<run>>>) will leave all
+ project and dependency modules loaded. This allows a better integration into
+ the development process using Emacs/distel (see later sections for detailed
+ information on that). Besides that you can assume that when a build has
+ finished (either successful or with failures) the backend node will be
+ regarding dynamically loaded modules or added code paths.
 
 * Emacs/distel Integration
 
@@ -52,7 +61,25 @@ Features (a detailed description)
 
 * Test-Run Applications
 
+ The {{{./run-mojo.html}run}} mojo provides a convenient way to run an
+ application project (with all dependency applications) for basic testing
+ purposes. The only configuration available will be the configuration specified
+ in the specific application resource files. The mojo will pause the build (by
+ waiting for user input) after all applications have been started successfully.
+ The plug-in will given advice about how to connect to the backend node to
+ interact with the started applications remotely. When finishing the build all
+ applications started by the plug-in will be stopped and unloaded. All modules
+ will be left loaded (but will be purged when the next build starts). 
+
 * Private Headers And Structured Source Directories
+
+ The plug-in supports structured source directories. All recursively found
+ modules will be compiled and the resulting <<<.beam>>> objects will be put
+ flattened into the targets <<<ebin>>> directory.
+
+ The root source folder of a project is added to the include path during
+ compilation. This may be used for private header files (e.g. testing purposes)
+ that will not be packaged along.
 
 * Resources And Test-Resources
 
