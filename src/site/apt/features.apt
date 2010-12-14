@@ -128,6 +128,6 @@ Features (a detailed description)
 
  The plug-in provides the possibility to generate test coverage reports with
  annotated source code listing (as you may know them from tools like
- {{http://www.eclemma.org/{eclemma}}}). See the
+ {{{http://www.eclemma.org/}eclemma}}). See the
  {{{./examples/coverage.html}coverage}} example page for further information
  about that.
