@@ -71,11 +71,13 @@ Features (a detailed description)
  applications started by the plug-in will be stopped and unloaded. All modules
  will be left loaded (but will be purged when the next build starts). 
 
-* Private Headers And Structured Source Directories
+* Private Headers
 
  The plug-in supports structured source directories. All recursively found
  modules will be compiled and the resulting <<<.beam>>> objects will be put
  flattened into the targets <<<ebin>>> directory.
+
+* Structured Source Directories
 
  The root source folder of a project is added to the include path during
  compilation. This may be used for private header files (e.g. testing purposes)
@@ -83,11 +85,32 @@ Features (a detailed description)
 
 * Resources And Test-Resources
 
+ The plug-in supports random resources that will be put into the target
+ <<<priv>>> directory.
+
 * EUnit Tests
+
+ Unless specified otherwise the plugin executes all modules with the suffix
+ <<<_test>>> or <<<_tests>>> as <<<eunit>>> tests. Tests may be skipped using
+ the <<<skipTests>>> paramter. To execute only a specific test the parameter
+ <<<test>>> can be used.
 
 * Mock Framework
 
+ The plug-in provides built-in support for module mocks that is automatically
+ available during test execution. The mock framework is a renamed
+ (to <<<mock>>>) version of <<<ltest_mock>>> by Samuel Rivas which is based on
+ the original <<<erlymock>>> by Sven Heyll. For detailed information and API
+ see:
+ 
+ * {{{http://sheyll.blogspot.com/2009/02/erlang-mock-erlymock.html}the original erlymock}}
+ 
+ * {{{http://github.com/lambdastream/ltest_mock}ltest_mock}}
+
 * Surefire Reports
+
+ The plugin provides surefire compatible reports about test runs that will
+ automatically be found by the maven surefire plugin on site generation.
 
 * Managed Application Packaging
 
@@ -100,3 +123,11 @@ Features (a detailed description)
  packaging variables <<<$\{ARTIFACT\}>>>, <<<$\{DESCRIPTION\}>>>, <<<$\{ID\}>>>
  and <<<$\{VERSION\}>>> are available to the overview file and may be used
  accordingly.
+
+* Coverage Reports With Source Annotation
+
+ The plug-in provides the possibility to generate test coverage reports with
+ annotated source code listing (as you may know them from tools like
+ {{http://www.eclemma.org/{eclemma}}}). See the
+ {{{./examples/coverage.html}coverage}} example page for further information
+ about that.
