@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.ericsson.otp.erlang.OtpAuthException;
 import com.ericsson.otp.erlang.OtpConnection;
@@ -40,8 +41,8 @@ public final class MavenSelf {
       "_R_E_S_U_L_T_ = try" + //
       "                    %s " + //
       "                catch" + //
-      "                    _E_ -> {exception, throw, _E_};" + //
-      "                    _C_:_E_ -> {exception, _C_, _E_}" + //
+      "                    _C_:_R_ ->" + //
+      "                        {exception, _C_, _R_, erlang:get_stacktrace()}" + //
       "                end," + //
       "[code:del_path(_P_A_T_H_) || _P_A_T_H_ <- C_O_D_E_P_A_T_H_S_]," + //
       "_P_U_R_G_E_ = code:all_loaded() -- _B_E_F_O_R_E_," + //
@@ -49,12 +50,13 @@ public final class MavenSelf {
       "[code:delete(_M_O_D_) || {_M_O_D_, _} <- _P_U_R_G_E_]," + //
       "[code:purge(_M_O_D_) || {_M_O_D_, _} <- _P_U_R_G_E_]," + //
       "case _R_E_S_U_L_T_ of" + //
-      "    {exception, _C_L_A_S_S_, _E_X_C_E_P_T_I_O_N_} ->" + //
-      "        throw({_C_L_A_S_S_, _E_X_C_E_P_T_I_O_N_});" + //
+      "    {exception, _C_L_A_S_S_, _R_E_A_S_O_N_, _S_T_A_C_K_} ->" + //
+      "        erlang:raise(_C_L_A_S_S_, _R_E_A_S_O_N_, _S_T_A_C_K_);" + //
       "    _ -> _R_E_S_U_L_T_ " + // do not kill the whitespace at the end of this line!!!
       "end.";
 
-  private static MavenSelf instance = null;
+  private static final AtomicLong serial = new AtomicLong(0L);
+  private static final Map<String, MavenSelf> instances = new HashMap<String, MavenSelf>();
 
   private final OtpSelf self;
   private final Map<String, OtpConnection> connections;
@@ -67,20 +69,35 @@ public final class MavenSelf {
   /**
    * Returns a unique instance of {@link MavenSelf} using the singleton pattern.
    * 
+   * @param c the cookie to use for this java node
+   * @return an instance of {@link MavenSelf}, never {@code null}
+   * @throws MojoExecutionException in case the instance cannot be created
+   */
+  public static MavenSelf get(String cookie) throws MojoExecutionException {
+    String c = cookie != null ? cookie : "";
+    MavenSelf self = instances.get(c);
+    if (self == null) {
+      try {
+        String name = "maven-erlang-plugin-frontend-" + serial.getAndIncrement();
+        OtpSelf otpSelf = c.isEmpty() ? new OtpSelf(name) : new OtpSelf(name, c);
+        self = new MavenSelf(otpSelf);
+        instances.put(c, self);
+      }
+      catch (IOException e) {
+        throw new MojoExecutionException("failed to create self node for cookie '" + c + "'", e);
+      }
+    }
+    return self;
+  }
+
+  /**
+   * Returns a unique instance of {@link MavenSelf} using the singleton pattern.
+   * 
    * @return an instance of {@link MavenSelf}, never {@code null}
    * @throws MojoExecutionException in case the instance cannot be created
    */
   public static MavenSelf get() throws MojoExecutionException {
-    if (instance == null) {
-      try {
-        OtpSelf otpSelf = new OtpSelf("maven-erlang-plugin-frontend");
-        instance = new MavenSelf(otpSelf);
-      }
-      catch (IOException e) {
-        throw new MojoExecutionException("failed to create self node", e);
-      }
-    }
-    return instance;
+    return get(null);
   }
 
   /**
