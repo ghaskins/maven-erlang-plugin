@@ -61,7 +61,7 @@ public final class ResourceGenerator extends ErlangMojo {
     }
 
     int foreignArtifacts = 0;
-    for (Artifact artifact : MavenUtils.getForeignArtifactsToPackage(p.project())) {
+    for (Artifact artifact : MavenUtils.getForeignDependenciesToPackage(p.project())) {
       File source = artifact.getFile();
       File destination = new File(p.targetPriv(), source.getName());
       try {

@@ -53,7 +53,7 @@ public final class TestResourceGenerator extends ErlangMojo {
     }
 
     int foreignArtifacts = 0;
-    for (Artifact artifact : MavenUtils.getForeignArtifacts(p.project())) {
+    for (Artifact artifact : MavenUtils.getForeignDependencies(p.project())) {
       File source = artifact.getFile();
       File destination = new File(p.targetTestPriv(), source.getName());
       try {

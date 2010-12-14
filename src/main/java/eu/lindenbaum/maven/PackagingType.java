@@ -15,7 +15,7 @@ package eu.lindenbaum.maven;
 public enum PackagingType {
   /**
    * Packaging type for erlang/OTP applications with maven standard directory
-   * layout: *
+   * layout:
    * 
    * <pre>
    *  BASE

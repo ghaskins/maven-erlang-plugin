@@ -69,7 +69,7 @@ public final class ResourceGenerator extends ErlangMojo {
     RuntimeInfoScript infoScript = new RuntimeInfoScript();
     RuntimeInfo runtimeInfo = MavenSelf.get().eval(p.node(), infoScript, new ArrayList<File>());
 
-    List<Artifact> artifacts = MavenUtils.getErlangArtifactsToPackage(p.project());
+    List<Artifact> artifacts = MavenUtils.getErlangReleaseArtifacts(p.project());
     String releaseName = p.project().getArtifactId();
     String releaseVersion = p.project().getVersion();
     String relFileBaseName = releaseName + "-" + releaseVersion;

@@ -84,7 +84,7 @@ public final class Packager extends ErlangMojo {
     log.info(" P A C K A G E R");
     log.info(MavenUtils.SEPARATOR);
 
-    List<Artifact> dependencies = MavenUtils.getErlangArtifactsToPackage(p.project());
+    List<Artifact> dependencies = MavenUtils.getErlangDependenciesToPackage(p.project());
     String projectVersion = p.project().getVersion();
 
     List<File> modules = getFilesRecursive(p.targetEbin(), ErlConstants.BEAM_SUFFIX);
