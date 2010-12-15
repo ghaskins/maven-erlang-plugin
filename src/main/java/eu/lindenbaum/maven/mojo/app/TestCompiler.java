@@ -103,7 +103,7 @@ public final class TestCompiler extends ErlangMojo {
 
       Script<CompilerResult> script = new BeamCompilerScript(files, p.targetTestEbin(), includes, options);
       List<File> codePaths = getDirectoriesRecursive(p.targetLib(), ErlConstants.BEAM_SUFFIX);
-      CompilerResult result = MavenSelf.get().eval(p.node(), script, codePaths);
+      CompilerResult result = MavenSelf.get(p.cookie()).eval(p.node(), script, codePaths);
       result.logOutput(log);
       String failedCompilationUnit = result.getFailed();
       if (failedCompilationUnit != null) {

@@ -67,7 +67,8 @@ public final class MavenSelf {
   }
 
   /**
-   * Returns a unique instance of {@link MavenSelf} using the singleton pattern.
+   * Returns a unique instance of {@link MavenSelf} per cookie using the
+   * singleton pattern.
    * 
    * @param c the cookie to use for this java node
    * @return an instance of {@link MavenSelf}, never {@code null}
@@ -88,16 +89,6 @@ public final class MavenSelf {
       }
     }
     return self;
-  }
-
-  /**
-   * Returns a unique instance of {@link MavenSelf} using the singleton pattern.
-   * 
-   * @return an instance of {@link MavenSelf}, never {@code null}
-   * @throws MojoExecutionException in case the instance cannot be created
-   */
-  public static MavenSelf get() throws MojoExecutionException {
-    return get(null);
   }
 
   /**

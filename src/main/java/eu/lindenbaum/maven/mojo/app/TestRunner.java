@@ -88,7 +88,7 @@ public final class TestRunner extends ErlangMojo {
     p.targetSurefireReports().mkdirs();
 
     Script<Void> purgeScript = new PurgeModulesScript();
-    MavenSelf.get().exec(p.node(), purgeScript);
+    MavenSelf.get(p.cookie()).exec(p.node(), purgeScript);
 
     List<File> testCodePaths = new ArrayList<File>();
     testCodePaths.add(p.targetTestEbin());
@@ -96,7 +96,7 @@ public final class TestRunner extends ErlangMojo {
 
     String suiteName = p.project().getArtifactId();
     Script<TestResult> script = new TestScript(tests, p.targetSurefireReports(), suiteName);
-    TestResult result = MavenSelf.get().eval(p.node(), script, testCodePaths);
+    TestResult result = MavenSelf.get(p.cookie()).eval(p.node(), script, testCodePaths);
     result.logOutput(log);
 
     List<File> codePaths = FileUtils.getDirectoriesRecursive(p.targetLib(), ErlConstants.BEAM_SUFFIX);
@@ -104,7 +104,7 @@ public final class TestRunner extends ErlangMojo {
     List<File> modules = FileUtils.getFilesRecursive(p.targetLib(), ErlConstants.BEAM_SUFFIX);
     modules.addAll(FileUtils.getFilesRecursive(p.targetEbin(), ErlConstants.BEAM_SUFFIX));
     Script<Integer> loadScript = new LoadModulesScript(modules, codePaths);
-    Integer loaded = MavenSelf.get().exec(p.node(), loadScript);
+    Integer loaded = MavenSelf.get(p.cookie()).exec(p.node(), loadScript);
     log.debug("Successfully reloaded " + loaded + " .beam file(s).");
 
     if (!result.testsPassed()) {

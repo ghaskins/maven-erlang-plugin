@@ -77,7 +77,7 @@ public class EDocReport extends ErlangReport {
 
     outdir.mkdirs();
     Script<Boolean> script = new EDocScript(application, p.src(), outdir, overview);
-    Boolean success = MavenSelf.get().exec(p.node(), script);
+    Boolean success = MavenSelf.get(p.cookie()).exec(p.node(), script);
     if (!success) {
       throw new MojoExecutionException("failed to generate documentation");
     }

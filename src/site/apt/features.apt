@@ -125,9 +125,7 @@ Features (a detailed description)
  versions of standard applications. E.g. if you decide to run your release on
  top of <<<R13B04>>> your backend node must actually run this version of erlang.
  This can be achieved by building your release on a central build server like
- {{{http://hudson-ci.org/}hudson}} or by building your release on a remote
- erlang node (remember that you can specify the erlang node to use as backend
- node).
+ {{{http://hudson-ci.org/}hudson}}.
 
  To simplify the erlang release file the plug-in provides several release
  packaging variables that may be used in the release file. These will be

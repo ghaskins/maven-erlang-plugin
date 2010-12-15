@@ -22,14 +22,13 @@ public final class TestScript implements Script<TestResult> {
   private static final String script = //
   "    Surefire = {report, {surefire, [{dir, \"%s\"}, {package, \"%s.\"}]}}," + //
       "Tty = {report, {ttycapture, [{report_to, self()}]}}," + //
-      "{_, Out} = case catch(eunit:test(%s, [Surefire, Tty])) of" + //
-      "               ok ->" + //
-      "                   {info, []};" + //
-      "               error ->" + //
-      "                   {error, []};" + //
-      "               {error, Reason} ->" + //
-      "                   {error, [lists:flatten(io_lib:format(\"~p\", [Reason]))]}" + //
-      "           end," + //
+      "Out = try eunit:test(%s, [Surefire, Tty]) of" + //
+      "          _ -> []" + //
+      "      catch" + //
+      "          Class:Exception ->" + //
+      "              Msg = io_lib:format(\"~p:~p\", [Class, Exception])," + //
+      "              [lists:flatten(Msg)]" + //
+      "      end," + //
       "receive {Level, Captured} -> {Level, Captured ++ Out} end.";
 
   private final List<File> tests;

@@ -4,6 +4,9 @@
   </properties>
   <body>
     <release version="1.0.0" date="TBA" description="Initial release">
+      <action dev="schlagert" type="remove">
+        Removed support for SNMP resource compilation.
+      </action>
       <action dev="schlagert" type="add">
         Added support for test resource which will override main resources.
       </action>

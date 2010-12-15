@@ -22,11 +22,13 @@ import org.apache.maven.plugin.MojoExecutionException;
  */
 public final class TarGzArchiver {
   private final String peer;
+  private final String cookie;
   private final File archive;
   private final Map<File, String> files = new HashMap<File, String>();
 
-  public TarGzArchiver(String peer, File archive) {
+  public TarGzArchiver(String peer, String cookie, File archive) {
     this.peer = peer;
+    this.cookie = cookie;
     this.archive = archive;
   }
 
@@ -78,7 +80,7 @@ public final class TarGzArchiver {
     else {
       Script<String> script = new TarGzArchiverScript(this.archive, this.files);
       try {
-        String error = MavenSelf.get().exec(this.peer, script);
+        String error = MavenSelf.get(this.cookie).exec(this.peer, script);
         if (error != null) {
           throw new IOException("failed to create archive: " + error);
         }

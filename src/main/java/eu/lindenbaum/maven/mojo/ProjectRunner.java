@@ -67,7 +67,7 @@ public final class ProjectRunner extends ErlangMojo {
     modules.addAll(FileUtils.getFilesRecursive(p.targetEbin(), ErlConstants.BEAM_SUFFIX));
 
     LoadModulesScript loadScript = new LoadModulesScript(modules, codePaths);
-    Integer loaded = MavenSelf.get().exec(p.node(), loadScript);
+    Integer loaded = MavenSelf.get(p.cookie()).exec(p.node(), loadScript);
     log.info("Successfully loaded " + loaded + " .beam file(s) into backend node.");
 
     List<String> applications = new ArrayList<String>();
@@ -77,7 +77,7 @@ public final class ProjectRunner extends ErlangMojo {
     }
     Collections.reverse(applications);
     Script<StartResult> startScript = new StartApplicationScript(codePaths, applications);
-    StartResult startResult = MavenSelf.get().exec(p.node(), startScript);
+    StartResult startResult = MavenSelf.get(p.cookie()).exec(p.node(), startScript);
     if (startResult.startSucceeded()) {
       String cookie = p.cookie() != null ? " -set_cookie " + p.cookie() + " " : "";
       String peer = new OtpPeer(p.node()).toString();
@@ -98,6 +98,6 @@ public final class ProjectRunner extends ErlangMojo {
     }
     List<String> toPreserve = startResult.getBeforeApplications();
     Script<Void> stopScript = new StopApplicationScript(toPreserve);
-    MavenSelf.get().exec(p.node(), stopScript);
+    MavenSelf.get(p.cookie()).exec(p.node(), stopScript);
   }
 }

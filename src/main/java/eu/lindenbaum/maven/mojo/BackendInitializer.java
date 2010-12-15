@@ -49,13 +49,19 @@ public class BackendInitializer extends ErlangMojo {
   static volatile String nodeName = "maven-erlang-plugin-backend";
 
   /**
+   * Static placeholder to insert the actual (configured) erlang cookie into the
+   * shutdown hook.
+   */
+  static volatile String nodeCookie = null;
+
+  /**
    * Static thread shutting down the running plugin backend.
    */
   private static final Thread shutdownHook = new Thread(new Runnable() {
     @Override
     public void run() {
       try {
-        OtpConnection connection = MavenSelf.get().connect(nodeName);
+        OtpConnection connection = MavenSelf.get(nodeCookie).connect(nodeName);
         connection.sendRPC("erlang", "halt", new OtpErlangList());
         System.out.println("[INFO] Successfully shut down '" + nodeName + "'");
       }
@@ -70,11 +76,13 @@ public class BackendInitializer extends ErlangMojo {
   @Override
   protected void execute(final Log log, Properties p) throws MojoExecutionException, MojoFailureException {
     nodeName = p.node();
+    nodeCookie = p.cookie();
     OtpPeer peer = new OtpPeer(nodeName);
     try {
       try {
-        long serial = System.nanoTime();
-        new OtpSelf("maven-erlang-plugin-startup-" + serial).connect(peer);
+        String startupName = "maven-erlang-plugin-startup-" + System.nanoTime();
+        OtpSelf self = nodeCookie != null ? new OtpSelf(startupName, nodeCookie) : new OtpSelf(startupName);
+        self.connect(peer);
         log.debug("Node " + peer + " is already running.");
       }
       catch (IOException e) {
@@ -83,8 +91,8 @@ public class BackendInitializer extends ErlangMojo {
         command.add(ErlConstants.ERL);
         command.add("-boot");
         command.add("start_sasl");
-        command.add("-sname");
-        command.add(peer.alive());
+        command.add("-name");
+        command.add(peer.node());
         command.add("-detached");
         Process process = new ProcessBuilder(command).start();
         if (process.waitFor() != 0) {
@@ -107,7 +115,7 @@ public class BackendInitializer extends ErlangMojo {
 
       // clean up dynamically loaded modules on backend from previous runs
       Script<Void> purgeScript = new PurgeModulesScript();
-      MavenSelf.get().exec(nodeName, purgeScript);
+      MavenSelf.get(nodeCookie).exec(nodeName, purgeScript);
     }
     catch (IOException e) {
       throw new MojoExecutionException("Failed to start " + peer + ".", e);

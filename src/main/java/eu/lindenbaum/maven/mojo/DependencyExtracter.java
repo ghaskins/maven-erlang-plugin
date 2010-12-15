@@ -31,7 +31,7 @@ public final class DependencyExtracter extends ErlangMojo {
   protected void execute(Log log, Properties p) throws MojoExecutionException, MojoFailureException {
     File targetLib = p.targetLib();
     targetLib.mkdirs();
-    TarGzUnarchiver unarchiver = new TarGzUnarchiver(p.node(), targetLib);
+    TarGzUnarchiver unarchiver = new TarGzUnarchiver(p.node(), p.cookie(), targetLib);
     List<Artifact> artifacts = MavenUtils.getErlangArtifacts(p.project());
     log.debug("found artifacts " + artifacts);
     for (Artifact artifact : artifacts) {

@@ -19,14 +19,16 @@ import org.apache.maven.plugin.MojoExecutionException;
  */
 public final class TarGzUnarchiver {
   private final String peer;
+  private final String cookie;
   private final File destination;
 
-  public TarGzUnarchiver(String peer) {
-    this(peer, new File("."));
+  public TarGzUnarchiver(String peer, String cookie) {
+    this(peer, cookie, new File("."));
   }
 
-  public TarGzUnarchiver(String peer, File destination) {
+  public TarGzUnarchiver(String peer, String cookie, File destination) {
     this.peer = peer;
+    this.cookie = cookie;
     this.destination = destination;
   }
 
@@ -55,7 +57,7 @@ public final class TarGzUnarchiver {
         if (this.destination.isDirectory()) {
           Script<String> script = new TarGzUnarchiverScript(archive, this.destination);
           try {
-            String error = MavenSelf.get().exec(this.peer, script);
+            String error = MavenSelf.get(this.cookie).exec(this.peer, script);
             if (error != null) {
               throw new IOException("failed to extract archive: " + error);
             }
