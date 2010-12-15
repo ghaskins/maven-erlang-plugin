@@ -134,7 +134,7 @@ public class CoverageReport extends ErlangReport {
     sink.text("Summary");
     sink.sectionTitle2_();
     sink.section2_();
-    sink.comment(summaryComment(report));
+    sink.rawText("<!-- " + summaryComment(report) + " -->");
     sink.table();
     sink.tableRow();
     sinkTableHeader(sink, "");
@@ -161,12 +161,13 @@ public class CoverageReport extends ErlangReport {
 
   private String summaryComment(Report report) {
     StringBuilder sb = new StringBuilder();
-    sb.append("summary[").append(report.getCoverage());
+    sb.append("summary: ").append(report.getCoverage());
     sb.append(",").append(report.getNumberOfModules());
     sb.append(",").append(report.getNumberOfFunctions());
     sb.append(",").append(report.getNumberOfClauses());
     sb.append(",").append(report.getNumberOfLines());
-    sb.append("]");
+    sb.append(",").append(report.getNumberOfCoveredLines());
+    sb.append(",").append(report.getNumberOfNotCoveredLines());
     return sb.toString();
   }
 
