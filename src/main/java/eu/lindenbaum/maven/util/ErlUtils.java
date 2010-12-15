@@ -8,9 +8,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.ericsson.otp.erlang.OtpErlangAtom;
+import com.ericsson.otp.erlang.OtpErlangInt;
 import com.ericsson.otp.erlang.OtpErlangList;
+import com.ericsson.otp.erlang.OtpErlangLong;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.ericsson.otp.erlang.OtpErlangRangeException;
 import com.ericsson.otp.erlang.OtpErlangString;
+import com.ericsson.otp.erlang.OtpErlangUInt;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -153,6 +157,33 @@ public final class ErlUtils {
   }
 
   /**
+   * Converts an {@link OtpErlangInt} or an {@link OtpErlangUInt} into an
+   * {@code int} using the object specific conversion function. If the
+   * conversion can't be performed, or throws an error during conversion, the
+   * value {@code 0} is always returned.
+   * 
+   * @param object to convert
+   * @return the object {@code int} value or {@code 0} if unable to convert
+   */
+  public static int toInt(OtpErlangObject object) {
+    try {
+      if (object instanceof OtpErlangInt) {
+        return ((OtpErlangInt) object).intValue();
+      }
+      if (object instanceof OtpErlangUInt) {
+        return ((OtpErlangUInt) object).intValue();
+      }
+      if (object instanceof OtpErlangLong) {
+        return ((OtpErlangLong) object).intValue();
+      }
+    }
+    catch (OtpErlangRangeException e) {
+      // Ok
+    }
+    return 0;
+  }
+
+  /**
    * Evaluate an erlang expression and return the result.
    * 
    * @param log logger.
@@ -263,4 +294,5 @@ public final class ErlUtils {
       throw new MojoExecutionException(e.getMessage(), e);
     }
   }
+
 }
