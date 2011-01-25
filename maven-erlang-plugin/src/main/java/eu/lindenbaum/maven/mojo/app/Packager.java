@@ -99,6 +99,7 @@ public final class Packager extends ErlangMojo {
     replacements.put("${VERSION}", "\"" + projectVersion + "\"");
     replacements.put("${MODULES}", ErlUtils.toModuleList(modules, "'", "'"));
     replacements.put("${REGISTERED}", registeredNames);
+    replacements.put("${APPLICATIONS}", getDependencyList(dependencies));
 
     // copy application resource files
     p.targetEbin().mkdirs();
@@ -248,5 +249,21 @@ public final class Packager extends ErlangMojo {
     if (missingDependencies) {
       throw new MojoFailureException("Missing application dependencies.");
     }
+  }
+
+  /**
+   * Generates a simple list of applications derived from the artifacts listed as dependencies. Intended to be
+   * used to fill in ${APPLICATIONS}
+   */
+  private String getDependencyList(List<Artifact> artifacts) {
+    StringBuilder applications = new StringBuilder("[");
+    int i = 0;
+    for (Artifact artifact : artifacts) {
+      if (i++ != 0) applications.append(", ");
+
+      applications.append(artifact.getArtifactId());
+    }
+    applications.append("]");
+    return applications.toString();
   }
 }
