@@ -19,6 +19,7 @@ import eu.lindenbaum.maven.erlang.RuntimeInfo;
 import eu.lindenbaum.maven.erlang.RuntimeInfoScript;
 import eu.lindenbaum.maven.erlang.Script;
 import eu.lindenbaum.maven.erlang.SystoolsScriptResult;
+import eu.lindenbaum.maven.util.AutoDeps;
 import eu.lindenbaum.maven.util.ErlConstants;
 import eu.lindenbaum.maven.util.FileUtils;
 import eu.lindenbaum.maven.util.MavenUtils;
@@ -103,7 +104,7 @@ public final class ResourceGenerator extends ErlangMojo {
     if (this.additionalAutoDependencies != null) {
       autoDeps.addAll(filter(otpArtifacts, Arrays.asList(this.additionalAutoDependencies)));
     }
-    replacements.put("${AUTODEPS}", "[" + getReleaseDependencies(autoDeps) + "]");
+    replacements.put("${AUTODEPS}", "[" + getAutoDeps(p, runtimeInfo.getLibDirectory(), autoDeps) + "]");
 
     List<Artifact> allApplications = new ArrayList<Artifact>(otpArtifacts);
     allApplications.addAll(artifacts);
@@ -188,6 +189,54 @@ public final class ResourceGenerator extends ErlangMojo {
       applications.append(artifact.getVersion());
       applications.append("\"}");
     }
+    return applications.toString();
+  }
+  
+  /**
+   * Returns a string suitable for injecting as the list of applications to include in the .rel Typically for
+   * generating the value of ${AUTODEPS}
+   */
+  private static String getAutoDeps(Properties p, File libDirectory, List<Artifact> artifacts) throws MojoExecutionException {
+
+    List<File> codepaths = new ArrayList<File>();
+    codepaths.add(libDirectory);
+    codepaths.add(p.targetLib()); /* must be last */
+
+    /*
+     * First prepare the autodeps mechanism by giving it our codepaths we want it to consider (namely, the OTP
+     * installation, plus any locally installed erlang-[otp|std] artifacts)
+     */
+    AutoDeps autodeps = new AutoDeps(p, codepaths);
+
+    /*
+     * Add each known artifact to the autodep system, allowing it to resolve transitive deps dynamically.
+     */
+    for (Artifact artifact : artifacts)
+      autodeps.add(artifact.getArtifactId());
+
+    /*
+     * Finally, let autodep know we are done adding explicit artifacts, and it should generate a list of
+     * known+transitive applications that must be installed as part of the release.
+     */
+    List<CheckAppResult> apps = autodeps.analyze();
+
+    /*
+     * And finally, translate the list to a app/version tuple based string
+     */
+    StringBuilder applications = new StringBuilder();
+    int i = 0;
+
+    for (CheckAppResult app : apps) {
+
+      if (i++ != 0) applications.append(",\n  ");
+
+      applications.append("{");
+      applications.append(app.getName());
+      applications.append(", \"");
+      applications.append(app.getVersion());
+      applications.append("\"}");
+    }
+
     return applications.toString();
   }
 }
