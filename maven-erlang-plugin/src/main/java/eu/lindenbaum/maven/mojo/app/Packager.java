@@ -70,6 +70,14 @@ import org.apache.maven.plugin.logging.Log;
  * @author Tobias Schlager <tobias.schlager@lindenbaum.eu>
  */
 public final class Packager extends ErlangMojo {
+
+  /**
+   * Comma separated list of all the ERTS provided dependencies this module has
+   * 
+   * @parameter default-value=""
+   */
+  private String systemDependencies;
+
   /**
    * Setting this to {@code true} will break the build when the application file
    * does not contain all found modules.
@@ -263,7 +271,14 @@ public final class Packager extends ErlangMojo {
 
       applications.append(artifact.getArtifactId());
     }
+    if (systemDependencies != null) {
+      for (String systemDependency : systemDependencies.split(",")) {
+        if (i++ != 0) applications.append(", ");
+
+        applications.append(systemDependency);
+      }
+    }
     applications.append("]");
     return applications.toString();
   }
-}
+}
