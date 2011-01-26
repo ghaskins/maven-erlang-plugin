@@ -21,6 +21,7 @@ import eu.lindenbaum.maven.erlang.RuntimeInfo;
 import eu.lindenbaum.maven.erlang.RuntimeInfoScript;
 import eu.lindenbaum.maven.erlang.Script;
 import eu.lindenbaum.maven.erlang.SystoolsScriptResult;
+import eu.lindenbaum.maven.util.AutoDeps;
 import eu.lindenbaum.maven.util.ErlConstants;
 import eu.lindenbaum.maven.util.ErlUtils;
 import eu.lindenbaum.maven.util.FileUtils;
@@ -103,9 +104,11 @@ public final class ResourceGenerator extends ErlangMojo {
     HashSet<String> appsToInclude = new HashSet<String>(Arrays.asList("kernel", "stdlib"));
     String[] dependencies = this.otpDependencies != null ? this.otpDependencies : new String[0];
     appsToInclude.addAll(Arrays.asList(dependencies));
-    List<Artifact> autoDeps = new ArrayList<Artifact>(artifacts);
-    autoDeps.addAll(filter(otpArtifacts, appsToInclude));
-    replacements.put("${AUTODEPS}", "[" + ErlUtils.toApplicationTuples(autoDeps) + "]");
+    List<File> codepaths = new ArrayList<File>(Arrays.asList(runtimeInfo.getLibDirectory(), p.targetLib()));
+    AutoDeps autodeps = new AutoDeps(p, codepaths);
+    autodeps.addAll(artifacts);
+    autodeps.addAll(filter(otpArtifacts, appsToInclude));
+    replacements.put("${AUTODEPS}", "[" + ErlUtils.toApplicationTuples(autodeps.analyze()) + "]");
 
     List<Artifact> allApplications = new ArrayList<Artifact>(otpArtifacts);
     allApplications.addAll(artifacts);
@@ -171,4 +174,5 @@ public final class ResourceGenerator extends ErlangMojo {
     }
     return result;
   }
+  
 }
