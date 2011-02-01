@@ -134,15 +134,22 @@ generate_classifier(Classifier) ->
 needs_classifier(Files) ->
     NativeTypes = sets:from_list(["application/x-executable", 
 				  "application/x-sharedlib"]),
-    needs_classifier(Files, NativeTypes).
 
-needs_classifier([{_File, Type} | T], NativeTypes) ->
-    case sets:is_element(Type, NativeTypes) of
-	true -> true;
-	false -> needs_classifier(T, NativeTypes)
-    end;
-needs_classifier([], _NativeTypes) ->
-    false.
+    Parent = self(),
+    Work = fun({_File, Type}) ->
+		   Result = sets:is_element(Type, NativeTypes),
+		   Parent ! {self(), Result}
+	   end,
+    Pids = [spawn_link(fun() -> Work(File) end) || File <- Files],
+ 
+    lists:foldl(fun(Pid, false) ->
+			receive
+			    {Pid, Result} -> Result
+			end;
+		   (_Pid, true) -> true
+		   end,
+		false,
+		Pids).
 
 process_args(["-deploy" | T], State) ->
     [RepoSpec | T1] = T,
@@ -198,15 +205,23 @@ find_files([File | T], Dir, Acc) ->
 	    Acc1 = find_files(FullName, Acc),
 	    find_files(T, Dir, Acc1);
 	regular ->
-	    RawMime = os_cmd_format("file -b --mime ~s", [FullName]),
-	    [Type, _CharSet] = string:tokens(RawMime, " "),
-	    MimeType = string:substr(Type, 1, length(Type)-1),
+	    MimeType = get_mimetype(FullName),
 	    find_files(T, Dir, [{FullName, MimeType} | Acc]);
 	UnexpectedType ->
 	    throw({"Unexpected file type", File, UnexpectedType})
     end;
 find_files([], _, Acc) ->
     Acc.
+
+get_mimetype(File) ->
+    RawMime = os_cmd_format("file -b --mime ~s", [File]),
+
+    % strip out any ";" or "\n" that may be present
+    Mime = re:replace(RawMime, "\[\n;]+", "", [global, {return, list}]),
+    case string:tokens(Mime, " ") of
+	       [T, _CharSet] -> T; 
+	       [T] -> T
+    end.
 
 os_cmd_format(CmdFormat, Params) ->
     os_cmd_format(CmdFormat, Params, false).
