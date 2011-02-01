@@ -68,7 +68,7 @@ eapp2mvn(Args) ->
 	       P -> P
 	   end,
 
-    AppFileName = lists:flatten(io_lib:format("~s.app", [State#state.app])),
+    AppFileName = format("~s.app", [State#state.app]),
     AppFilePath = case code:where_is_file(AppFileName) of
 		  non_existing -> throw({"Failed to find .app file",
 						AppFileName});
@@ -86,14 +86,17 @@ eapp2mvn(Args) ->
 
     try
 	Files = find_files(Path),
-	TarFiles = [{string:substr(File, length(Path)+2), File} || 
+	TarFiles = [{State#state.app ++
+		     "-" ++
+		     Vsn ++
+		     string:substr(File, length(Path)+1), File} || 
 		       {File, _Type} <- Files],
 	ok = erl_tar:create(TmpFile, TarFiles, [compressed]),
 	Goal = case State#state.deploy of
 		   install -> "install:install-file";
 		   {RepoId, Url} ->
 		       DeployCmd = "deploy:deploy-file -DrepositoryId=~s -Durl=~s",
-		       lists:flatten(io_lib:format(DeployCmd, [RepoId, Url]))
+		       format(DeployCmd, [RepoId, Url])
 	       end,
 	NeedsClassifier = needs_classifier(Files),
 	Options = case {State#state.classifier, NeedsClassifier} of
@@ -128,8 +131,11 @@ main(Args) ->
 	throw:Msg -> io:format("[ERROR] ~p~n", [Msg])
     end.
 
+format(String, Args) ->
+    lists:flatten(io_lib:format(String, Args)).
+
 generate_classifier(Classifier) ->
-    lists:flatten(io_lib:format("-Dclassifier=~s", [Classifier])).
+    format("-Dclassifier=~s", [Classifier]).
 
 needs_classifier(Files) ->
     NativeTypes = sets:from_list(["application/x-executable", 
@@ -227,7 +233,7 @@ os_cmd_format(CmdFormat, Params) ->
     os_cmd_format(CmdFormat, Params, false).
 
 os_cmd_format(CmdFormat, Params, Verbose) ->
-    Cmd = lists:flatten(io_lib:format(CmdFormat, Params)),    
+    Cmd = format(CmdFormat, Params),    
     os_cmd(Cmd, Verbose).
 
 os_cmd(Cmd) ->
