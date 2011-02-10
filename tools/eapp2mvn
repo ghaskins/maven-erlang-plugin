@@ -61,6 +61,9 @@
 	}
        ).
 
+default_extention() -> "erlang-otp".
+native_extention() -> "erlang-otp-native".
+
 eapp2mvn(Args) ->
     State = process_args(Args, #state{}),
     Path = case code:lib_dir(State#state.app) of
@@ -99,26 +102,27 @@ eapp2mvn(Args) ->
 		       format(DeployCmd, [RepoId, Url])
 	       end,
 	NeedsClassifier = needs_classifier(Files),
-	Options = case {State#state.classifier, NeedsClassifier} of
-		      {undefined, true} ->
-			  throw("Classifier required");
-		      {disabled, true} ->
-			  io:format("[WARNING] Classifier required, but disabled~n", []),
-			  "";
-		      {{forced, Classifier}, _} ->
-			  generate_classifier(Classifier);
-		      {{auto, Classifier}, true} ->
-			  generate_classifier(Classifier);
-		      _ ->
-			  ""
+	{Options, Ext} = case {State#state.classifier, NeedsClassifier} of
+			     {undefined, true} ->
+				 throw("Classifier required");
+			     {disabled, true} ->
+				 io:format("[WARNING] Classifier required, but disabled~n", []),
+				 {"", default_extention()};
+			     {{forced, Classifier}, _} ->
+				 generate_classifier(Classifier);
+			     {{auto, Classifier}, true} ->
+				 generate_classifier(Classifier);
+			     _ ->
+				 {"", default_extention()}
 		  end,
 	os_cmd_format("mvn ~s "  ++
 		      "-DgroupId=~s -DartifactId=~s -Dversion=~s " ++
-		      "-Dpackaging=erlang-otp -Dfile=~s ~s",
+		      "-Dpackaging=~s -Dfile=~s ~s",
 		      [Goal,
 		       State#state.groupId,
 		       State#state.app,
 		       Vsn,
+		       Ext,
 		       TmpFile,
 		       Options], true)
     after
@@ -135,7 +139,7 @@ format(String, Args) ->
     lists:flatten(io_lib:format(String, Args)).
 
 generate_classifier(Classifier) ->
-    format("-Dclassifier=~s", [Classifier]).
+    {format("-Dclassifier=~s", [Classifier]), native_extention()}.
 
 needs_classifier(Files) ->
     NativeTypes = sets:from_list(["application/x-executable", 
@@ -164,7 +168,7 @@ process_args(["-deploy" | T], State) ->
 process_args(["-app" | T], State) ->
     [App | T1] = T,
     process_args(T1, State#state{app=App});
-process_args(["-forceClassifier" | T], State) ->
+process_args(["-classifier" | T], State) ->
     [Classifier | T1] = T,
     process_args(T1, State#state{classifier={forced, Classifier}});
 process_args(["-autoClassifier" | T], State) ->
