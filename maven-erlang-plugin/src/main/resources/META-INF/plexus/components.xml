@@ -16,6 +16,12 @@
       </configuration>
     </component>
     <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>erlang-otp-native</role-hint>
+      <implementation>eu.lindenbaum.maven.handler.NativeArtifactHandler</implementation>
+    </component>
+    
+    <component>
       <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>erlang-otp</role-hint>
       <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
