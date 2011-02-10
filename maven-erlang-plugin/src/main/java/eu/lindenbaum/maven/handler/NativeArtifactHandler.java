@@ -11,7 +11,7 @@ public class NativeArtifactHandler implements ArtifactHandler {
   private String classifier;
 
   public NativeArtifactHandler() {
-    OsInfo osinfo = OsInfoFactory.getInfo();
+    OsInfo osinfo = OsInfoFactory.create();
 
     classifier = osinfo.getName() + "-" + osinfo.getVersion() + "-" + osinfo.getArch();
   }

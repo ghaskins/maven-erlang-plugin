@@ -189,7 +189,7 @@
     <dependency>
        <groupId>com.github.ghaskins</groupId>
        <artifactId>osclarity</artifactId>
-       <version>0.0.1-SNAPSHOT</version>
+       <version>1.0</version>
        <type>jar</type>
        <scope>compile</scope>
     </dependency>
