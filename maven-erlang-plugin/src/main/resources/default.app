@@ -6,6 +6,6 @@
    {maxT, infinity},
    {registered, ${REGISTERED}},
    {included_applications, []},
-   {applications, []},
+   {applications, ${APPLICATIONS}},
    {env, []},
    {start_phases, []}]}.
